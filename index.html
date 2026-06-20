@@ -196,25 +196,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--pink);min-height:100vh;di
     if (role === 'admin') {
       setLoading(true);
       try {
-        // Step 1: Sign in via Supabase Auth
-        const { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password: pw });
-
-        if (authErr) {
-          showErr('Invalid admin credentials.');
-          setLoading(false);
-          return;
-        }
-
-        // Step 2: Check if this email exists in the admins table
+        // Check admins table directly — no Supabase Auth needed for admin
         const { data: adminRecord, error: adminErr } = await sb
           .from('admins')
           .select('id, email, name')
           .eq('email', email)
+          .eq('password', pw)
           .single();
 
         if (adminErr || !adminRecord) {
-          await sb.auth.signOut();
-          showErr('You are not authorized as an admin.');
+          showErr('Invalid admin credentials.');
           setLoading(false);
           return;
         }
