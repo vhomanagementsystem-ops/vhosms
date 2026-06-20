@@ -810,7 +810,7 @@
   });
 
   // ── CHANGE PASSWORD (ADMIN) ──
-  documgetElementById('admSendResetBtn').addEventListener('click', async function () {
+  document.getElementById('admSendResetBtn').addEventListener('click', async function () {
     const newPassword = document.getElementById('adm_cp_email').value.trim();
     const msgEl = document.getElementById('adm_cp_msg');
 
