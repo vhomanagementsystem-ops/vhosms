@@ -115,20 +115,20 @@
 
     <!-- CHANGE PASSWORD -->
     <div id="page-changepassword" class="page" style="display:none">
-      <div class="page-header"><div class="page-header-left"><h1>Change Password</h1><p>Enter your active Gmail to receive a password reset link</p></div></div>
+      <div class="page-header"><div class="page-header-left"><h1>Change Password</h1><p>Set a new password for your admin account</p></div></div>
       <div style="max-width:480px">
         <div class="card">
-          <div class="card-header"><span class="card-title">Reset Your Password</span></div>
+          <div class="card-header"><span class="card-title">Set New Password</span></div>
           <div class="card-body">
             <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:18px;font-size:13px;color:#1e40af;line-height:1.6">
-              📧 Enter your active Gmail below. We will send a password reset link to that email. Click the link to set your new password.
+              🔒 Enter your new password below. Make sure it is at least 6 characters. You will use this new password next time you log in.
             </div>
             <div class="form-field" style="margin-bottom:14px">
-              <label class="form-label">Your Active Gmail Address</label>
-              <input class="form-input" id="adm_cp_email" type="email" placeholder="yourname@gmail.com">
+              <label class="form-label">New Password</label>
+              <input class="form-input" id="adm_cp_email" type="password" placeholder="Enter new password (min 6 characters)">
             </div>
             <div id="adm_cp_msg" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px"></div>
-            <button class="btn btn-primary" id="admSendResetBtn" style="width:100%">Send Reset Link to Gmail</button>
+            <button class="btn btn-primary" id="admSendResetBtn" style="width:100%">Save New Password</button>
           </div>
         </div>
         <div class="card" style="margin-top:14px">
@@ -375,8 +375,7 @@
     openModal('mLogoutConfirm');
   });
   document.getElementById('cancelLogoutBtn').addEventListener('click', () => closeModal('mLogoutConfirm'));
-  document.getElementById('confirmLogoutBtn').addEventListener('click', async function() {
-    await sb.auth.signOut();
+  document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
     sessionStorage.removeItem('vho_role');
     sessionStorage.removeItem('admin_name');
     sessionStorage.removeItem('admin_email');
@@ -811,8 +810,8 @@
   });
 
   // ── CHANGE PASSWORD (ADMIN) ──
-  documengetElementById('admSendResetBtn').addEventListener('click', async function () {
-    const email = document.getElementById('adm_cp_email').value.trim().toLowerCase();
+  documgetElementById('admSendResetBtn').addEventListener('click', async function () {
+    const newPassword = document.getElementById('adm_cp_email').value.trim();
     const msgEl = document.getElementById('adm_cp_msg');
 
     function showMsg(type, text) {
@@ -822,32 +821,26 @@
       msgEl.textContent = text;
     }
 
-    if (!email || !email.includes('@')) {
-      showMsg('err', 'Please enter a valid Gmail address.');
+    if (!newPassword || newPassword.length < 6) {
+      showMsg('err', 'Password must be at least 6 characters.');
       return;
     }
 
     this.disabled = true;
-    this.textContent = 'Sending…';
+    this.textContent = 'Saving…';
     msgEl.style.display = 'none';
 
-    // Build redirect URL dynamically
-    const base = window.location.origin + window.location.pathname.replace(/admin\.html.*$/, '');
-    const redirectUrl = base + 'reset.html';
-
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl
-    });
+    const adminEmail = sessionStorage.getItem('admin_email');
+    const { error } = await sb.from('admins')
+      .update({ password: newPassword })
+      .eq('email', adminEmail);
 
     this.disabled = false;
-    this.textContent = 'Send Reset Link to Gmail';
+    this.textContent = 'Save New Password';
 
-    if (error) {
-      showMsg('err', error.message);
-      return;
-    }
+    if (error) { showMsg('err', error.message); return; }
 
-    showMsg('ok', '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.');
+    showMsg('ok', '✅ Password changed! Use your new password next time you log in.');
     document.getElementById('adm_cp_email').value = '';
   });
 
