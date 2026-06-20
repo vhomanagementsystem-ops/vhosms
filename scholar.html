@@ -373,19 +373,26 @@
   document.getElementById('cancelLogoutBtn').addEventListener('click', () => closeModal('mLogoutConfirm'));
   document.getElementById('mLogoutConfirm').addEventListener('click', function(e) { if(e.target===this) closeModal('mLogoutConfirm'); });
   // ── CHANGE PASSWORD ──
-  documengetElementById('sendResetBtn').addEventListener('click', async function () {
+  document.getElementById('sendResetBtn').addEventListener('click', async function () {
     const email = document.getElementById('cp_email').value.trim().toLowerCase();
     const msgEl = document.getElementById('cp_msg');
 
-    function showMsg(type, text) {
-      msgEl.style.cssText = type === 'err'
-        ? 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
-        : 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
-      msgEl.textContent = text;
+    if (!email) {
+      msgEl.style.display = 'block';
+      msgEl.style.background = '#fff0f2';
+      msgEl.style.border = '1px solid #fcc';
+      msgEl.style.color = '#e05065';
+      msgEl.textContent = 'Please enter your Gmail address.';
+      return;
     }
 
-    if (!email || !email.includes('@')) {
-      showMsg('err', 'Please enter a valid email address.');
+    // Validate it looks like a Gmail
+    if (!email.includes('@')) {
+      msgEl.style.display = 'block';
+      msgEl.style.background = '#fff0f2';
+      msgEl.style.border = '1px solid #fcc';
+      msgEl.style.color = '#e05065';
+      msgEl.textContent = 'Please enter a valid email address.';
       return;
     }
 
@@ -393,11 +400,14 @@
     this.textContent = 'Sending…';
     msgEl.style.display = 'none';
 
-    // Send reset password email directly — no updateUser call
-    // This avoids the confirmation email issue
+    // First update the scholar's email in Supabase Auth so the reset link works
+    // Then send reset to the Gmail they provided
+    const { error: updateErr } = await sb.auth.updateUser({ email });
+
+    // Send reset password email to the new Gmail
+    // Build redirect URL dynamically — works on Vercel, localhost, any domain
     const base = window.location.origin + window.location.pathname.replace(/scholar\.html.*$/, '');
     const redirectUrl = base + 'reset.html';
-
     const { error } = await sb.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl
     });
@@ -406,11 +416,23 @@
     this.textContent = 'Send Reset Link to Gmail';
 
     if (error) {
-      showMsg('err', error.message);
+      msgEl.style.display = 'block';
+      msgEl.style.background = '#fff0f2';
+      msgEl.style.border = '1px solid #fcc';
+      msgEl.style.color = '#e05065';
+      msgEl.textContent = error.message;
       return;
     }
 
-    showMsg('ok', '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.');
+    // Update email in scholars table too
+    await sb.from('scholars').update({ email }).eq('id', currentUser.id);
+    currentUser.email = email;
+
+    msgEl.style.display = 'block';
+    msgEl.style.background = '#f0fdf4';
+    msgEl.style.border = '1px solid #86efac';
+    msgEl.style.color = '#166534';
+    msgEl.textContent = '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.';
     document.getElementById('cp_email').value = '';
   });
 
@@ -570,7 +592,18 @@
 
     if (error) { toast(error.message, '❌'); return; }
 
-    toast('Profile updated successfully', '✅');
+    // If email changed, update it in Supabase Auth too so login works with new email
+    const newEmail = updates.email;
+    if (newEmail && newEmail !== currentUser.email) {
+      const { error: authEmailErr } = await sb.auth.updateUser({ email: newEmail });
+      if (authEmailErr) {
+        toast('Profile saved but email update in auth failed: ' + authEmailErr.message, '⚠️');
+      } else {
+        toast('Profile updated! Email changed — please use your new email to log in next time.', '✅');
+      }
+    } else {
+      toast('Profile updated successfully', '✅');
+    }
 
     currentUser = updated;
     setupSidebar();
