@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password – VHO SMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--pink:#e8d5d5;--blue:#6b7fad;--blue2:#4a5a8a;--red:#e05065;--text:#2c2c3e;--muted:#8a8a9e;--border:#e8e8f0;}
+body{font-family:'DM Sans',sans-serif;background:var(--pink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.wrap{background:#fff;border-radius:24px;width:min(440px,100%);padding:44px 40px;box-shadow:0 32px 80px rgba(74,90,138,.2);animation:up .5s cubic-bezier(.22,1,.36,1)}
+@keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.logo-row svg{width:36px;height:36px}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text);line-height:1.3}
+.brand-name small{display:block;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:1px}
+h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:6px}
+p.sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fafafa;outline:none;transition:border .2s}
+.field input:focus{border-color:var(--blue);background:#fff}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn:hover:not(:disabled){background:var(--blue2);transform:translateY(-1px)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.msg{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+.msg.err{background:#fff0f2;border:1px solid #fcc;color:var(--red)}
+.msg.ok{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.pw-rule{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.loading{text-align:center;padding:30px 0;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="logo-row">
+    <svg viewBox="0 0 44 44"><path d="M22 38s-16-10.5-16-21a10 10 0 0 1 16-8 10 10 0 0 1 16 8c0 10.5-16 21-16 21z" fill="#e05065"/><path d="M22 38s0-10.5 0-21a10 10 0 0 1 16-8c0 10.5-16 21-16 21z" fill="#a83248"/></svg>
+    <div class="brand-name">Victoria Heartstrong<small>Organization</small></div>
+  </div>
+
+  <div id="loadingState" class="loading">⏳ Verifying reset link…</div>
+
+  <div id="formState" style="display:none">
+    <h1>Set New Password</h1>
+    <p class="sub">Enter and confirm your new password below.</p>
+    <div class="msg err" id="errMsg"></div>
+    <div class="msg ok" id="okMsg"></div>
+    <div class="field">
+      <label>New Password</label>
+      <input type="password" id="newPw" placeholder="Enter new password">
+      <div class="pw-rule">Minimum 6 characters</div>
+    </div>
+    <div class="field">
+      <label>Confirm New Password</label>
+      <input type="password" id="confirmPw" placeholder="Re-enter new password">
+    </div>
+    <button class="btn" id="saveBtn">Save New Password</button>
+  </div>
+
+  <div id="errorState" style="display:none">
+    <h1>Link Expired</h1>
+    <p class="sub">This password reset link has expired or is invalid. Please request a new one from the Change Password page.</p>
+    <button class="btn" onclick="window.location.href='index.html'">Back to Login</button>
+  </div>
+
+  <div id="successState" style="display:none">
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <h1 style="margin-bottom:8px">Password Updated!</h1>
+      <p class="sub">Your new password has been saved. You can now log in with your new password.</p>
+      <button class="btn" onclick="window.location.href='index.html'">Go to Login</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://fatlifawnrricmlosvxg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhdGxpZmF3bnJyaWNtbG9zdnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mjc2NDEsImV4cCI6MjA5NzEwMzY0MX0.pYiqeIFCkQA6cxJ9nk0vLGeqPtEP7kwF_d_tV1yrD3I";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function show(id) {
+    ['loadingState','formState','errorState','successState'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? 'block' : 'none';
+    });
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('errMsg');
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById('okMsg').style.display = 'none';
+  }
+
+  // Supabase sends the token in the URL hash as #access_token=...&type=recovery
+  window.addEventListener('DOMContentLoaded', async function () {
+    // Listen for the auth state change — Supabase auto-handles the hash token
+    const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // Valid recovery session — show the form
+        show('formState');
+      } else if (event === 'SIGNED_IN' && session) {
+        // Already signed in from recovery — show form
+        show('formState');
+      }
+    });
+
+    // Check if there's a hash with error
+    const hash = window.location.hash;
+    if (hash.includes('error=')) {
+      show('errorState');
+      return;
+    }
+
+    // If no hash at all and no session, show error
+    if (!hash.includes('access_token') && !hash.includes('type=recovery')) {
+      // Give Supabase a moment to process
+      setTimeout(async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) show('errorState');
+      }, 2000);
+    }
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async function () {
+    const newPw = document.getElementById('newPw').value;
+    const confirmPw = document.getElementById('confirmPw').value;
+
+    if (!newPw || !confirmPw) { showErr('Please fill in both fields.'); return; }
+    if (newPw.length < 6) { showErr('Password must be at least 6 characters.'); return; }
+    if (newPw !== confirmPw) { showErr('Passwords do not match.'); return; }
+
+    this.disabled = true;
+    this.textContent = 'Saving…';
+    document.getElementById('errMsg').style.display = 'none';
+
+    const { error } = await sb.auth.updateUser({ password: newPw });
+
+    this.disabled = false;
+    this.textContent = 'Save New Password';
+
+    if (error) { showErr(error.message); return; }
+
+    // Sign out after password change so user logs in fresh
+    await sb.auth.signOut();
+    show('successState');
+  });
+})();
+</script>
+</body>
+</html>

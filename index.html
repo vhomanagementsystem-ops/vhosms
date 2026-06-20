@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VHO Scholarship Management System</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --pink:#e8d5d5;--pink2:#d4b8b8;--blue:#6b7fad;--blue2:#4a5a8a;--blue3:#8e9fc2;
+  --red:#e05065;--red2:#a83248;--white:#fff;--text:#2c2c3e;--muted:#8a8a9e;
+  --border:#e8e8f0;--radius:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--pink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;position:relative;overflow:hidden}
+.bg-orbs{position:fixed;inset:0;pointer-events:none}
+.bg-orbs span{position:absolute;border-radius:50%;opacity:.12;animation:float 10s ease-in-out infinite alternate}
+.bg-orbs span:nth-child(1){width:500px;height:500px;background:var(--blue);top:-150px;right:-100px;animation-delay:0s}
+.bg-orbs span:nth-child(2){width:350px;height:350px;background:var(--red);bottom:-100px;left:-80px;animation-delay:3s}
+.bg-orbs span:nth-child(3){width:200px;height:200px;background:var(--blue2);top:40%;left:20%;animation-delay:6s}
+@keyframes float{from{transform:translate(0,0)scale(1)}to{transform:translate(15px,-15px)scale(1.04)}}
+.wrap{display:grid;grid-template-columns:1fr 1fr;width:min(880px,100%);min-height:580px;border-radius:24px;overflow:hidden;box-shadow:0 32px 80px rgba(74,90,138,.2);animation:up .6s cubic-bezier(.22,1,.36,1)}
+@keyframes up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.brand{background:var(--blue2);padding:52px 44px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.brand::before{content:'';position:absolute;width:340px;height:340px;border-radius:50%;border:1px solid rgba(255,255,255,.08);top:-80px;right:-80px}
+.brand::after{content:'';position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid rgba(255,255,255,.06);bottom:-60px;left:-60px}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:40px;z-index:1;position:relative}
+.heart-icon{width:44px;height:44px}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(255,255,255,.9);line-height:1.3}
+.brand-name small{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-top:2px}
+.brand h1{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:#fff;line-height:1.2;z-index:1;position:relative;margin-bottom:16px}
+.brand h1 em{font-style:italic;color:rgba(255,255,255,.65)}
+.brand p{font-size:13px;color:rgba(255,255,255,.55);line-height:1.7;z-index:1;position:relative;max-width:280px}
+.form-side{background:#fff;padding:52px 44px;display:flex;flex-direction:column;justify-content:center}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;color:var(--text);margin-bottom:6px}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.tabs{display:flex;gap:6px;margin-bottom:24px;background:#f4f4f8;border-radius:10px;padding:4px}
+.tab{flex:1;padding:8px;border:none;border-radius:8px;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);transition:all .2s}
+.tab.on{background:#fff;color:var(--blue2);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fafafa;outline:none;transition:border .2s}
+.field input:focus{border-color:var(--blue);background:#fff}
+.check-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.check-row label{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer}
+.check-row input[type=checkbox]{accent-color:var(--blue);width:14px;height:14px}
+.check-row a{font-size:12px;color:var(--blue3);text-decoration:none;cursor:pointer}
+.check-row a:hover{color:var(--blue2)}
+.btn-login{width:100%;padding:13px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-login:hover:not(:disabled){background:var(--blue2);transform:translateY(-1px)}
+.btn-login:disabled{opacity:.6;cursor:not-allowed}
+.err{display:none;background:#fff0f2;border:1px solid #fcc;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px}
+.err.show{display:block}
+.modal-bg{position:fixed;inset:0;background:rgba(44,44,62,.5);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:20px;width:min(420px,100%);padding:32px;animation:up .3s ease;position:relative}
+.modal h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.modal-close{position:absolute;top:18px;right:18px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px 8px;border-radius:6px}
+.modal-close:hover{background:#f4f4f8}
+.steps{display:flex;gap:4px;margin-bottom:20px}
+.step{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s}
+.step.done{background:var(--blue)}
+.field-modal{margin-bottom:14px}
+.field-modal label{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.field-modal input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fafafa;outline:none;transition:border .2s}
+.field-modal input:focus{border-color:var(--blue);background:#fff}
+@media(max-width:640px){
+  .wrap{grid-template-columns:1fr}
+  .brand{display:none}
+  .form-side{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+<div class="bg-orbs"><span></span><span></span><span></span></div>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="logo-row">
+      <svg class="heart-icon" viewBox="0 0 44 44"><path d="M22 38s-16-10.5-16-21a10 10 0 0 1 16-8 10 10 0 0 1 16 8c0 10.5-16 21-16 21z" fill="#e05065"/><path d="M22 38s0-10.5 0-21a10 10 0 0 1 16-8c0 10.5-16 21-16 21z" fill="#a83248"/></svg>
+      <div class="brand-name">Victoria Heartstrong<small>Organization</small></div>
+    </div>
+    <h1>Empowering<br><em>women</em><br>scholars.</h1>
+    <p>A centralized scholar records &amp; document verification system for the Victoria Heartstrong Organization scholarship program.</p>
+  </div>
+
+  <div class="form-side">
+    <h2 class="form-title">Welcome back ♥</h2>
+    <p class="form-sub">Sign in to your account</p>
+
+    <div class="tabs">
+      <button class="tab on" id="tabAdmin">Admin</button>
+      <button class="tab" id="tabScholar">Scholar</button>
+    </div>
+
+    <div class="err" id="errMsg"></div>
+
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="check-row">
+      <label><input type="checkbox" id="rememberMe"> Remember me</label>
+      <a id="forgotLink">Forgot password?</a>
+    </div>
+    <button class="btn-login" id="loginBtn">
+      Sign in
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-bg" id="forgotModal">
+  <div class="modal">
+    <button class="modal-close" id="forgotClose">✕</button>
+    <h2>Reset Password</h2>
+    <p>Enter your registered email address and we'll send you a password reset link.</p>
+    <div class="steps"><div class="step done" id="s1"></div><div class="step" id="s2"></div></div>
+    <div id="forgotStep1">
+      <div class="field-modal"><label>Email address</label><input type="email" id="forgotEmail" placeholder="your@email.com"></div>
+      <div style="margin-top:4px;font-size:12px;color:var(--muted)">Default scholar password: <strong>VHO + first name (e.g. VHOdanica)</strong></div>
+      <button class="btn-login" style="margin-top:16px" id="resetBtn">Send Reset Link</button>
+    </div>
+    <div id="forgotStep2" style="display:none;text-align:center;padding:16px 0">
+      <div style="font-size:40px;margin-bottom:12px">📧</div>
+      <div style="font-size:16px;font-weight:500;margin-bottom:8px">Reset link sent!</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">A password reset link has been sent to <strong id="sentTo"></strong>. Please check your inbox.</div>
+      <button class="btn-login" style="margin-top:20px" id="forgotDoneBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── SUPABASE INIT ──
+  const SUPABASE_URL = "https://fatlifawnrricmlosvxg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhdGxpZmF3bnJyaWNtbG9zdnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mjc2NDEsImV4cCI6MjA5NzEwMzY0MX0.pYiqeIFCkQA6cxJ9nk0vLGeqPtEP7kwF_d_tV1yrD3I";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let role = 'admin';
+
+  // ── ELEMENTS ──
+  const tabAdmin    = document.getElementById('tabAdmin');
+  const tabScholar  = document.getElementById('tabScholar');
+  const loginBtn    = document.getElementById('loginBtn');
+  const forgotLink  = document.getElementById('forgotLink');
+  const forgotModal = document.getElementById('forgotModal');
+  const forgotClose = document.getElementById('forgotClose');
+  const resetBtn    = document.getElementById('resetBtn');
+  const forgotDone  = document.getElementById('forgotDoneBtn');
+  const errMsg      = document.getElementById('errMsg');
+  const loginEmail  = document.getElementById('loginEmail');
+  const loginPw     = document.getElementById('loginPw');
+
+  // ── INIT ──
+  const saved = localStorage.getItem('vho_remember');
+  if (saved) { loginEmail.value = saved; document.getElementById('rememberMe').checked = true; }
+  sb.auth.signOut(); // clear any stale session
+
+  // ── TABS ──
+  tabAdmin.addEventListener('click', function () {
+    role = 'admin';
+    tabAdmin.classList.add('on');
+    tabScholar.classList.remove('on');
+    errMsg.classList.remove('show');
+  });
+  tabScholar.addEventListener('click', function () {
+    role = 'scholar';
+    tabScholar.classList.add('on');
+    tabAdmin.classList.remove('on');
+    errMsg.classList.remove('show');
+  });
+
+  // ── LOGIN ──
+  loginBtn.addEventListener('click', doLogin);
+  loginPw.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+
+  async function doLogin() {
+    const email = loginEmail.value.trim().toLowerCase();
+    const pw    = loginPw.value;
+    const remember = document.getElementById('rememberMe').checked;
+
+    if (!email || !pw) { showErr('Please enter your email and password.'); return; }
+
+    if (remember) localStorage.setItem('vho_remember', email);
+    else localStorage.removeItem('vho_remember');
+
+    if (role === 'admin') {
+      setLoading(true);
+      try {
+        const { data: admins, error: adminErr } = await sb
+          .from('admins')
+          .select('id, email, name')
+          .eq('email', email)
+          .eq('password', pw)
+          .single();
+
+        if (adminErr || !admins) {
+          showErr('Invalid admin credentials.');
+          setLoading(false);
+          return;
+        }
+
+        sessionStorage.setItem('vho_role', 'admin');
+        sessionStorage.setItem('admin_name', admins.name || 'Admin');
+        sessionStorage.setItem('admin_email', admins.email);
+        window.location.href = 'admin.html';
+
+      } catch (err) {
+        console.error(err);
+        showErr('Login failed. Please try again.');
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Scholar login
+    setLoading(true);
+    try {
+      // Step 1: Check if scholar record exists with this email
+      const { data: scholarCheck, error: checkErr } = await sb
+        .from('scholars')
+        .select('id, auth_id, name')
+        .eq('email', email)
+        .single();
+
+      if (checkErr || !scholarCheck) {
+        showErr('No scholar record found for this email. Please contact your admin.');
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Try signing in with Supabase Auth using the email they typed
+      const { data: authData, error: signInErr } = await sb.auth.signInWithPassword({ email, password: pw });
+
+      if (signInErr) {
+        // Case A: Scholar has no auth account yet (first-time login)
+        if (!scholarCheck.auth_id) {
+          const firstName = scholarCheck.name.split(' ')[0];
+          const defaultPw = 'VHO' + firstName;
+
+          if (pw !== defaultPw) {
+            showErr(`First time logging in? Your default password is: VHO${firstName}`);
+            setLoading(false);
+            return;
+          }
+
+          const { data: signUpData, error: signUpErr } = await sb.auth.signUp({ email, password: pw });
+          if (signUpErr) { showErr(signUpErr.message); setLoading(false); return; }
+
+          await sb.from('scholars').update({ auth_id: signUpData.user.id }).eq('id', scholarCheck.id);
+          sessionStorage.setItem('vho_role', 'scholar');
+          sessionStorage.setItem('scholar_id', scholarCheck.id);
+          window.location.href = 'scholar.html';
+          return;
+        }
+
+        // Case B: Scholar updated their email in profile but Supabase Auth still has old email.
+        // Show helpful message.
+        if (signInErr.message.includes('Invalid login credentials')) {
+          showErr('Login failed. If you recently changed your email, please use your original registered email to log in, or use Forgot Password to reset access.');
+        } else {
+          showErr(signInErr.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Step 3: Successful auth — sync auth_id if missing
+      if (!scholarCheck.auth_id) {
+        await sb.from('scholars').update({ auth_id: authData.user.id }).eq('id', scholarCheck.id);
+      }
+
+      // Step 4: Sync email in scholars table if auth email differs (e.g. after email change in auth)
+      if (authData.user.email && authData.user.email !== scholarCheck.email) {
+        await sb.from('scholars').update({ email: authData.user.email }).eq('id', scholarCheck.id);
+      }
+
+      sessionStorage.setItem('vho_role', 'scholar');
+      sessionStorage.setItem('scholar_id', scholarCheck.id);
+      window.location.href = 'scholar.html';
+
+    } catch (err) {
+      console.error(err);
+      showErr('Login failed. Please try again.');
+      setLoading(false);
+    }
+  }
+
+  function showErr(msg) { errMsg.textContent = msg; errMsg.classList.add('show'); }
+  function setLoading(on) {
+    loginBtn.disabled = on;
+    loginBtn.innerHTML = on
+      ? 'Signing in…'
+      : 'Sign in <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+  }
+
+  // ── FORGOT PASSWORD ──
+  forgotLink.addEventListener('click', function () { forgotModal.classList.add('open'); });
+  forgotClose.addEventListener('click', closeForgot);
+  forgotDone.addEventListener('click', closeForgot);
+  forgotModal.addEventListener('click', function (e) { if (e.target === forgotModal) closeForgot(); });
+
+  function closeForgot() {
+    forgotModal.classList.remove('open');
+    document.getElementById('forgotStep1').style.display = 'block';
+    document.getElementById('forgotStep2').style.display = 'none';
+    document.getElementById('s2').classList.remove('done');
+    document.getElementById('forgotEmail').value = '';
+  }
+
+  resetBtn.addEventListener('click', async function () {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) { alert('Please enter your email address.'); return; }
+    resetBtn.disabled = true;
+    resetBtn.textContent = 'Sending…';
+    const base = window.location.origin + window.location.pathname.replace(/index\.html.*$/, '');
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: base + 'reset.html'
+    });
+    resetBtn.disabled = false;
+    resetBtn.textContent = 'Send Reset Link';
+    if (error) { alert(error.message); return; }
+    document.getElementById('sentTo').textContent = email;
+    document.getElementById('s2').classList.add('done');
+    document.getElementById('forgotStep1').style.display = 'none';
+    document.getElementById('forgotStep2').style.display = 'block';
+  });
+
+})();
+</script>
+</body>
+</html>

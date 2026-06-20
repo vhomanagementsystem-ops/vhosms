@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scholar – VHO SMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="shared.css">
+<style>
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.quick-btn{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text)}
+.quick-btn:hover{border-color:var(--blue);background:var(--blue-pale);transform:translateY(-2px)}
+.quick-btn .qicon{font-size:24px;margin-bottom:8px}
+.quick-btn .qlabel{font-size:13px;font-weight:500}
+.doc-upload-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px}
+.doc-upload-card h3{font-size:15px;font-weight:500;margin-bottom:4px}
+.doc-upload-card p{font-size:12px;color:var(--muted);margin-bottom:14px}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;color:#fff;margin:0 auto 10px;flex-shrink:0}
+.profile-name{font-size:20px;font-weight:600;text-align:center}
+.profile-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:14px}
+.status-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+.info-item label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+.info-item .info-val{font-size:14px;font-weight:500}
+.edit-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.verif-box{border-radius:var(--radius);border:2px solid var(--border);padding:18px;text-align:center}
+.verif-box.pending{border-color:#f59e0b;background:#fffbeb}
+.verif-box.verified{border-color:#22c55e;background:#f0fdf4}
+.verif-box.rejected{border-color:#ef4444;background:#fef2f2}
+.verif-box.not_submitted{border-color:var(--border);background:#f9f9fb}
+.verif-icon{font-size:36px;margin-bottom:8px}
+.verif-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.verif-desc{font-size:12px;color:var(--muted)}
+.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #f4f4f8}
+.checklist-item:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 30 30"><path d="M15 26s-11-7-11-14a7 7 0 0 1 11-5.7A7 7 0 0 1 26 12c0 7-11 14-11 14z" fill="#e05065"/><path d="M15 26s0-7 0-14a7 7 0 0 1 11-5.7C26 12 15 26 15 26z" fill="#a83248"/></svg>
+    <div class="logo-text">Victoria Heartstrong<span>Organization</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">My Account</div>
+    <a class="nav-item active" id="nav-home">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7A1 1 0 0 0 3 11h1v6a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3h2v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-6h1a1 1 0 0 0 .707-1.707l-7-7z"/></svg>Home</a>
+    <a class="nav-item" id="nav-profile">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7 9a7 7 0 1 1 14 0H3z"/></svg>My Profile</a>
+    <a class="nav-item" id="nav-documents">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h4.586A2 2 0 0 1 12 2.586L15.414 6A2 2 0 0 1 16 7.414V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 6a1 1 0 0 1 1-1h6a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm1 3a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H7z"/></svg>Documents</a>
+    <a class="nav-item" id="nav-verification">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 0 0 1.745-.723 3.066 3.066 0 0 1 3.976 0 3.066 3.066 0 0 0 1.745.723 3.066 3.066 0 0 1 2.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 0 1 0 3.976 3.066 3.066 0 0 0-.723 1.745 3.066 3.066 0 0 1-2.812 2.812 3.066 3.066 0 0 0-1.745.723 3.066 3.066 0 0 1-3.976 0 3.066 3.066 0 0 0-1.745-.723 3.066 3.066 0 0 1-2.812-2.812 3.066 3.066 0 0 0-.723-1.745 3.066 3.066 0 0 1 0-3.976 3.066 3.066 0 0 0 .723-1.745 3.066 3.066 0 0 1 2.812-2.812zm7.44 5.252a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4z"/></svg>Verification</a>
+    <div class="nav-group-label">Settings</div>
+    <a class="nav-item" id="nav-changepassword">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0 1 10 0v2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2zm8-2v2H7V7a3 3 0 0 1 6 0z"/></svg>Change Password</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip" id="logoutBtn">
+      <div class="avatar" id="avatarEl">?</div>
+      <div class="user-info"><div class="user-name" id="nameEl">Scholar</div><div class="user-role" id="roleEl">Loading…</div></div>
+      <svg width="14" height="14" fill="rgba(255,255,255,.4)" viewBox="0 0 20 20"><path d="M3 3a1 1 0 0 0 0 2h11.586l-2.293 2.293a1 1 0 1 0 1.414 1.414l4-4a1 1 0 0 0 0-1.414l-4-4a1 1 0 1 0-1.414 1.414L14.586 3H3z"/></svg>
+    </div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      <span class="topbar-title" id="pageTitle">Home</span>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div id="page-home" class="page">
+      <div class="page-header"><div class="page-header-left"><h1 id="homeGreet">Welcome back ♥</h1><p id="homeSubtitle">Loading…</p></div></div>
+      <div class="stat-grid" id="homeStats"></div>
+      <div class="quick-grid">
+        <div class="quick-btn" id="qbtn-profile"><div class="qicon">👤</div><div class="qlabel">Edit Profile</div></div>
+        <div class="quick-btn" id="qbtn-documents"><div class="qicon">📄</div><div class="qlabel">Upload Docs</div></div>
+        <div class="quick-btn" id="qbtn-verification"><div class="qicon">✅</div><div class="qlabel">Verification</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Scholarship Status</span></div>
+        <div class="card-body" id="homeStatus"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="page-profile" class="page" style="display:none">
+      <div class="page-header">
+        <div class="page-header-left"><h1>My Profile</h1><p>View and update your scholar information</p></div>
+        <button class="btn btn-primary btn-sm" id="editToggleBtn">✏️ Edit Profile</button>
+      </div>
+
+      <!-- View Mode -->
+      <div id="profileView">
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-body" style="text-align:center;padding:28px 20px">
+            <div class="profile-avatar" id="profileAvatar">?</div>
+            <div class="profile-name" id="profileFullName">—</div>
+            <div class="profile-sub" id="profileSub">—</div>
+            <div class="status-row" id="profileBadges"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><span class="card-title">Personal Information</span></div>
+          <div class="card-body"><div class="info-grid" id="profileInfoGrid"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Academic Information</span></div>
+          <div class="card-body"><div class="info-grid" id="profileAcadGrid"></div></div>
+        </div>
+      </div>
+
+      <!-- Edit Mode -->
+      <div id="profileEdit" style="display:none">
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><span class="card-title">Personal Information</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-field"><label class="form-label">Full Name *</label><input class="form-input" id="ef_name" type="text" placeholder="Maria Santos"></div>
+              <div class="form-field"><label class="form-label">Email</label><input class="form-input" id="ef_email" type="email"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-field"><label class="form-label">Birthdate</label><input class="form-input" id="ef_birthdate" type="date"></div>
+              <div class="form-field"><label class="form-label">Phone Number</label><input class="form-input" id="ef_phone" type="tel" placeholder="09XXXXXXXXX"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><span class="card-title">Academic Information</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-field"><label class="form-label">School</label><input class="form-input" id="ef_school" type="text"></div>
+              <div class="form-field"><label class="form-label">Grade Level</label>
+                <select class="form-select" id="ef_gradeLevel">
+                  <option value="">— Select —</option>
+                  <option value="Junior High School">Junior High School</option>
+                  <option value="Senior High School">Senior High School</option>
+                  <option value="College">College</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field"><label class="form-label">Year Level</label>
+                <select class="form-select" id="ef_yearLevel">
+                  <option value="">— Select Grade Level first —</option>
+                </select>
+              </div>
+              <div class="form-field"><label class="form-label">Year of Graduation</label><input class="form-input" id="ef_gradYear" type="number" min="2020" max="2035" placeholder="e.g. 2027"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><span class="card-title">Scholarship Details</span><span style="font-size:12px;color:var(--muted);margin-left:8px">(Read-only — set by admin)</span></div>
+          <div class="card-body"><div class="info-grid" id="scholarshipReadOnly"></div></div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn btn-ghost" id="cancelEditBtn">Cancel</button>
+          <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div id="page-documents" class="page" style="display:none">
+      <div class="page-header"><div class="page-header-left"><h1>Documents</h1><p>Upload your required scholarship documents (PDF only, max 10MB)</p></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="doc-upload-card">
+          <h3>📋 Certificate of Registration (COR)</h3>
+          <p>Upload your Certificate of Registration / Enrollment from your school.</p>
+          <div id="certBadge" style="margin-bottom:12px"></div>
+          <div class="upload-zone" id="uploadZoneCert">
+            <svg width="28" height="28" fill="none" stroke="var(--light)" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <p><strong>Click to upload</strong> PDF</p>
+          </div>
+          <input type="file" id="up_cert" accept=".pdf" style="display:none">
+        </div>
+        <div class="doc-upload-card">
+          <h3>📊 Grade Report</h3>
+          <p>Upload your latest report card, grade sheet, or transcript of records.</p>
+          <div id="rcBadge" style="margin-bottom:12px"></div>
+          <div class="upload-zone" id="uploadZoneGrade">
+            <svg width="28" height="28" fill="none" stroke="var(--light)" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <p><strong>Click to upload</strong> PDF</p>
+          </div>
+          <input type="file" id="up_rc" accept=".pdf" style="display:none">
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="card-header"><span class="card-title">Upload History</span></div>
+        <div class="table-wrap"><table><thead><tr><th>File Name</th><th>Type</th><th>Date</th><th>Status</th><th>Remarks</th></tr></thead><tbody id="docHistory"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- VERIFICATION -->
+    <div id="page-verification" class="page" style="display:none">
+      <div class="page-header"><div class="page-header-left"><h1>Verification Status</h1><p>Track the review status of your submitted documents</p></div></div>
+      <div style="max-width:520px">
+        <div class="verif-box not_submitted" id="verifBox" style="margin-bottom:16px">
+          <div class="verif-icon" id="verifIcon">📭</div>
+          <div class="verif-title" id="verifTitle">No Documents Submitted</div>
+          <div class="verif-desc" id="verifDesc">Upload your documents to begin the verification process.</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Document Checklist</span></div>
+          <div class="card-body" id="verifChecklist"><div class="empty"><p>Loading…</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHANGE PASSWORD -->
+    <div id="page-changepassword" class="page" style="display:none">
+      <div class="page-header"><div class="page-header-left"><h1>Change Password</h1><p>Enter your active Gmail to receive a password reset link</p></div></div>
+      <div style="max-width:480px">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Reset Your Password</span></div>
+          <div class="card-body">
+            <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:18px;font-size:13px;color:#1e40af;line-height:1.6">
+              📧 Enter your active Gmail below. We will send a password reset link to that email. Click the link to set your new password.
+            </div>
+            <div class="form-field" style="margin-bottom:14px">
+              <label class="form-label">Your Active Gmail Address</label>
+              <input class="form-input" id="cp_email" type="email" placeholder="yourname@gmail.com">
+            </div>
+            <div id="cp_msg" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px"></div>
+            <button class="btn btn-primary" id="sendResetBtn" style="width:100%">Send Reset Link to Gmail</button>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="card-header"><span class="card-title">How it works</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+                <div style="font-size:13px">Enter your active Gmail and click <strong>Send Reset Link</strong></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+                <div style="font-size:13px">Check your Gmail inbox for a reset link from VHO</div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+                <div style="font-size:13px">Click the link — it will open a page where you set your new password</div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+                <div style="font-size:13px">Use your new password to log in next time</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal-bg" id="mLogoutConfirm">
+<div class="modal" style="max-width:380px">
+  <h2 class="modal-title">Sign Out</h2>
+  <p class="modal-sub">Are you sure you want to sign out of your scholar account?</p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelLogoutBtn">Cancel</button>
+    <button class="btn btn-primary" id="confirmLogoutBtn">Yes, Sign Out</button>
+  </div>
+</div></div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://fatlifawnrricmlosvxg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhdGxpZmF3bnJyaWNtbG9zdnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mjc2NDEsImV4cCI6MjA5NzEwMzY0MX0.pYiqeIFCkQA6cxJ9nk0vLGeqPtEP7kwF_d_tV1yrD3I";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let myDocs = [];
+
+  // ── HELPERS ──
+  // ── YEAR LEVEL HELPER ──
+  const YEAR_LEVELS = {
+    'Junior High School': ['Grade 7','Grade 8','Grade 9','Grade 10'],
+    'Senior High School': ['Grade 11','Grade 12'],
+    'College':            ['1st Year','2nd Year','3rd Year','4th Year','5th Year']
+  };
+  function populateYearLevel(selectId, gradeLevel, currentValue) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    const opts = YEAR_LEVELS[gradeLevel] || [];
+    sel.innerHTML = '<option value="">— Select Year Level —</option>' +
+      opts.map(o => `<option value="${o}" ${o === currentValue ? 'selected' : ''}>${o}</option>`).join('');
+  }
+
+  function calcAge(dob) {
+    if (!dob) return '—';
+    const b = new Date(dob + 'T00:00:00'), now = new Date();
+    let age = now.getFullYear() - b.getFullYear();
+    const m = now.getMonth() - b.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+    return age;
+  }
+  function ini(name) { return (name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
+  function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  function toast(msg, icon = 'ℹ️') {
+    const c = document.getElementById('toasts');
+    const t = document.createElement('div'); t.className = 'toast';
+    t.innerHTML = `<span class="toast-icon">${icon}</span><div><strong>${msg}</strong></div>`;
+    c.appendChild(t); setTimeout(() => t.remove(), 3500);
+  }
+  function infoItem(label, val) {
+    return `<div class="info-item"><label>${label}</label><div class="info-val">${val || '—'}</div></div>`;
+  }
+
+  // ── DATA LOAD ──
+  async function loadProfile() {
+    const scholarId = sessionStorage.getItem('scholar_id');
+    const { data, error } = await sb.from('scholars').select('*').eq('id', scholarId).single();
+    if (error || !data) { toast('Failed to load profile', '❌'); console.error(error); return false; }
+    currentUser = data;
+    return true;
+  }
+
+  async function loadDocs() {
+    const { data, error } = await sb.from('documents').select('*').eq('scholar_id', currentUser.id).order('uploaded_at', { ascending: false });
+    if (!error) myDocs = data || [];
+  }
+
+  // ── SIDEBAR / NAV ──
+  const navPages = ['home', 'profile', 'documents', 'verification', 'changepassword'];
+  const pageTitles = { home: 'Home', profile: 'My Profile', documents: 'Documents', verification: 'Verification', changepassword: 'Change Password' };
+
+  function gotoPage(page) {
+    navPages.forEach(p => {
+      document.getElementById('page-' + p).style.display = p === page ? 'block' : 'none';
+      document.getElementById('nav-' + p).classList.toggle('active', p === page);
+    });
+    document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+    if (page === 'home') renderHome();
+    if (page === 'profile') renderProfile();
+    if (page === 'documents') loadDocs().then(renderDocs);
+    if (page === 'verification') loadDocs().then(renderVerification);
+    closeSidebar();
+  }
+
+  navPages.forEach(p => document.getElementById('nav-' + p).addEventListener('click', () => gotoPage(p)));
+  document.getElementById('qbtn-profile').addEventListener('click', () => gotoPage('profile'));
+  document.getElementById('qbtn-documents').addEventListener('click', () => gotoPage('documents'));
+  document.getElementById('qbtn-verification').addEventListener('click', () => gotoPage('verification'));
+
+  document.getElementById('hamburger').addEventListener('click', toggleSidebar);
+  document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    openModal('mLogoutConfirm');
+  });
+  document.getElementById('cancelLogoutBtn').addEventListener('click', () => closeModal('mLogoutConfirm'));
+  document.getElementById('mLogoutConfirm').addEventListener('click', function(e) { if(e.target===this) closeModal('mLogoutConfirm'); });
+  // ── CHANGE PASSWORD ──
+  document.getElementById('sendResetBtn').addEventListener('click', async function () {
+    const email = document.getElementById('cp_email').value.trim().toLowerCase();
+    const msgEl = document.getElementById('cp_msg');
+
+    if (!email) {
+      msgEl.style.display = 'block';
+      msgEl.style.background = '#fff0f2';
+      msgEl.style.border = '1px solid #fcc';
+      msgEl.style.color = '#e05065';
+      msgEl.textContent = 'Please enter your Gmail address.';
+      return;
+    }
+
+    // Validate it looks like a Gmail
+    if (!email.includes('@')) {
+      msgEl.style.display = 'block';
+      msgEl.style.background = '#fff0f2';
+      msgEl.style.border = '1px solid #fcc';
+      msgEl.style.color = '#e05065';
+      msgEl.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = 'Sending…';
+    msgEl.style.display = 'none';
+
+    // First update the scholar's email in Supabase Auth so the reset link works
+    // Then send reset to the Gmail they provided
+    const { error: updateErr } = await sb.auth.updateUser({ email });
+
+    // Send reset password email to the new Gmail
+    // Build redirect URL dynamically — works on Vercel, localhost, any domain
+    const base = window.location.origin + window.location.pathname.replace(/scholar\.html.*$/, '');
+    const redirectUrl = base + 'reset.html';
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl
+    });
+
+    this.disabled = false;
+    this.textContent = 'Send Reset Link to Gmail';
+
+    if (error) {
+      msgEl.style.display = 'block';
+      msgEl.style.background = '#fff0f2';
+      msgEl.style.border = '1px solid #fcc';
+      msgEl.style.color = '#e05065';
+      msgEl.textContent = error.message;
+      return;
+    }
+
+    // Update email in scholars table too
+    await sb.from('scholars').update({ email }).eq('id', currentUser.id);
+    currentUser.email = email;
+
+    msgEl.style.display = 'block';
+    msgEl.style.background = '#f0fdf4';
+    msgEl.style.border = '1px solid #86efac';
+    msgEl.style.color = '#166534';
+    msgEl.textContent = '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.';
+    document.getElementById('cp_email').value = '';
+  });
+
+  document.getElementById('confirmLogoutBtn').addEventListener('click', async function() {
+    await sb.auth.signOut();
+    sessionStorage.removeItem('vho_role');
+    sessionStorage.removeItem('scholar_id');
+    window.location.href = 'index.html';
+  });
+
+  // ── SETUP SIDEBAR USER ──
+  function setupSidebar() {
+    const name = currentUser.name || 'Scholar';
+    document.getElementById('avatarEl').textContent = ini(name);
+    document.getElementById('nameEl').textContent = name;
+    document.getElementById('roleEl').textContent = [currentUser.grade_level, currentUser.year_level, currentUser.school].filter(Boolean).join(' · ') || 'Scholar';
+  }
+
+  // ── HOME ──
+  function renderHome() {
+    if (!currentUser) return;
+    const s = currentUser;
+    const cor   = myDocs.find(d => d.document_type === 'Certificate of Registration');
+    const grade = myDocs.find(d => d.document_type === 'Grade Report');
+    const docsCount = (cor ? 1 : 0) + (grade ? 1 : 0);
+
+    let verifStatus = 'Not Submitted';
+    if (myDocs.length > 0) {
+      if (myDocs.every(d => d.verification_status === 'Verified')) verifStatus = 'Verified';
+      else if (myDocs.some(d => d.verification_status === 'Rejected')) verifStatus = 'Rejected';
+      else verifStatus = 'Pending';
+    }
+    const verifColor = { Pending: 'amber', Verified: 'green', Rejected: 'pink', 'Not Submitted': '' };
+
+    document.getElementById('homeGreet').textContent = `Welcome back, ${s.name} ♥`;
+    document.getElementById('homeSubtitle').textContent = [s.grade_level, s.year_level, s.school].filter(Boolean).join(' · ') || 'VHO Scholar';
+
+    document.getElementById('homeStats').innerHTML = `
+      <div class="stat-card blue"><div class="stat-label">Scholar Status</div><div class="stat-val" style="font-size:18px">${cap(s.scholar_status)}</div><div class="stat-sub">Current standing</div></div>
+      <div class="stat-card green"><div class="stat-label">Documents</div><div class="stat-val">${docsCount}/2</div><div class="stat-sub">${docsCount === 2 ? 'All uploaded' : 'Pending upload'}</div></div>
+      <div class="stat-card ${verifColor[verifStatus] || 'amber'}"><div class="stat-label">Verification</div><div class="stat-val" style="font-size:18px">${verifStatus}</div><div class="stat-sub">Document review</div></div>
+      <div class="stat-card pink"><div class="stat-label">Batch No.</div><div class="stat-val">${s.batch_no || '—'}</div><div class="stat-sub">Year Joined: ${s.year_joined || '—'}</div></div>`;
+
+    const statusMap = {
+      active:   { icon: '🟢', color: '#22c55e', desc: 'Your scholarship is currently active.' },
+      inactive: { icon: '🔴', color: '#ef4444', desc: 'Your scholarship is currently inactive.' },
+      graduated:{ icon: '🎓', color: '#6366f1', desc: 'Congratulations! You have graduated.' }
+    };
+    const ss = statusMap[s.scholar_status] || statusMap.active;
+    document.getElementById('homeStatus').innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;padding:10px 0">
+        <div style="font-size:36px">${ss.icon}</div>
+        <div>
+          <div style="font-size:16px;font-weight:600;color:${ss.color}">${cap(s.scholar_status)}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">${ss.desc}</div>
+        </div>
+      </div>`;
+  }
+
+  // ── PROFILE VIEW ──
+  function renderProfile() {
+    if (!currentUser) return;
+    const s = currentUser;
+    const status = s.scholar_status || 'active';
+    const ssBadge = { active: 'badge-green', inactive: 'badge-gray', graduated: 'badge-blue' };
+
+    document.getElementById('profileAvatar').textContent = ini(s.name);
+    document.getElementById('profileFullName').textContent = s.name || '—';
+    document.getElementById('profileSub').textContent = [s.grade_level, s.school].filter(Boolean).join(' · ') || '—';
+    document.getElementById('profileBadges').innerHTML = `
+      <span class="badge ${ssBadge[status] || 'badge-gray'}">${cap(status)}</span>
+      <span class="badge badge-blue">Batch ${s.batch_no || '—'}</span>
+      <span class="badge badge-purple">${s.group_name || '—'}</span>`;
+
+    const bd = s.birthdate ? new Date(s.birthdate + 'T00:00:00').toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
+    const age = calcAge(s.birthdate);
+
+    document.getElementById('profileInfoGrid').innerHTML =
+      infoItem('Full Name', s.name) +
+      infoItem('Email', s.email) +
+      infoItem('Birthdate', bd) +
+      infoItem('Age', typeof age === 'number' ? age + ' years old' : '—') +
+      infoItem('Phone Number', s.phone_number);
+
+    document.getElementById('profileAcadGrid').innerHTML =
+      infoItem('School', s.school) +
+      infoItem('Grade Level', s.grade_level) +
+      infoItem('Year Level', s.year_level) +
+      infoItem('Year of Graduation', s.graduation_year) +
+      infoItem('Group', s.group_name) +
+      infoItem('Year Joined', s.year_joined) +
+      infoItem('Scholarship Status', cap(status));
+  }
+
+  // ── PROFILE EDIT ──
+  document.getElementById('editToggleBtn').addEventListener('click', openEdit);
+  // Auto-update year level when grade level changes in edit form
+  document.getElementById('ef_gradeLevel').addEventListener('change', function () {
+    populateYearLevel('ef_yearLevel', this.value, '');
+  });
+  document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
+  document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+
+  function openEdit() {
+    const s = currentUser;
+    document.getElementById('ef_name').value      = s.name || '';
+    document.getElementById('ef_email').value     = s.email || '';
+    document.getElementById('ef_birthdate').value = s.birthdate || '';
+    document.getElementById('ef_phone').value     = s.phone_number || '';
+    document.getElementById('ef_school').value    = s.school || '';
+    document.getElementById('ef_gradeLevel').value = s.grade_level || '';
+    populateYearLevel('ef_yearLevel', s.grade_level || '', s.year_level || '');
+    document.getElementById('ef_gradYear').value  = s.graduation_year || '';
+
+    document.getElementById('scholarshipReadOnly').innerHTML =
+      infoItem('Group', s.group_name) +
+      infoItem('Batch No.', s.batch_no) +
+      infoItem('Year Joined', s.year_joined) +
+      infoItem('Scholar Status', cap(s.scholar_status));
+
+    document.getElementById('profileView').style.display = 'none';
+    document.getElementById('profileEdit').style.display = 'block';
+    document.getElementById('editToggleBtn').style.display = 'none';
+  }
+
+  function cancelEdit() {
+    document.getElementById('profileView').style.display = 'block';
+    document.getElementById('profileEdit').style.display = 'none';
+    document.getElementById('editToggleBtn').style.display = '';
+  }
+
+  async function saveProfile() {
+    const name = document.getElementById('ef_name').value.trim();
+    if (!name) { toast('Full name is required', '⚠️'); return; }
+
+    const btn = document.getElementById('saveProfileBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const bd = document.getElementById('ef_birthdate').value;
+    const age = calcAge(bd);
+
+    const updates = {
+      name,
+      email:          document.getElementById('ef_email').value.trim() || currentUser.email,
+      birthdate:      bd || null,
+      phone_number:   document.getElementById('ef_phone').value.trim(),
+      school:         document.getElementById('ef_school').value.trim(),
+      grade_level:    document.getElementById('ef_gradeLevel').value || null,
+      year_level:     document.getElementById('ef_yearLevel').value || null,
+      graduation_year: document.getElementById('ef_gradYear').value ? parseInt(document.getElementById('ef_gradYear').value) : null,
+      age:            typeof age === 'number' ? age : null
+    };
+
+    const { data: updated, error } = await sb.from('scholars').update(updates).eq('id', currentUser.id).select().single();
+
+    btn.disabled = false; btn.textContent = 'Save Changes';
+
+    if (error) { toast(error.message, '❌'); return; }
+
+    // If email changed, update it in Supabase Auth too so login works with new email
+    const newEmail = updates.email;
+    if (newEmail && newEmail !== currentUser.email) {
+      const { error: authEmailErr } = await sb.auth.updateUser({ email: newEmail });
+      if (authEmailErr) {
+        toast('Profile saved but email update in auth failed: ' + authEmailErr.message, '⚠️');
+      } else {
+        toast('Profile updated! Email changed — please use your new email to log in next time.', '✅');
+      }
+    } else {
+      toast('Profile updated successfully', '✅');
+    }
+
+    currentUser = updated;
+    setupSidebar();
+    cancelEdit();
+    renderProfile();
+  }
+
+  // ── DOCUMENTS ──
+  document.getElementById('uploadZoneCert').addEventListener('click', () => document.getElementById('up_cert').click());
+  document.getElementById('uploadZoneGrade').addEventListener('click', () => document.getElementById('up_rc').click());
+  document.getElementById('up_cert').addEventListener('change', function () { handleUpload('Certificate of Registration', this); });
+  document.getElementById('up_rc').addEventListener('change', function () { handleUpload('Grade Report', this); });
+
+  function renderDocs() {
+    const cor   = myDocs.find(d => d.document_type === 'Certificate of Registration');
+    const grade = myDocs.find(d => d.document_type === 'Grade Report');
+
+    function badge(doc, label) {
+      if (!doc) return `<span class="badge badge-gray">${label} — Not uploaded</span>`;
+      const m = { Pending: 'badge-amber', Verified: 'badge-green', Rejected: 'badge-pink' };
+      return `<span class="badge ${m[doc.verification_status] || 'badge-gray'}">✓ ${label} — ${doc.verification_status}</span>`;
+    }
+
+    document.getElementById('certBadge').innerHTML = badge(cor, 'COR');
+    document.getElementById('rcBadge').innerHTML   = badge(grade, 'Grade Report');
+
+    if (!myDocs.length) {
+      document.getElementById('docHistory').innerHTML = `<tr><td colspan="5"><div class="empty"><p>No uploads yet.</p></div></td></tr>`;
+      return;
+    }
+
+    const m = { Pending: 'badge-amber', Verified: 'badge-green', Rejected: 'badge-pink' };
+    document.getElementById('docHistory').innerHTML = myDocs.map(doc => `<tr>
+      <td>${doc.file_name}</td>
+      <td>${doc.document_type}</td>
+      <td>${fmtDate(doc.uploaded_at)}</td>
+      <td><span class="badge ${m[doc.verification_status] || 'badge-gray'}">${doc.verification_status || 'Pending'}</span></td>
+      <td style="font-size:12px;color:var(--muted);max-width:200px">${doc.remarks || '—'}</td>
+    </tr>`).join('');
+  }
+
+  async function handleUpload(documentType, input) {
+    if (!input.files.length) return;
+    const file = input.files[0];
+
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      toast('Only PDF files are accepted', '⚠️'); input.value = ''; return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast('File must be under 10MB', '⚠️'); input.value = ''; return;
+    }
+
+    // Disable both upload zones while uploading
+    document.getElementById('uploadZoneCert').style.pointerEvents  = 'none';
+    document.getElementById('uploadZoneGrade').style.pointerEvents = 'none';
+    toast('Uploading…', '⏳');
+
+    try {
+      const filePath = `${currentUser.id}/${documentType.replace(/ /g, '_')}/${Date.now()}_${file.name}`;
+
+      const { error: upErr } = await sb.storage.from('scholar-documents').upload(filePath, file);
+      if (upErr) { toast(upErr.message, '❌'); input.value = ''; return; }
+
+      const { data: urlData } = sb.storage.from('scholar-documents').getPublicUrl(filePath);
+
+      const { error: dbErr } = await sb.from('documents').insert({
+        scholar_id:          currentUser.id,
+        document_type:       documentType,
+        file_name:           file.name,
+        file_url:            urlData.publicUrl,
+        verification_status: 'Pending',
+        uploaded_at:         new Date().toISOString()
+      });
+
+      if (dbErr) { toast(dbErr.message, '❌'); input.value = ''; return; }
+
+      toast('Document uploaded!', '✅');
+      input.value = '';
+      await loadDocs();
+      renderDocs();
+      renderVerification();
+
+    } catch (err) {
+      console.error(err);
+      toast('Upload failed. Please try again.', '❌');
+      input.value = '';
+    } finally {
+      document.getElementById('uploadZoneCert').style.pointerEvents  = '';
+      document.getElementById('uploadZoneGrade').style.pointerEvents = '';
+    }
+  }
+
+  // ── VERIFICATION ──
+  function renderVerification() {
+    const cor   = myDocs.find(d => d.document_type === 'Certificate of Registration');
+    const grade = myDocs.find(d => d.document_type === 'Grade Report');
+
+    let status = 'not_submitted';
+    if (myDocs.length > 0) {
+      if (myDocs.every(d => d.verification_status === 'Verified'))  status = 'verified';
+      else if (myDocs.some(d => d.verification_status === 'Rejected')) status = 'rejected';
+      else status = 'pending';
+    }
+
+    const box = document.getElementById('verifBox');
+    box.className = 'verif-box ' + status;
+
+    const icons  = { pending: '⏳', verified: '✅', rejected: '❌', not_submitted: '📭' };
+    const titles = { pending: 'Under Review', verified: 'All Verified', rejected: 'Action Required', not_submitted: 'No Documents Submitted' };
+    const descs  = {
+      pending:       'Your documents are under review by the admin. Please wait.',
+      verified:      'All your documents have been verified. Great job!',
+      rejected:      'One or more documents were rejected. Check the remarks below and re-upload.',
+      not_submitted: 'Upload your COR and Grade Report to begin verification.'
+    };
+
+    document.getElementById('verifIcon').textContent  = icons[status];
+    document.getElementById('verifTitle').textContent = titles[status];
+    document.getElementById('verifDesc').textContent  = descs[status];
+
+    function checkItem(label, doc) {
+      if (!doc) return `
+        <div class="checklist-item">
+          <span style="font-size:22px">⬜</span>
+          <div><div style="font-weight:500">${label}</div><div style="font-size:12px;color:var(--muted)">Not uploaded</div></div>
+        </div>`;
+      const icons = { Pending: '⏳', Verified: '✅', Rejected: '❌' };
+      const remarksHtml = doc.remarks
+        ? `<div style="font-size:12px;color:var(--red);margin-top:4px">Admin remark: ${doc.remarks}</div>` : '';
+      return `
+        <div class="checklist-item">
+          <span style="font-size:22px">${icons[doc.verification_status] || '⏳'}</span>
+          <div>
+            <div style="font-weight:500">${label}</div>
+            <div style="font-size:12px;color:var(--muted)">${doc.file_name} · ${fmtDate(doc.uploaded_at)}</div>
+            ${remarksHtml}
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('verifChecklist').innerHTML =
+      checkItem('Certificate of Registration (COR)', cor) +
+      checkItem('Grade Report', grade);
+  }
+
+  // ── BOOT ──
+  window.addEventListener('DOMContentLoaded', async function () {
+    if (sessionStorage.getItem('vho_role') !== 'scholar') {
+      window.location.href = 'index.html';
+      return;
+    }
+    const ok = await loadProfile();
+    if (!ok) return;
+    await loadDocs();
+    setupSidebar();
+    renderHome();
+  });
+
+})();
+</script>
+</body>
+</html>
