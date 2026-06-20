@@ -375,7 +375,8 @@
     openModal('mLogoutConfirm');
   });
   document.getElementById('cancelLogoutBtn').addEventListener('click', () => closeModal('mLogoutConfirm'));
-  document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
+  document.getElementById('confirmLogoutBtn').addEventListener('click', async function() {
+    await sb.auth.signOut();
     sessionStorage.removeItem('vho_role');
     sessionStorage.removeItem('admin_name');
     sessionStorage.removeItem('admin_email');
@@ -810,14 +811,19 @@
   });
 
   // ── CHANGE PASSWORD (ADMIN) ──
-  document.getElementById('admSendResetBtn').addEventListener('click', async function () {
+  documengetElementById('admSendResetBtn').addEventListener('click', async function () {
     const email = document.getElementById('adm_cp_email').value.trim().toLowerCase();
     const msgEl = document.getElementById('adm_cp_msg');
 
+    function showMsg(type, text) {
+      msgEl.style.cssText = type === 'err'
+        ? 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
+        : 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
+      msgEl.textContent = text;
+    }
+
     if (!email || !email.includes('@')) {
-      msgEl.style.display = 'block';
-      msgEl.style.cssText = 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065';
-      msgEl.textContent = 'Please enter a valid Gmail address.';
+      showMsg('err', 'Please enter a valid Gmail address.');
       return;
     }
 
@@ -825,9 +831,10 @@
     this.textContent = 'Sending…';
     msgEl.style.display = 'none';
 
-    // Build redirect URL dynamically — works on Vercel, localhost, any domain
+    // Build redirect URL dynamically
     const base = window.location.origin + window.location.pathname.replace(/admin\.html.*$/, '');
     const redirectUrl = base + 'reset.html';
+
     const { error } = await sb.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl
     });
@@ -836,21 +843,11 @@
     this.textContent = 'Send Reset Link to Gmail';
 
     if (error) {
-      msgEl.style.cssText = 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065';
-      msgEl.textContent = error.message;
+      showMsg('err', error.message);
       return;
     }
 
-    // Update admin email in admins table
-    const adminEmail = sessionStorage.getItem('admin_email');
-    if (adminEmail) {
-      await sb.from('admins').update({ email }).eq('email', adminEmail);
-      sessionStorage.setItem('admin_email', email);
-      document.getElementById('adminEmail').textContent = email;
-    }
-
-    msgEl.style.cssText = 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
-    msgEl.textContent = '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.';
+    showMsg('ok', '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.');
     document.getElementById('adm_cp_email').value = '';
   });
 
