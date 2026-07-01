@@ -90,7 +90,7 @@
       <div class="card">
         <div class="search-row">
           <input id="sSearch" placeholder="Search name or email…">
-          <select id="sGroup"><option value="">All Groups</option><option>CKC</option><option>POLO</option><option>N/A</option><option>Others</option></select>
+          <select id="sGroup"><option value="">All Groups</option><option>CKC</option><option>POLO</option><option>Zapateria Hub</option><option>N/A</option><option>Others</option></select>
           <select id="sBatch"><option value="">All Batches</option><option value="1">Batch 1</option><option value="2">Batch 2</option><option value="3">Batch 3</option><option value="4">Batch 4</option><option value="5">Batch 5</option><option value="6">Batch 6</option><option value="7">Batch 7</option><option value="8">Batch 8</option><option value="9">Batch 9</option><option value="10">Batch 10</option></select>
           <select id="sYearJoined"><option value="">All Years Joined</option><option>2023</option><option>2024</option><option>2025</option><option>2026</option></select>
           <select id="sGradeLevel"><option value="">All Grade Levels</option><option>Junior High School</option><option>Senior High School</option><option>College</option></select>
@@ -177,7 +177,7 @@
   </div>
   <div class="form-row">
     <div class="form-field"><label class="form-label">Group *</label>
-      <select class="form-select" id="f_group"><option value="CKC">CKC</option><option value="POLO">POLO</option><option value="N/A">N/A</option><option value="Others">Others</option></select>
+      <select class="form-select" id="f_group"><option value="CKC">CKC</option><option value="Zapateria Hub">Zapateria Hub</option><option value="POLO">POLO</option><option value="N/A">N/A</option><option value="Others">Others</option></select>
     </div>
     <div class="form-field"><label class="form-label">Batch No. *</label>
       <select class="form-select" id="f_batch"><option value="1">Batch 1</option><option value="2">Batch 2</option><option value="3">Batch 3</option><option value="4">Batch 4</option><option value="5">Batch 5</option><option value="6">Batch 6</option><option value="7">Batch 7</option><option value="8">Batch 8</option><option value="9">Batch 9</option><option value="10">Batch 10</option></select>
@@ -280,7 +280,7 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhdGxpZmF3bnJyaWNtbG9zdnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mjc2NDEsImV4cCI6MjA5NzEwMzY0MX0.pYiqeIFCkQA6cxJ9nk0vLGeqPtEP7kwF_d_tV1yrD3I";
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const GROUPS = ['CKC', 'POLO', 'N/A', 'Others'];
+  const GROUPS = ['CKC', 'POLO', 'Zapateria Hub', 'N/A', 'Others'];
   const GRADE_LEVELS = ['Junior High School', 'Senior High School', 'College'];
 
   let scholars = [];
