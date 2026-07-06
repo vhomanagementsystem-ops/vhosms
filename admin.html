@@ -957,32 +957,52 @@
   async function openAttendance(id) {
     const ann = announcements.find(function(a) { return a.id === id; });
     if (!ann) return;
-    document.getElementById('attendanceTitle').textContent = ann.title + ' — Actual Attendance';
-    document.getElementById('attendanceSub').textContent = 'Scholars who marked themselves as attended.';
+    document.getElementById('attendanceTitle').textContent = ann.title + ' — Attendance';
+    document.getElementById('attendanceSub').textContent = 'Scholars who marked their attendance for this event.';
     document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
     openModal('mAttendance');
 
-    const { data: attendanceRecords } = await sb.from('attendance').select('*, scholars(name, group_name, batch_no)').eq('announcement_id', id).eq('attended', true);
+    const { data: allRecords } = await sb.from('attendance').select('*, scholars(name, group_name, batch_no)').eq('announcement_id', id);
     const { data: responses } = await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id', id);
-    const attended = attendanceRecords || [];
+    const records = allRecords || [];
 
-    if (!attended.length) {
-      document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked themselves as attended yet.</div>';
+    if (!records.length) {
+      document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked their attendance yet.</div>';
       return;
     }
 
-    const html = attended.map(function(a) {
+    const attended = records.filter(function(r) { return r.attended === true; });
+    const notAttended = records.filter(function(r) { return r.attended === false; });
+
+    function scholarRow(a, didAttend) {
       const s = a.scholars || {};
       const resp = responses ? responses.find(function(r) { return r.scholar_id === a.scholar_id; }) : null;
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">' +
         '<div><div style="font-size:14px;font-weight:500">' + (s.name || '—') + '</div>' +
         '<div style="font-size:12px;color:var(--muted)">' + (s.group_name || '') + ' · Batch ' + (s.batch_no || '—') + '</div>' +
         '<div style="font-size:12px;color:var(--muted)">Poll answer: ' + (resp && resp.poll_options ? resp.poll_options.option_text : 'No response') + '</div></div>' +
-        '<span class="badge badge-green">Attended</span></div>';
-    }).join('');
+        (didAttend ? '<span class="badge badge-green">✅ Attended</span>' : '<span class="badge badge-pink">❌ Did Not Attend</span>') +
+        '</div>';
+    }
 
-    document.getElementById('attendanceBody').innerHTML =
-      '<div style="margin-bottom:14px;font-size:13px;color:var(--muted);font-weight:500">' + attended.length + ' scholar' + (attended.length !== 1 ? 's' : '') + ' attended</div>' + html;
+    let html = '<div style="margin-bottom:16px">' +
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">' +
+        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;color:#166534;font-weight:500">✅ Attended: ' + attended.length + '</div>' +
+        '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 16px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: ' + notAttended.length + '</div>' +
+        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:500">Total Responded: ' + records.length + '</div>' +
+      '</div>';
+
+    if (attended.length) {
+      html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended (' + attended.length + ')</div>' +
+        attended.map(function(a) { return scholarRow(a, true); }).join('');
+    }
+    if (notAttended.length) {
+      html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px">Did Not Attend (' + notAttended.length + ')</div>' +
+        notAttended.map(function(a) { return scholarRow(a, false); }).join('');
+    }
+    html += '</div>';
+
+    document.getElementById('attendanceBody').innerHTML = html;
   }
 
   // ── CHANGE PASSWORD ──
