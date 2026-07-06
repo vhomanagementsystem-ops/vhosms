@@ -619,7 +619,20 @@
       if (hasOptions) {
         let pollContent = '';
         if (myResponse) {
-          pollContent = '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534">You answered: <strong>' + (myResponse.poll_options ? myResponse.poll_options.option_text : '—') + '</strong></div>';
+          // Scholar already answered — show answer + Edit button
+          pollContent =
+            '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
+              '<span>You answered: <strong>' + (myResponse.poll_options ? myResponse.poll_options.option_text : '—') + '</strong></span>' +
+              '<button class="btn btn-ghost btn-sm" data-action="editPoll" data-ann="' + ann.id + '" data-resp="' + myResponse.id + '" style="font-size:12px">✏️ Edit Answer</button>' +
+            '</div>' +
+            // Hidden edit form (shown when Edit is clicked)
+            '<div id="editPollForm_' + ann.id + '" style="display:none;margin-top:10px">' +
+              options.map(function(opt) {
+                const isSelected = myResponse.poll_option_id === opt.id;
+                return '<button class="btn ' + (isSelected ? 'btn-primary' : 'btn-ghost') + '" style="text-align:left;justify-content:flex-start;margin-bottom:6px" data-action="updatePoll" data-ann="' + ann.id + '" data-opt="' + opt.id + '" data-resp="' + myResponse.id + '">' + (isSelected ? '✓ ' : '') + opt.option_text + '</button>';
+              }).join('') +
+              '<button class="btn btn-ghost btn-sm" data-action="cancelEditPoll" data-ann="' + ann.id + '" style="margin-top:4px;font-size:12px">Cancel</button>' +
+            '</div>';
         } else {
           pollContent = options.map(function(opt) {
             return '<button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;margin-bottom:6px" data-action="answerPoll" data-ann="' + ann.id + '" data-opt="' + opt.id + '">' + opt.option_text + '</button>';
@@ -631,10 +644,45 @@
       // Attendance section - show on event day or after
       let attendanceHtml = '';
       if (eventDate && (isToday || isPast)) {
-        if (myAtt && myAtt.attended) {
-          attendanceHtml = '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;gap:8px"><span style="font-size:20px">✅</span><span>You marked yourself as <strong>attended</strong> for this event.</span></div></div>';
+        const attLabel = isToday ? 'EVENT ATTENDANCE — Today!' : 'EVENT ATTENDANCE';
+        if (myAtt) {
+          // Already marked — show status with option to change
+          if (myAtt.attended) {
+            attendanceHtml =
+              '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">' +
+              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + attLabel + '</div>' +
+              '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
+                '<span><span style="font-size:18px">✅</span> You marked: <strong>Attended</strong></span>' +
+                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="' + ann.id + '" style="font-size:12px">Change</button>' +
+              '</div>' +
+              '<div id="attForm_' + ann.id + '" style="display:none;margin-top:10px;display:none">' +
+                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="' + ann.id + '" data-val="true">✅ Attended</button>' +
+                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '" data-val="false">❌ Did Not Attend</button>' +
+              '</div>' +
+              '</div>';
+          } else {
+            attendanceHtml =
+              '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">' +
+              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + attLabel + '</div>' +
+              '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:12px;font-size:13px;color:#e05065;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
+                '<span><span style="font-size:18px">❌</span> You marked: <strong>Did Not Attend</strong></span>' +
+                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="' + ann.id + '" style="font-size:12px">Change</button>' +
+              '</div>' +
+              '<div id="attForm_' + ann.id + '" style="display:none;margin-top:10px">' +
+                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="' + ann.id + '" data-val="true">✅ Attended</button>' +
+                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '" data-val="false">❌ Did Not Attend</button>' +
+              '</div>' +
+              '</div>';
+          }
         } else {
-          attendanceHtml = '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">EVENT ATTENDANCE' + (isToday ? ' — Today!' : '') + '</div><button class="btn btn-primary" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '">' + (isToday ? '✋ Mark Myself as Attended' : '✋ Mark Attendance') + '</button></div>';
+          // Not yet marked
+          attendanceHtml =
+            '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">' +
+            '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + attLabel + '</div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Please mark your actual attendance for this event:</div>' +
+            '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="' + ann.id + '" data-val="true">✅ I Attended</button>' +
+            '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '" data-val="false">❌ I Did Not Attend</button>' +
+            '</div>';
         }
       }
 
@@ -681,19 +729,65 @@
       renderAnnouncements();
       return;
     }
-    // Mark attended
+    // Edit poll answer — show edit form
+    const editBtn = e.target.closest('[data-action="editPoll"]');
+    if (editBtn) {
+      const annId = editBtn.dataset.ann;
+      const form = document.getElementById('editPollForm_' + annId);
+      if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      return;
+    }
+
+    // Cancel edit poll
+    const cancelEditBtn = e.target.closest('[data-action="cancelEditPoll"]');
+    if (cancelEditBtn) {
+      const annId = cancelEditBtn.dataset.ann;
+      const form = document.getElementById('editPollForm_' + annId);
+      if (form) form.style.display = 'none';
+      return;
+    }
+
+    // Update poll answer
+    const updateBtn = e.target.closest('[data-action="updatePoll"]');
+    if (updateBtn && !updateBtn.disabled) {
+      updateBtn.disabled = true;
+      updateBtn.textContent = 'Saving...';
+      const respId = updateBtn.dataset.resp;
+      const optId = updateBtn.dataset.opt;
+      // Update the existing response
+      const { error } = await sb.from('poll_responses')
+        .update({ poll_option_id: optId, responded_at: new Date().toISOString() })
+        .eq('id', respId);
+      if (error) { toast(error.message, '❌'); updateBtn.disabled = false; return; }
+      toast('Answer updated!', '✅');
+      renderAnnouncements();
+      return;
+    }
+
+    // Change attendance — toggle the form
+    const changeAttBtn = e.target.closest('[data-action="changeAttendance"]');
+    if (changeAttBtn) {
+      const annId = changeAttBtn.dataset.ann;
+      const form = document.getElementById('attForm_' + annId);
+      if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      return;
+    }
+
+    // Mark attended or not attended
     const attBtn = e.target.closest('[data-action="markAttended"]');
     if (attBtn && !attBtn.disabled) {
+      const attended = attBtn.dataset.val === 'true';
+      const origText = attBtn.textContent;
       attBtn.disabled = true;
       attBtn.textContent = 'Saving...';
       const { error } = await sb.from('attendance').upsert({
         announcement_id: attBtn.dataset.ann,
         scholar_id: currentUser.id,
-        attended: true,
+        attended: attended,
         marked_at: new Date().toISOString()
       }, { onConflict: 'announcement_id,scholar_id' });
-      if (error) { toast(error.message, '❌'); attBtn.disabled = false; attBtn.textContent = '✋ Mark Myself as Attended'; return; }
-      toast('Attendance marked! Thank you for confirming.', '✅');
+      if (error) { toast(error.message, '❌'); attBtn.disabled = false; attBtn.textContent = origText; return; }
+      toast(attended ? 'Attendance marked! Thank you.' : 'Noted — marked as Did Not Attend.', '✅');
       renderAnnouncements();
     }
   });
