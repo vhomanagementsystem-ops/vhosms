@@ -29,6 +29,9 @@
       <svg fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 1 1 6 0 3 3 0 0 1-6 0zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm14-1a5 5 0 0 1 4 5H13a5 5 0 0 1 4-5z"/></svg>All Scholars</a>
     <a class="nav-item" id="nav-documents">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h4.586A2 2 0 0 1 12 2.586L15.414 6A2 2 0 0 1 16 7.414V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 6a1 1 0 0 1 1-1h6a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm1 3a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H7z"/></svg>Document Verification<span class="nav-badge" id="nb-documents" style="display:none">0</span></a>
+    <div class="nav-group-label">Engagement</div>
+    <a class="nav-item" id="nav-announcements">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l6.553 3.276A1 1 0 0 0 18 15V3z"/></svg>Announcements<span class="nav-badge" id="nb-announcements" style="display:none">0</span></a>
     <div class="nav-group-label">Settings</div>
     <a class="nav-item" id="nav-changepassword">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0 1 10 0v2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2zm8-2v2H7V7a3 3 0 0 1 6 0z"/></svg>Change Password</a>
@@ -113,6 +116,15 @@
       </div>
     </div>
 
+    <!-- ANNOUNCEMENTS -->
+    <div id="page-announcements" class="page" style="display:none">
+      <div class="page-header">
+        <div class="page-header-left"><h1>Announcements</h1><p>Post events and polls for scholars</p></div>
+        <button class="btn btn-primary" id="addAnnouncementBtn">+ New Announcement</button>
+      </div>
+      <div id="announcementsList"><div class="empty"><p>Loading...</p></div></div>
+    </div>
+
     <!-- CHANGE PASSWORD -->
     <div id="page-changepassword" class="page" style="display:none">
       <div class="page-header"><div class="page-header-left"><h1>Change Password</h1><p>Set a new password for your admin account</p></div></div>
@@ -129,29 +141,6 @@
             </div>
             <div id="adm_cp_msg" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px"></div>
             <button class="btn btn-primary" id="admSendResetBtn" style="width:100%">Save New Password</button>
-          </div>
-        </div>
-        <div class="card" style="margin-top:14px">
-          <div class="card-header"><span class="card-title">How it works</span></div>
-          <div class="card-body">
-            <div style="display:flex;flex-direction:column;gap:12px">
-              <div style="display:flex;align-items:flex-start;gap:10px">
-                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
-                <div style="font-size:13px">Enter your active Gmail and click <strong>Send Reset Link</strong></div>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:10px">
-                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
-                <div style="font-size:13px">Check your Gmail inbox for a reset link from VHO</div>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:10px">
-                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
-                <div style="font-size:13px">Click the link — it opens a page where you set your new password</div>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:10px">
-                <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
-                <div style="font-size:13px">Use your new password to log in next time</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -193,16 +182,13 @@
   </div>
   <div class="form-row">
     <div class="form-field"><label class="form-label">Year Level *</label>
-      <select class="form-select" id="f_yearlevel">
-        <option value="">— Select Year Level —</option>
-      </select>
+      <select class="form-select" id="f_yearlevel"><option value="">— Select Year Level —</option></select>
     </div>
     <div class="form-field"><label class="form-label">School *</label><input class="form-input" id="f_school" placeholder="School / University name"></div>
   </div>
   <div class="form-row">
     <div class="form-field"><label class="form-label">Year of Graduation</label><input class="form-input" id="f_yog" type="number" placeholder="2027" min="2023" max="2040"></div>
   </div>
-
   <div class="modal-footer">
     <button class="btn btn-ghost" id="cancelScholarForm">Cancel</button>
     <button class="btn btn-primary" id="scholarFormSaveBtn">Add Scholar</button>
@@ -249,6 +235,52 @@
   <iframe class="pdf-frame" id="docViewFrame" src="about:blank"></iframe>
 </div></div>
 
+<!-- Add/Edit Announcement -->
+<div class="modal-bg" id="mAnnouncementForm">
+<div class="modal" style="max-width:560px">
+  <button class="modal-close" id="closeAnnouncementForm">✕</button>
+  <h2 class="modal-title" id="announcementFormTitle">New Announcement</h2>
+  <p class="modal-sub">Fill in the event details and add poll options for scholars.</p>
+  <div class="form-field"><label class="form-label">Title *</label><input class="form-input" id="ann_title" placeholder="e.g. Monthly Meeting - July 2026"></div>
+  <div class="form-field"><label class="form-label">Description</label><textarea class="form-textarea" id="ann_desc" placeholder="Event details, venue, instructions..."></textarea></div>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Event Date</label><input class="form-input" id="ann_date" type="date"></div>
+    <div class="form-field"><label class="form-label">Location</label><input class="form-input" id="ann_location" placeholder="e.g. VHO Office, Zoom"></div>
+  </div>
+  <div class="form-field"><label class="form-label">Poll Question</label><input class="form-input" id="ann_poll_question" placeholder="e.g. Will you attend this event?"></div>
+  <div class="form-field">
+    <label class="form-label">Poll Options <span style="font-size:11px;color:var(--muted)">(one per line)</span></label>
+    <textarea class="form-textarea" id="ann_poll_options" placeholder="Yes, I will attend&#10;No, I cannot attend&#10;Maybe"></textarea>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelAnnouncementForm">Cancel</button>
+    <button class="btn btn-primary" id="saveAnnouncementBtn">Post Announcement</button>
+  </div>
+</div></div>
+
+<!-- Poll Results Modal -->
+<div class="modal-bg" id="mPollResults">
+<div class="modal" style="max-width:600px">
+  <button class="modal-close" id="closePollResults">✕</button>
+  <h2 class="modal-title" id="pollResultsTitle">Poll Results</h2>
+  <div id="pollResultsBody"></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="closePollResultsBtn">Close</button>
+  </div>
+</div></div>
+
+<!-- Attendance View Modal (admin read-only) -->
+<div class="modal-bg" id="mAttendance">
+<div class="modal" style="max-width:600px">
+  <button class="modal-close" id="closeAttendance">✕</button>
+  <h2 class="modal-title" id="attendanceTitle">Actual Attendance</h2>
+  <p class="modal-sub" id="attendanceSub">Scholars who marked themselves as attended.</p>
+  <div id="attendanceBody"></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="closeAttendanceBtn">Close</button>
+  </div>
+</div></div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal-bg" id="mDeleteConfirm">
 <div class="modal" style="max-width:400px">
@@ -275,35 +307,33 @@
 
 <script>
 (function () {
-  // ── SUPABASE ──
   const SUPABASE_URL = "https://fatlifawnrricmlosvxg.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhdGxpZmF3bnJyaWNtbG9zdnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mjc2NDEsImV4cCI6MjA5NzEwMzY0MX0.pYiqeIFCkQA6cxJ9nk0vLGeqPtEP7kwF_d_tV1yrD3I";
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const GROUPS = ['CKC', 'POLO', 'Zapateria Hub', 'N/A', 'Others'];
   const GRADE_LEVELS = ['Junior High School', 'Senior High School', 'College'];
+  const YEAR_LEVELS = {
+    'Junior High School': ['Grade 7','Grade 8','Grade 9','Grade 10'],
+    'Senior High School': ['Grade 11','Grade 12'],
+    'College': ['1st Year','2nd Year','3rd Year','4th Year','5th Year']
+  };
 
   let scholars = [];
   let docs = [];
+  let announcements = [];
   let editingScholarId = null;
   let editingStatusId = null;
   let reviewTarget = null;
+  let editingAnnouncementId = null;
 
-  // ── YEAR LEVEL HELPER ──
-  const YEAR_LEVELS = {
-    'Junior High School':  ['Grade 7','Grade 8','Grade 9','Grade 10'],
-    'Senior High School':  ['Grade 11','Grade 12'],
-    'College':             ['1st Year','2nd Year','3rd Year','4th Year','5th Year']
-  };
-
+  // ── HELPERS ──
   function populateYearLevel(selectId, gradeLevel, currentValue) {
     const sel = document.getElementById(selectId);
     const opts = YEAR_LEVELS[gradeLevel] || [];
     sel.innerHTML = '<option value="">— Select Year Level —</option>' +
-      opts.map(o => `<option value="${o}" ${o === currentValue ? 'selected' : ''}>${o}</option>`).join('');
+      opts.map(o => '<option value="' + o + '"' + (o === currentValue ? ' selected' : '') + '>' + o + '</option>').join('');
   }
-
-  // ── HELPERS ──
   function calcAge(bd) {
     if (!bd) return '—';
     const b = new Date(bd + 'T00:00:00');
@@ -318,19 +348,20 @@
   function statusBadge(s) {
     const m = { active: 'badge-green', inactive: 'badge-gray', graduated: 'badge-purple' };
     const l = { active: 'Active', inactive: 'Inactive', graduated: 'Graduated' };
-    return `<span class="badge ${m[s] || 'badge-gray'}">${l[s] || s || '—'}</span>`;
+    return '<span class="badge ' + (m[s] || 'badge-gray') + '">' + (l[s] || s || '—') + '</span>';
   }
   function docBadge(status) {
     if (!status) return '<span class="badge badge-gray">Not Submitted</span>';
     const m = { Pending: 'badge-amber', Verified: 'badge-green', Rejected: 'badge-pink' };
-    return `<span class="badge ${m[status] || 'badge-gray'}">${status}</span>`;
+    return '<span class="badge ' + (m[status] || 'badge-gray') + '">' + status + '</span>';
   }
   function getDoc(scholarId, type) { return docs.find(d => d.scholar_id === scholarId && d.document_type === type); }
-  function toast(msg, icon = 'ℹ️') {
+  function toast(msg, icon) {
+    icon = icon || 'ℹ️';
     const c = document.getElementById('toasts');
     const t = document.createElement('div'); t.className = 'toast';
-    t.innerHTML = `<span class="toast-icon">${icon}</span><div><strong>${msg}</strong></div>`;
-    c.appendChild(t); setTimeout(() => t.remove(), 3500);
+    t.innerHTML = '<span class="toast-icon">' + icon + '</span><div><strong>' + msg + '</strong></div>';
+    c.appendChild(t); setTimeout(function() { t.remove(); }, 3500);
   }
   function openModal(id) { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -346,11 +377,11 @@
   }
 
   // ── NAV ──
-  const pages = ['dashboard', 'scholars', 'documents', 'changepassword'];
-  const titles = { dashboard: 'Dashboard', scholars: 'All Scholars', documents: 'Document Verification', changepassword: 'Change Password' };
+  const pages = ['dashboard', 'scholars', 'documents', 'announcements', 'changepassword'];
+  const titles = { dashboard: 'Dashboard', scholars: 'All Scholars', documents: 'Document Verification', announcements: 'Announcements', changepassword: 'Change Password' };
 
   function gotoPage(page) {
-    pages.forEach(p => {
+    pages.forEach(function(p) {
       const el = document.getElementById('page-' + p);
       if (el) el.style.display = p === page ? 'block' : 'none';
       const nav = document.getElementById('nav-' + p);
@@ -360,21 +391,20 @@
     if (page === 'dashboard') renderDash();
     if (page === 'scholars') renderScholarsTable();
     if (page === 'documents') renderDocsTable();
+    if (page === 'announcements') renderAnnouncements();
     closeSidebar();
   }
 
-  pages.forEach(p => { const el = document.getElementById('nav-' + p); if(el) el.addEventListener('click', () => gotoPage(p)); });
-  document.getElementById('dashViewAll').addEventListener('click', () => gotoPage('scholars'));
+  pages.forEach(function(p) { const el = document.getElementById('nav-' + p); if(el) el.addEventListener('click', function() { gotoPage(p); }); });
+  document.getElementById('dashViewAll').addEventListener('click', function() { gotoPage('scholars'); });
 
   // ── SIDEBAR ──
   function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
   function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
   document.getElementById('hamburger').addEventListener('click', toggleSidebar);
   document.getElementById('overlay').addEventListener('click', closeSidebar);
-  document.getElementById('logoutBtn').addEventListener('click', function () {
-    openModal('mLogoutConfirm');
-  });
-  document.getElementById('cancelLogoutBtn').addEventListener('click', () => closeModal('mLogoutConfirm'));
+  document.getElementById('logoutBtn').addEventListener('click', function() { openModal('mLogoutConfirm'); });
+  document.getElementById('cancelLogoutBtn').addEventListener('click', function() { closeModal('mLogoutConfirm'); });
   document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
     sessionStorage.removeItem('vho_role');
     sessionStorage.removeItem('admin_name');
@@ -385,36 +415,29 @@
 
   // ── DASHBOARD ──
   function renderDash() {
-    const active = scholars.filter(s => s.scholar_status === 'active').length;
-    const inactive = scholars.filter(s => s.scholar_status === 'inactive').length;
-    const graduated = scholars.filter(s => s.scholar_status === 'graduated').length;
-    const pending = docs.filter(d => d.verification_status === 'Pending').length;
+    const active = scholars.filter(function(s) { return s.scholar_status === 'active'; }).length;
+    const inactive = scholars.filter(function(s) { return s.scholar_status === 'inactive'; }).length;
+    const graduated = scholars.filter(function(s) { return s.scholar_status === 'graduated'; }).length;
+    const pending = docs.filter(function(d) { return d.verification_status === 'Pending'; }).length;
 
-    document.getElementById('dashStats').innerHTML = `
-      <div class="stat-card blue"><div class="stat-label">Total Scholars</div><div class="stat-val">${scholars.length}</div><div class="stat-sub">All records</div></div>
-      <div class="stat-card green"><div class="stat-label">Active</div><div class="stat-val">${active}</div><div class="stat-sub">Currently enrolled</div></div>
-      <div class="stat-card"><div class="stat-label">Inactive</div><div class="stat-val">${inactive}</div><div class="stat-sub">Not continuing</div></div>
-      <div class="stat-card purple"><div class="stat-label">Graduated</div><div class="stat-val">${graduated}</div><div class="stat-sub">Completed program</div></div>
-      <div class="stat-card amber"><div class="stat-label">Pending Reviews</div><div class="stat-val">${pending}</div><div class="stat-sub">Awaiting review</div></div>`;
+    document.getElementById('dashStats').innerHTML =
+      '<div class="stat-card blue"><div class="stat-label">Total Scholars</div><div class="stat-val">' + scholars.length + '</div><div class="stat-sub">All records</div></div>' +
+      '<div class="stat-card green"><div class="stat-label">Active</div><div class="stat-val">' + active + '</div><div class="stat-sub">Currently enrolled</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Inactive</div><div class="stat-val">' + inactive + '</div><div class="stat-sub">Not continuing</div></div>' +
+      '<div class="stat-card purple"><div class="stat-label">Graduated</div><div class="stat-val">' + graduated + '</div><div class="stat-sub">Completed program</div></div>' +
+      '<div class="stat-card amber"><div class="stat-label">Pending Reviews</div><div class="stat-val">' + pending + '</div><div class="stat-sub">Awaiting review</div></div>';
 
-    document.getElementById('dashTable').innerHTML = scholars.slice(0, 6).map(s => {
+    document.getElementById('dashTable').innerHTML = scholars.slice(0, 6).map(function(s) {
       const cor = getDoc(s.id, 'Certificate of Registration');
       const gr = getDoc(s.id, 'Grade Report');
-      return `<tr>
-        <td><div class="s-info-row"><div class="s-avatar">${ini(s.name)}</div><div><div class="s-name">${s.name}</div><div class="s-sub">${s.email}</div></div></div></td>
-        <td><span class="badge badge-blue">${s.group_name || '—'}</span></td>
-        <td>${s.grade_level || '—'}</td>
-        <td>${s.year_level || '—'}</td>
-        <td>${statusBadge(s.scholar_status)}</td>
-        <td>${docBadge(cor ? cor.verification_status : null)}</td>
-        <td>${docBadge(gr ? gr.verification_status : null)}</td></tr>`;
-    }).join('') || `<tr><td colspan="6"><div class="empty"><p>No scholars yet.</p></div></td></tr>`;
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">' + ini(s.name) + '</div><div><div class="s-name">' + s.name + '</div><div class="s-sub">' + s.email + '</div></div></div></td><td><span class="badge badge-blue">' + (s.group_name || '—') + '</span></td><td>' + (s.grade_level || '—') + '</td><td>' + (s.year_level || '—') + '</td><td>' + statusBadge(s.scholar_status) + '</td><td>' + docBadge(cor ? cor.verification_status : null) + '</td><td>' + docBadge(gr ? gr.verification_status : null) + '</td></tr>';
+    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No scholars yet.</p></div></td></tr>';
 
-    const gc = {}; GROUPS.forEach(g => gc[g] = 0); scholars.forEach(s => { gc[s.group_name] = (gc[s.group_name] || 0) + 1; });
-    document.getElementById('groupBreakdown').innerHTML = GROUPS.map(g => `<div class="breakdown-row"><span style="font-size:13px">${g}</span><span class="badge badge-blue">${gc[g] || 0}</span></div>`).join('');
+    const gc = {}; GROUPS.forEach(function(g) { gc[g] = 0; }); scholars.forEach(function(s) { gc[s.group_name] = (gc[s.group_name] || 0) + 1; });
+    document.getElementById('groupBreakdown').innerHTML = GROUPS.map(function(g) { return '<div class="breakdown-row"><span style="font-size:13px">' + g + '</span><span class="badge badge-blue">' + (gc[g] || 0) + '</span></div>'; }).join('');
 
-    const glc = {}; GRADE_LEVELS.forEach(g => glc[g] = 0); scholars.forEach(s => { glc[s.grade_level] = (glc[s.grade_level] || 0) + 1; });
-    document.getElementById('glBreakdown').innerHTML = GRADE_LEVELS.map(g => `<div class="breakdown-row"><span style="font-size:13px">${g}</span><span class="badge badge-purple">${glc[g] || 0}</span></div>`).join('');
+    const glc = {}; GRADE_LEVELS.forEach(function(g) { glc[g] = 0; }); scholars.forEach(function(s) { glc[s.grade_level] = (glc[s.grade_level] || 0) + 1; });
+    document.getElementById('glBreakdown').innerHTML = GRADE_LEVELS.map(function(g) { return '<div class="breakdown-row"><span style="font-size:13px">' + g + '</span><span class="badge badge-purple">' + (glc[g] || 0) + '</span></div>'; }).join('');
 
     updateDocsBadge();
   }
@@ -428,47 +451,25 @@
     const gl = document.getElementById('sGradeLevel').value;
     const st = document.getElementById('sStatus').value;
 
-    const data = scholars.filter(s =>
-      (!q || (s.name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q)) &&
-      (!grp || s.group_name === grp) &&
-      (!batch || String(s.batch_no) === batch) &&
-      (!yj || String(s.year_joined) === yj) &&
-      (!gl || s.grade_level === gl) &&
-      (!st || s.scholar_status === st));
+    const data = scholars.filter(function(s) {
+      return (!q || (s.name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q)) &&
+        (!grp || s.group_name === grp) && (!batch || String(s.batch_no) === batch) &&
+        (!yj || String(s.year_joined) === yj) && (!gl || s.grade_level === gl) && (!st || s.scholar_status === st);
+    });
 
-    document.getElementById('scholarsTable').innerHTML = data.map(s => {
+    document.getElementById('scholarsTable').innerHTML = data.map(function(s) {
       const cor = getDoc(s.id, 'Certificate of Registration');
       const gr = getDoc(s.id, 'Grade Report');
-      return `<tr>
-        <td><div class="s-info-row"><div class="s-avatar">${ini(s.name)}</div><div><div class="s-name">${s.name}</div><div class="s-sub">${s.email}</div></div></div></td>
-        <td><span class="badge badge-blue">${s.group_name || '—'}</span></td>
-        <td>Batch ${s.batch_no || '—'}</td>
-        <td>${s.grade_level || '—'}</td>
-        <td>${s.year_level || '—'}</td>
-        <td>${statusBadge(s.scholar_status)}</td>
-        <td>
-          <div style="display:flex;flex-direction:column;gap:4px">
-            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--muted);min-width:44px">COR</span>${docBadge(cor ? cor.verification_status : null)}</div>
-            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--muted);min-width:44px">Grades</span>${docBadge(gr ? gr.verification_status : null)}</div>
-          </div>
-        </td>
-        <td style="display:flex;gap:4px;flex-wrap:wrap">
-          <button class="btn btn-ghost btn-sm" data-action="view" data-id="${s.id}">View</button>
-          <button class="btn btn-ghost btn-sm" data-action="edit" data-id="${s.id}">Edit</button>
-          <button class="btn btn-amber btn-sm" data-action="status" data-id="${s.id}">Status</button>
-          <button class="btn btn-danger btn-sm" data-action="delete" data-id="${s.id}">Delete</button>
-        </td></tr>`;
-    }).join('') || `<tr><td colspan="7"><div class="empty"><p>No scholars found.</p></div></td></tr>`;
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">' + ini(s.name) + '</div><div><div class="s-name">' + s.name + '</div><div class="s-sub">' + s.email + '</div></div></div></td><td><span class="badge badge-blue">' + (s.group_name || '—') + '</span></td><td>Batch ' + (s.batch_no || '—') + '</td><td>' + (s.grade_level || '—') + '</td><td>' + (s.year_level || '—') + '</td><td>' + statusBadge(s.scholar_status) + '</td><td><div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--muted);min-width:44px">COR</span>' + docBadge(cor ? cor.verification_status : null) + '</div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--muted);min-width:44px">Grades</span>' + docBadge(gr ? gr.verification_status : null) + '</div></div></td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="view" data-id="' + s.id + '">View</button><button class="btn btn-ghost btn-sm" data-action="edit" data-id="' + s.id + '">Edit</button><button class="btn btn-amber btn-sm" data-action="status" data-id="' + s.id + '">Status</button><button class="btn btn-danger btn-sm" data-action="delete" data-id="' + s.id + '">Delete</button></td></tr>';
+    }).join('') || '<tr><td colspan="8"><div class="empty"><p>No scholars found.</p></div></td></tr>';
   }
 
-  // Filter listeners
-  ['sSearch','sGroup','sBatch','sYearJoined','sGradeLevel','sStatus'].forEach(id => {
+  ['sSearch','sGroup','sBatch','sYearJoined','sGradeLevel','sStatus'].forEach(function(id) {
     document.getElementById(id).addEventListener('input', renderScholarsTable);
     document.getElementById(id).addEventListener('change', renderScholarsTable);
   });
 
-  // Table action delegation
-  document.getElementById('scholarsTable').addEventListener('click', function (e) {
+  document.getElementById('scholarsTable').addEventListener('click', function(e) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const id = btn.dataset.id;
@@ -481,19 +482,15 @@
 
   // ── ADD / EDIT SCHOLAR ──
   document.getElementById('addScholarBtn').addEventListener('click', openAddScholar);
-  document.getElementById('closeScholarForm').addEventListener('click', () => closeModal('mScholarForm'));
-  document.getElementById('cancelScholarForm').addEventListener('click', () => closeModal('mScholarForm'));
-  document.getElementById('mScholarForm').addEventListener('click', function (e) { if (e.target === this) closeModal('mScholarForm'); });
+  document.getElementById('closeScholarForm').addEventListener('click', function() { closeModal('mScholarForm'); });
+  document.getElementById('cancelScholarForm').addEventListener('click', function() { closeModal('mScholarForm'); });
+  document.getElementById('mScholarForm').addEventListener('click', function(e) { if (e.target === this) closeModal('mScholarForm'); });
   document.getElementById('scholarFormSaveBtn').addEventListener('click', saveScholarForm);
-
-  // Auto-update year level when grade level changes
-  document.getElementById('f_gradelevel').addEventListener('change', function () {
-    populateYearLevel('f_yearlevel', this.value, '');
-  });
+  document.getElementById('f_gradelevel').addEventListener('change', function() { populateYearLevel('f_yearlevel', this.value, ''); });
 
   function openAddScholar() {
     editingScholarId = null;
-    ['f_name','f_em','f_phone','f_bd','f_school','f_yog'].forEach(id => document.getElementById(id).value = '');
+    ['f_name','f_em','f_phone','f_bd','f_school','f_yog'].forEach(function(id) { document.getElementById(id).value = ''; });
     document.getElementById('f_group').value = 'CKC';
     document.getElementById('f_batch').value = '1';
     document.getElementById('f_yj').value = '2026';
@@ -506,7 +503,7 @@
   }
 
   function openEditScholar(id) {
-    const s = scholars.find(x => x.id === id);
+    const s = scholars.find(function(x) { return x.id === id; });
     if (!s) return;
     editingScholarId = id;
     document.getElementById('f_name').value = s.name || '';
@@ -521,24 +518,24 @@
     document.getElementById('f_school').value = s.school || '';
     document.getElementById('f_yog').value = s.graduation_year || '';
     document.getElementById('scholarFormTitle').textContent = 'Edit Scholar';
-    document.getElementById('scholarFormSub').textContent = `Update ${s.name}'s information.`;
+    document.getElementById('scholarFormSub').textContent = 'Update ' + s.name + '\'s information.';
     document.getElementById('scholarFormSaveBtn').textContent = 'Save Changes';
     closeModal('mScholarDetail');
     openModal('mScholarForm');
   }
 
   async function saveScholarForm() {
-    const name   = document.getElementById('f_name').value.trim();
-    const email  = document.getElementById('f_em').value.trim().toLowerCase();
-    const phone  = document.getElementById('f_phone').value.trim();
-    const group  = document.getElementById('f_group').value;
-    const batch  = parseInt(document.getElementById('f_batch').value);
-    const yj     = parseInt(document.getElementById('f_yj').value);
-    const bd     = document.getElementById('f_bd').value;
-    const school     = document.getElementById('f_school').value.trim();
-    const gl         = document.getElementById('f_gradelevel').value;
+    const name = document.getElementById('f_name').value.trim();
+    const email = document.getElementById('f_em').value.trim().toLowerCase();
+    const phone = document.getElementById('f_phone').value.trim();
+    const group = document.getElementById('f_group').value;
+    const batch = parseInt(document.getElementById('f_batch').value);
+    const yj = parseInt(document.getElementById('f_yj').value);
+    const bd = document.getElementById('f_bd').value;
+    const school = document.getElementById('f_school').value.trim();
+    const gl = document.getElementById('f_gradelevel').value;
     const year_level = document.getElementById('f_yearlevel').value;
-    const yog        = document.getElementById('f_yog').value ? parseInt(document.getElementById('f_yog').value) : null;
+    const yog = document.getElementById('f_yog').value ? parseInt(document.getElementById('f_yog').value) : null;
 
     if (!name || !email || !bd || !school || !gl || !year_level) { toast('Please fill in all required fields including Year Level', '⚠️'); return; }
 
@@ -547,25 +544,17 @@
 
     try {
       const age = calcAge(bd);
-
       if (editingScholarId === null) {
-        // Insert scholar record directly — no Supabase Auth signup here.
-        // The scholar registers their auth account separately on first login
-        // using the email the admin provides.
         const { data: newS, error: dbErr } = await sb.from('scholars').insert({
           name, group_name: group, batch_no: batch, year_joined: yj,
           birthdate: bd, age: typeof age === 'number' ? age : null,
           school, grade_level: gl, year_level, graduation_year: yog,
           email, phone_number: phone, scholar_status: 'active'
         }).select().single();
-
         if (dbErr) { toast(dbErr.message, '❌'); btn.disabled = false; btn.textContent = 'Add Scholar'; return; }
         scholars.unshift(newS);
-
         const firstName = name.split(' ')[0];
-        const defaultPw = `VHO${firstName}`;
-        toast(`${name} added! ✅ Default password: ${defaultPw}`, '🎓');
-
+        toast(name + ' added! Default password: VHO' + firstName, '🎓');
       } else {
         const { data: upd, error } = await sb.from('scholars').update({
           name, group_name: group, batch_no: batch, year_joined: yj,
@@ -573,33 +562,30 @@
           school, grade_level: gl, year_level, graduation_year: yog,
           email, phone_number: phone
         }).eq('id', editingScholarId).select().single();
-
         if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Save Changes'; return; }
-        const idx = scholars.findIndex(x => x.id === editingScholarId);
+        const idx = scholars.findIndex(function(x) { return x.id === editingScholarId; });
         if (idx !== -1) scholars[idx] = upd;
-        toast('Scholar updated ✅', '✅');
+        toast('Scholar updated', '✅');
       }
-
       closeModal('mScholarForm');
       renderScholarsTable();
       renderDash();
-
     } catch (err) { console.error(err); toast('An error occurred: ' + err.message, '❌'); }
     btn.disabled = false;
     btn.textContent = editingScholarId ? 'Save Changes' : 'Add Scholar';
   }
 
   // ── STATUS ──
-  document.getElementById('closeStatus').addEventListener('click', () => closeModal('mStatus'));
-  document.getElementById('cancelStatus').addEventListener('click', () => closeModal('mStatus'));
-  document.getElementById('mStatus').addEventListener('click', function (e) { if (e.target === this) closeModal('mStatus'); });
+  document.getElementById('closeStatus').addEventListener('click', function() { closeModal('mStatus'); });
+  document.getElementById('cancelStatus').addEventListener('click', function() { closeModal('mStatus'); });
+  document.getElementById('mStatus').addEventListener('click', function(e) { if (e.target === this) closeModal('mStatus'); });
   document.getElementById('saveStatusBtn').addEventListener('click', saveStatus);
 
   function openStatusModal(id) {
-    const s = scholars.find(x => x.id === id);
+    const s = scholars.find(function(x) { return x.id === id; });
     if (!s) return;
     editingStatusId = id;
-    document.getElementById('statusModalSub').textContent = `Update the scholarship status for ${s.name}.`;
+    document.getElementById('statusModalSub').textContent = 'Update the scholarship status for ' + s.name + '.';
     document.getElementById('statusSelect').value = s.scholar_status || 'active';
     closeModal('mScholarDetail');
     openModal('mStatus');
@@ -609,7 +595,7 @@
     const status = document.getElementById('statusSelect').value;
     const { data: upd, error } = await sb.from('scholars').update({ scholar_status: status }).eq('id', editingStatusId).select().single();
     if (error) { toast(error.message, '❌'); return; }
-    const idx = scholars.findIndex(x => x.id === editingStatusId);
+    const idx = scholars.findIndex(function(x) { return x.id === editingStatusId; });
     if (idx !== -1) scholars[idx] = upd;
     closeModal('mStatus');
     renderScholarsTable(); renderDash();
@@ -618,16 +604,14 @@
 
   // ── DELETE ──
   let deletingScholarId = null;
-
   function deleteScholar(id) {
-    const s = scholars.find(x => x.id === id);
+    const s = scholars.find(function(x) { return x.id === id; });
     if (!s) return;
     deletingScholarId = id;
     document.getElementById('deleteModalName').textContent = s.name;
     openModal('mDeleteConfirm');
   }
-
-  document.getElementById('cancelDeleteBtn').addEventListener('click', () => closeModal('mDeleteConfirm'));
+  document.getElementById('cancelDeleteBtn').addEventListener('click', function() { closeModal('mDeleteConfirm'); });
   document.getElementById('mDeleteConfirm').addEventListener('click', function(e) { if(e.target===this) closeModal('mDeleteConfirm'); });
   document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
     if (!deletingScholarId) return;
@@ -637,8 +621,8 @@
     const { error } = await sb.from('scholars').delete().eq('id', id);
     this.disabled = false; this.textContent = 'Yes, Delete';
     if (error) { toast(error.message, '❌'); return; }
-    scholars = scholars.filter(x => x.id !== id);
-    docs = docs.filter(x => x.scholar_id !== id);
+    scholars = scholars.filter(function(x) { return x.id !== id; });
+    docs = docs.filter(function(x) { return x.scholar_id !== id; });
     closeModal('mDeleteConfirm');
     deletingScholarId = null;
     renderScholarsTable(); renderDash(); renderDocsTable();
@@ -646,7 +630,7 @@
   });
 
   // ── SCHOLAR DETAIL ──
-  document.getElementById('mScholarDetail').addEventListener('click', function (e) {
+  document.getElementById('mScholarDetail').addEventListener('click', function(e) {
     if (e.target === this) closeModal('mScholarDetail');
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -657,66 +641,44 @@
   });
 
   function viewScholar(id) {
-    const s = scholars.find(x => x.id === id);
+    const s = scholars.find(function(x) { return x.id === id; });
     if (!s) return;
     const cor = getDoc(s.id, 'Certificate of Registration');
-    const gr  = getDoc(s.id, 'Grade Report');
-    document.getElementById('mScholarDetailBody').innerHTML = `
-      <button class="modal-close" data-action="closeDetail" data-id="${s.id}">✕</button>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-        <div style="width:52px;height:52px;border-radius:50%;background:var(--pink2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--blue2)">${ini(s.name)}</div>
-        <div><h2 class="modal-title" style="margin-bottom:2px">${s.name}</h2><p style="font-size:13px;color:var(--muted)">${s.email}</p></div>
-      </div>
-      <div class="info-grid" style="margin-bottom:16px">
-        ${[['Group',s.group_name],['Batch No.','Batch '+(s.batch_no||'—')],['Year Joined',s.year_joined],['Birthdate',s.birthdate||'—'],['Age',calcAge(s.birthdate)],['School',s.school||'—'],['Grade Level',s.grade_level||'—'],['Year Level',s.year_level||'—'],['Year of Graduation',s.graduation_year||'—'],['Phone',s.phone_number||'—'],['Status',statusBadge(s.scholar_status)]].map(([k,v])=>
-          `<div class="info-item"><div class="info-label">${k}</div><div class="info-value">${v}</div></div>`).join('')}
-      </div>
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px">Documents</div>
-      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px">
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted)">COR:</span>${docBadge(cor?cor.verification_status:null)}</div>
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted)">Grades:</span>${docBadge(gr?gr.verification_status:null)}</div>
-      </div>
-      ${cor&&cor.remarks?`<div class="remarks-box ${cor.verification_status==='Rejected'?'rejected':''}"><strong>COR Remarks: </strong>${cor.remarks}</div>`:''}
-      ${gr&&gr.remarks?`<div class="remarks-box ${gr.verification_status==='Rejected'?'rejected':''}"><strong>Grades Remarks: </strong>${gr.remarks}</div>`:''}
-      <div class="modal-footer">
-        <button class="btn btn-ghost" data-action="closeDetail" data-id="${s.id}">Close</button>
-        <button class="btn btn-amber btn-sm" data-action="status" data-id="${s.id}">Change Status</button>
-        <button class="btn btn-primary" data-action="edit" data-id="${s.id}">Edit Info</button>
-      </div>`;
+    const gr = getDoc(s.id, 'Grade Report');
+    const fields = [['Group',s.group_name],['Batch No.','Batch '+(s.batch_no||'—')],['Year Joined',s.year_joined],['Birthdate',s.birthdate||'—'],['Age',calcAge(s.birthdate)],['School',s.school||'—'],['Grade Level',s.grade_level||'—'],['Year Level',s.year_level||'—'],['Year of Graduation',s.graduation_year||'—'],['Phone',s.phone_number||'—'],['Status',statusBadge(s.scholar_status)]];
+    document.getElementById('mScholarDetailBody').innerHTML =
+      '<button class="modal-close" data-action="closeDetail" data-id="' + s.id + '">✕</button>' +
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px"><div style="width:52px;height:52px;border-radius:50%;background:var(--pink2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--blue2)">' + ini(s.name) + '</div><div><h2 class="modal-title" style="margin-bottom:2px">' + s.name + '</h2><p style="font-size:13px;color:var(--muted)">' + s.email + '</p></div></div>' +
+      '<div class="info-grid" style="margin-bottom:16px">' + fields.map(function(f) { return '<div class="info-item"><div class="info-label">' + f[0] + '</div><div class="info-value">' + f[1] + '</div></div>'; }).join('') + '</div>' +
+      '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px">Documents</div>' +
+      '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted)">COR:</span>' + docBadge(cor?cor.verification_status:null) + '</div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted)">Grades:</span>' + docBadge(gr?gr.verification_status:null) + '</div></div>' +
+      (cor&&cor.remarks?'<div class="remarks-box '+(cor.verification_status==='Rejected'?'rejected':'')+'"><strong>COR Remarks: </strong>'+cor.remarks+'</div>':'') +
+      (gr&&gr.remarks?'<div class="remarks-box '+(gr.verification_status==='Rejected'?'rejected':'')+'"><strong>Grades Remarks: </strong>'+gr.remarks+'</div>':'') +
+      '<div class="modal-footer"><button class="btn btn-ghost" data-action="closeDetail" data-id="' + s.id + '">Close</button><button class="btn btn-amber btn-sm" data-action="status" data-id="' + s.id + '">Change Status</button><button class="btn btn-primary" data-action="edit" data-id="' + s.id + '">Edit Info</button></div>';
     openModal('mScholarDetail');
   }
 
   // ── DOCUMENTS TABLE ──
   function renderDocsTable() {
-    const q  = document.getElementById('dSearch').value.toLowerCase();
+    const q = document.getElementById('dSearch').value.toLowerCase();
     const ty = document.getElementById('dType').value;
     const st = document.getElementById('dStatus').value;
-
-    let rows = docs.map(doc => ({ doc, scholar: scholars.find(s => s.id === doc.scholar_id) })).filter(r => r.scholar);
-    if (q)  rows = rows.filter(r => r.scholar.name.toLowerCase().includes(q));
-    if (ty) rows = rows.filter(r => r.doc.document_type === ty);
-    if (st) rows = rows.filter(r => r.doc.verification_status === st);
-
-    document.getElementById('docsTable').innerHTML = rows.map(({ doc, scholar: s }) => `<tr>
-      <td><div class="s-info-row"><div class="s-avatar">${ini(s.name)}</div><div><div class="s-name">${s.name}</div><div class="s-sub">${s.group_name||'—'} · Batch ${s.batch_no||'—'}</div></div></div></td>
-      <td>${doc.document_type}</td>
-      <td style="font-size:12px;color:var(--muted)">${doc.file_name||'—'}</td>
-      <td style="font-size:12px;color:var(--muted);white-space:nowrap">${fmtDate(doc.uploaded_at)}</td>
-      <td>${docBadge(doc.verification_status)}</td>
-      <td style="font-size:12px;color:var(--muted);max-width:220px">${doc.remarks||'—'}</td>
-      <td style="display:flex;gap:4px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" data-action="viewDoc" data-id="${doc.id}">View</button>
-        <button class="btn btn-success btn-sm" data-action="verify" data-id="${doc.id}" ${doc.verification_status==='Verified'?'disabled':''}>Verify</button>
-        <button class="btn btn-danger btn-sm" data-action="reject" data-id="${doc.id}" ${doc.verification_status==='Rejected'?'disabled':''}>Reject</button>
-      </td></tr>`).join('') || `<tr><td colspan="7"><div class="empty"><p>No documents found.</p></div></td></tr>`;
+    let rows = docs.map(function(doc) { return { doc: doc, scholar: scholars.find(function(s) { return s.id === doc.scholar_id; }) }; }).filter(function(r) { return r.scholar; });
+    if (q) rows = rows.filter(function(r) { return r.scholar.name.toLowerCase().includes(q); });
+    if (ty) rows = rows.filter(function(r) { return r.doc.document_type === ty; });
+    if (st) rows = rows.filter(function(r) { return r.doc.verification_status === st; });
+    document.getElementById('docsTable').innerHTML = rows.map(function(r) {
+      const doc = r.doc; const s = r.scholar;
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">' + ini(s.name) + '</div><div><div class="s-name">' + s.name + '</div><div class="s-sub">' + (s.group_name||'—') + ' · Batch ' + (s.batch_no||'—') + '</div></div></div></td><td>' + doc.document_type + '</td><td style="font-size:12px;color:var(--muted)">' + (doc.file_name||'—') + '</td><td style="font-size:12px;color:var(--muted);white-space:nowrap">' + fmtDate(doc.uploaded_at) + '</td><td>' + docBadge(doc.verification_status) + '</td><td style="font-size:12px;color:var(--muted);max-width:220px">' + (doc.remarks||'—') + '</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="viewDoc" data-id="' + doc.id + '">View</button><button class="btn btn-success btn-sm" data-action="verify" data-id="' + doc.id + '"' + (doc.verification_status==='Verified'?' disabled':'') + '>Verify</button><button class="btn btn-danger btn-sm" data-action="reject" data-id="' + doc.id + '"' + (doc.verification_status==='Rejected'?' disabled':'') + '>Reject</button></td></tr>';
+    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No documents found.</p></div></td></tr>';
   }
 
-  ['dSearch','dType','dStatus'].forEach(id => {
+  ['dSearch','dType','dStatus'].forEach(function(id) {
     document.getElementById(id).addEventListener('input', renderDocsTable);
     document.getElementById(id).addEventListener('change', renderDocsTable);
   });
 
-  document.getElementById('docsTable').addEventListener('click', function (e) {
+  document.getElementById('docsTable').addEventListener('click', function(e) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const id = btn.dataset.id;
@@ -726,25 +688,25 @@
   });
 
   function updateDocsBadge() {
-    const count = docs.filter(d => d.verification_status === 'Pending').length;
+    const count = docs.filter(function(d) { return d.verification_status === 'Pending'; }).length;
     const el = document.getElementById('nb-documents');
     el.style.display = count ? '' : 'none';
     if (count) el.textContent = count;
   }
 
   // ── DOC REVIEW ──
-  document.getElementById('closeDocReview').addEventListener('click', () => closeModal('mDocReview'));
-  document.getElementById('cancelDocReview').addEventListener('click', () => closeModal('mDocReview'));
-  document.getElementById('mDocReview').addEventListener('click', function (e) { if (e.target === this) closeModal('mDocReview'); });
+  document.getElementById('closeDocReview').addEventListener('click', function() { closeModal('mDocReview'); });
+  document.getElementById('cancelDocReview').addEventListener('click', function() { closeModal('mDocReview'); });
+  document.getElementById('mDocReview').addEventListener('click', function(e) { if (e.target === this) closeModal('mDocReview'); });
   document.getElementById('docReviewBtn').addEventListener('click', confirmDocReview);
 
   function openDocReview(docId, action) {
-    const doc = docs.find(d => d.id === docId);
+    const doc = docs.find(function(d) { return d.id === docId; });
     if (!doc) return;
-    const s = scholars.find(x => x.id === doc.scholar_id);
-    reviewTarget = { docId, action };
+    const s = scholars.find(function(x) { return x.id === doc.scholar_id; });
+    reviewTarget = { docId: docId, action: action };
     document.getElementById('docReviewTitle').textContent = action === 'verified' ? 'Verify Document' : 'Reject Document';
-    document.getElementById('docReviewSub').textContent = `${s ? s.name : '—'} — ${doc.document_type} (${doc.file_name})`;
+    document.getElementById('docReviewSub').textContent = (s ? s.name : '—') + ' — ' + doc.document_type + ' (' + doc.file_name + ')';
     document.getElementById('docReviewRemarks').value = action === 'rejected' ? (doc.remarks || '') : '';
     document.getElementById('docReviewBtn').textContent = action === 'verified' ? 'Mark as Verified' : 'Mark as Rejected';
     document.getElementById('docReviewBtn').className = action === 'verified' ? 'btn btn-success' : 'btn btn-danger';
@@ -753,117 +715,309 @@
 
   async function confirmDocReview() {
     if (!reviewTarget) return;
-    const { docId, action } = reviewTarget;
+    const docId = reviewTarget.docId; const action = reviewTarget.action;
     const remarks = document.getElementById('docReviewRemarks').value.trim();
     const newStatus = action === 'verified' ? 'Verified' : 'Rejected';
-
-    const { data: upd, error } = await sb.from('documents')
-      .update({ verification_status: newStatus, remarks, verified_at: new Date().toISOString() })
-      .eq('id', docId).select().single();
-
+    const { data: upd, error } = await sb.from('documents').update({ verification_status: newStatus, remarks: remarks, verified_at: new Date().toISOString() }).eq('id', docId).select().single();
     if (error) { toast(error.message, '❌'); return; }
-    const idx = docs.findIndex(d => d.id === docId);
+    const idx = docs.findIndex(function(d) { return d.id === docId; });
     if (idx !== -1) docs[idx] = upd;
-
     if (action === 'rejected') {
-      const s = scholars.find(x => x.id === upd.scholar_id);
+      const s = scholars.find(function(x) { return x.id === upd.scholar_id; });
       if (s && s.scholar_status === 'active') {
         const { data: us } = await sb.from('scholars').update({ scholar_status: 'inactive' }).eq('id', s.id).select().single();
-        if (us) { const si = scholars.findIndex(x => x.id === s.id); if (si !== -1) scholars[si] = us; }
+        if (us) { const si = scholars.findIndex(function(x) { return x.id === s.id; }); if (si !== -1) scholars[si] = us; }
         toast('Document rejected — scholar marked Inactive', '⚠️');
       } else toast('Document rejected', '⚠️');
     } else toast('Document verified', '✅');
-
     closeModal('mDocReview');
     renderDocsTable(); renderScholarsTable(); renderDash();
     reviewTarget = null;
   }
 
   // ── DOC PREVIEW ──
-  document.getElementById('closeDocView').addEventListener('click', () => closeModal('mDocView'));
-  document.getElementById('mDocView').addEventListener('click', function (e) { if (e.target === this) closeModal('mDocView'); });
+  document.getElementById('closeDocView').addEventListener('click', function() { closeModal('mDocView'); });
+  document.getElementById('mDocView').addEventListener('click', function(e) { if (e.target === this) closeModal('mDocView'); });
 
   function viewDoc(docId) {
-    const doc = docs.find(d => d.id === docId);
+    const doc = docs.find(function(d) { return d.id === docId; });
     if (!doc) return;
-    const s = scholars.find(x => x.id === doc.scholar_id);
-    document.getElementById('docViewTitle').textContent = `${s ? s.name : '—'} — ${doc.document_type}`;
+    const s = scholars.find(function(x) { return x.id === doc.scholar_id; });
+    document.getElementById('docViewTitle').textContent = (s ? s.name : '—') + ' — ' + doc.document_type;
     document.getElementById('docViewFrame').src = doc.file_url || 'about:blank';
     if (!doc.file_url) toast('No file URL available', '⚠️');
     openModal('mDocView');
   }
 
   // ── EXPORT ──
-  document.getElementById('exportBtn').addEventListener('click', function () {
-    const headers = ['Name','Group','Batch No.','Year Joined','Birthdate','Age','School','Grade Level','Year of Graduation','Email','Phone Number','Scholarship Status','COR Status','Grades Status','COR Remarks','Grades Remarks'];
-    const rows = scholars.map(s => {
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    const headers = ['Name','Group','Batch No.','Year Joined','Birthdate','Age','School','Grade Level','Year Level','Year of Graduation','Email','Phone Number','Scholarship Status','COR Status','Grades Status','COR Remarks','Grades Remarks'];
+    const rows = scholars.map(function(s) {
       const cor = getDoc(s.id, 'Certificate of Registration');
-      const gr  = getDoc(s.id, 'Grade Report');
-      return [s.name,s.group_name,s.batch_no,s.year_joined,s.birthdate||'',calcAge(s.birthdate),s.school,s.grade_level,s.graduation_year||'',s.email,s.phone_number||'',s.scholar_status,cor?cor.verification_status:'not submitted',gr?gr.verification_status:'not submitted',cor?cor.remarks||'':'',gr?gr.remarks||'':''];
+      const gr = getDoc(s.id, 'Grade Report');
+      return [s.name,s.group_name,s.batch_no,s.year_joined,s.birthdate||'',calcAge(s.birthdate),s.school,s.grade_level,s.year_level||'',s.graduation_year||'',s.email,s.phone_number||'',s.scholar_status,cor?cor.verification_status:'not submitted',gr?gr.verification_status:'not submitted',cor?cor.remarks||'':'',gr?gr.remarks||'':''];
     });
-    const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const csv = [headers].concat(rows).map(function(r) { return r.map(function(v) { return '"' + String(v != null ? v : '').replace(/"/g,'""') + '"'; }).join(','); }).join('\r\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
-    a.download = `VHO_Scholars_Report_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = 'VHO_Scholars_Report_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
     toast('Report exported!','📄');
   });
 
-  // ── CHANGE PASSWORD (ADMIN) ──
-  document.getElementById('admSendResetBtn').addEventListener('click', async function () {
+  // ── ANNOUNCEMENTS ──
+  document.getElementById('addAnnouncementBtn').addEventListener('click', openAddAnnouncement);
+  document.getElementById('closeAnnouncementForm').addEventListener('click', function() { closeModal('mAnnouncementForm'); });
+  document.getElementById('cancelAnnouncementForm').addEventListener('click', function() { closeModal('mAnnouncementForm'); });
+  document.getElementById('mAnnouncementForm').addEventListener('click', function(e) { if(e.target===this) closeModal('mAnnouncementForm'); });
+  document.getElementById('saveAnnouncementBtn').addEventListener('click', saveAnnouncement);
+  document.getElementById('closePollResults').addEventListener('click', function() { closeModal('mPollResults'); });
+  document.getElementById('closePollResultsBtn').addEventListener('click', function() { closeModal('mPollResults'); });
+  document.getElementById('mPollResults').addEventListener('click', function(e) { if(e.target===this) closeModal('mPollResults'); });
+  document.getElementById('closeAttendance').addEventListener('click', function() { closeModal('mAttendance'); });
+  document.getElementById('closeAttendanceBtn').addEventListener('click', function() { closeModal('mAttendance'); });
+  document.getElementById('mAttendance').addEventListener('click', function(e) { if(e.target===this) closeModal('mAttendance'); });
+
+  function openAddAnnouncement() {
+    editingAnnouncementId = null;
+    document.getElementById('ann_title').value = '';
+    document.getElementById('ann_desc').value = '';
+    document.getElementById('ann_date').value = '';
+    document.getElementById('ann_location').value = '';
+    document.getElementById('ann_poll_question').value = '';
+    document.getElementById('ann_poll_options').value = '';
+    document.getElementById('announcementFormTitle').textContent = 'New Announcement';
+    document.getElementById('saveAnnouncementBtn').textContent = 'Post Announcement';
+    openModal('mAnnouncementForm');
+  }
+
+  async function openEditAnnouncement(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann) return;
+    editingAnnouncementId = id;
+    document.getElementById('ann_title').value = ann.title || '';
+    document.getElementById('ann_desc').value = ann.description || '';
+    document.getElementById('ann_date').value = ann.event_date || '';
+    document.getElementById('ann_location').value = ann.event_location || '';
+    document.getElementById('ann_poll_question').value = ann.poll_question || '';
+    const { data: opts } = await sb.from('poll_options').select('*').eq('announcement_id', id);
+    document.getElementById('ann_poll_options').value = opts ? opts.map(function(o) { return o.option_text; }).join('\n') : '';
+    document.getElementById('announcementFormTitle').textContent = 'Edit Announcement';
+    document.getElementById('saveAnnouncementBtn').textContent = 'Save Changes';
+    openModal('mAnnouncementForm');
+  }
+
+  async function saveAnnouncement() {
+    const title = document.getElementById('ann_title').value.trim();
+    if (!title) { toast('Title is required', '⚠️'); return; }
+    const btn = document.getElementById('saveAnnouncementBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const payload = {
+      title: title,
+      description: document.getElementById('ann_desc').value.trim() || null,
+      event_date: document.getElementById('ann_date').value || null,
+      event_location: document.getElementById('ann_location').value.trim() || null,
+      poll_question: document.getElementById('ann_poll_question').value.trim() || null,
+      updated_at: new Date().toISOString()
+    };
+
+    const optionsText = document.getElementById('ann_poll_options').value.trim();
+    const optionLines = optionsText ? optionsText.split('\n').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+    let annId = editingAnnouncementId;
+
+    if (!editingAnnouncementId) {
+      const { data: newAnn, error } = await sb.from('announcements').insert(payload).select().single();
+      if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Post Announcement'; return; }
+      annId = newAnn.id;
+      toast('Announcement posted!', '📢');
+    } else {
+      const { error } = await sb.from('announcements').update(payload).eq('id', annId);
+      if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Save Changes'; return; }
+      await sb.from('poll_options').delete().eq('announcement_id', annId);
+      toast('Announcement updated!', '✅');
+    }
+
+    if (optionLines.length > 0) {
+      await sb.from('poll_options').insert(optionLines.map(function(opt) { return { announcement_id: annId, option_text: opt }; }));
+    }
+
+    btn.disabled = false;
+    btn.textContent = editingAnnouncementId ? 'Save Changes' : 'Post Announcement';
+    closeModal('mAnnouncementForm');
+    renderAnnouncements();
+  }
+
+  async function deleteAnnouncement(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann || !confirm('Delete "' + ann.title + '"? This cannot be undone.')) return;
+    await sb.from('poll_responses').delete().eq('announcement_id', id);
+    await sb.from('poll_options').delete().eq('announcement_id', id);
+    await sb.from('attendance').delete().eq('announcement_id', id);
+    await sb.from('announcements').delete().eq('id', id);
+    toast('Announcement deleted', '🗑️');
+    renderAnnouncements();
+  }
+
+  async function renderAnnouncements() {
+    const container = document.getElementById('announcementsList');
+    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
+
+    const { data: anns, error } = await sb.from('announcements').select('*').order('created_at', { ascending: false });
+    if (error || !anns || !anns.length) {
+      container.innerHTML = '<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
+      document.getElementById('nb-announcements').style.display = 'none';
+      return;
+    }
+    announcements = anns;
+
+    const htmlParts = [];
+    for (const ann of anns) {
+      const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', ann.id);
+      const { data: responses } = await sb.from('poll_responses').select('*').eq('announcement_id', ann.id);
+      const { data: attended } = await sb.from('attendance').select('*').eq('announcement_id', ann.id).eq('attended', true);
+      const totalResponses = responses ? responses.length : 0;
+      const attendedCount = attended ? attended.length : 0;
+      const hasOptions = options && options.length > 0;
+      const eventDate = ann.event_date ? new Date(ann.event_date + 'T00:00:00').toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}) : null;
+
+      let pollBar = '';
+      if (hasOptions) {
+        pollBar = options.map(function(o) {
+          const count = responses ? responses.filter(function(r) { return r.poll_option_id === o.id; }).length : 0;
+          const pct = totalResponses ? Math.round(count / totalResponses * 100) : 0;
+          return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>' + o.option_text + '</span><span style="color:var(--muted)">' + count + ' (' + pct + '%)</span></div><div style="height:6px;background:#f0f0f5;border-radius:3px"><div style="height:100%;width:' + pct + '%;background:var(--blue);border-radius:3px"></div></div></div>';
+        }).join('');
+      }
+
+      htmlParts.push(
+        '<div class="card" style="margin-bottom:14px">' +
+        '<div class="card-header"><div><span class="card-title">' + ann.title + '</span>' +
+        (eventDate ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 ' + eventDate + (ann.event_location ? ' · 📍 ' + ann.event_location : '') + '</div>' : '') +
+        '</div><div style="display:flex;gap:6px;flex-wrap:wrap">' +
+        (hasOptions ? '<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="' + ann.id + '">📊 Poll Results (' + totalResponses + ')</button>' : '') +
+        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="' + ann.id + '">👥 Attendees (' + attendedCount + ')</button>' +
+        '<button class="btn btn-ghost btn-sm" data-action="editAnn" data-id="' + ann.id + '">Edit</button>' +
+        '<button class="btn btn-danger btn-sm" data-action="deleteAnn" data-id="' + ann.id + '">Delete</button>' +
+        '</div></div>' +
+        (ann.description ? '<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">' + ann.description + '</p></div>' : '') +
+        (hasOptions ? '<div class="card-body" style="border-top:1px solid var(--border)"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">' + (ann.poll_question || 'POLL') + '</div>' + pollBar + '</div>' : '') +
+        '</div>'
+      );
+    }
+
+    container.innerHTML = htmlParts.join('');
+
+    const badge = document.getElementById('nb-announcements');
+    badge.style.display = anns.length ? '' : 'none';
+    if (anns.length) badge.textContent = anns.length;
+  }
+
+  document.getElementById('announcementsList').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    if (action === 'pollResults') openPollResults(id);
+    if (action === 'viewAttendance') openAttendance(id);
+    if (action === 'editAnn') openEditAnnouncement(id);
+    if (action === 'deleteAnn') deleteAnnouncement(id);
+  });
+
+  async function openPollResults(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann) return;
+    document.getElementById('pollResultsTitle').textContent = ann.title + ' — Poll Results';
+    document.getElementById('pollResultsBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+    openModal('mPollResults');
+
+    const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', id);
+    const { data: responses } = await sb.from('poll_responses').select('*, scholars(name), poll_options(option_text)').eq('announcement_id', id);
+    const total = responses ? responses.length : 0;
+
+    if (!options || !options.length) {
+      document.getElementById('pollResultsBody').innerHTML = '<p style="color:var(--muted);font-size:13px">No poll options for this announcement.</p>';
+      return;
+    }
+
+    const html = options.map(function(opt) {
+      const responders = responses ? responses.filter(function(r) { return r.poll_option_id === opt.id; }) : [];
+      const pct = total ? Math.round(responders.length / total * 100) : 0;
+      return '<div style="margin-bottom:18px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin-bottom:4px"><span>' + opt.option_text + '</span><span style="color:var(--muted)">' + responders.length + ' / ' + total + ' (' + pct + '%)</span></div>' +
+        '<div style="height:8px;background:#f0f0f5;border-radius:4px;margin-bottom:8px"><div style="height:100%;width:' + pct + '%;background:var(--blue);border-radius:4px"></div></div>' +
+        (responders.length ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + responders.map(function(r) { return '<span class="badge badge-blue">' + (r.scholars ? r.scholars.name : '—') + '</span>'; }).join('') + '</div>' : '<span style="font-size:12px;color:var(--muted)">No responses yet</span>') +
+        '</div>';
+    }).join('');
+
+    document.getElementById('pollResultsBody').innerHTML =
+      '<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">' + (ann.poll_question || 'Poll') + ' · ' + total + ' total response' + (total !== 1 ? 's' : '') + '</div>' + html;
+  }
+
+  async function openAttendance(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann) return;
+    document.getElementById('attendanceTitle').textContent = ann.title + ' — Actual Attendance';
+    document.getElementById('attendanceSub').textContent = 'Scholars who marked themselves as attended.';
+    document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+    openModal('mAttendance');
+
+    const { data: attendanceRecords } = await sb.from('attendance').select('*, scholars(name, group_name, batch_no)').eq('announcement_id', id).eq('attended', true);
+    const { data: responses } = await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id', id);
+    const attended = attendanceRecords || [];
+
+    if (!attended.length) {
+      document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked themselves as attended yet.</div>';
+      return;
+    }
+
+    const html = attended.map(function(a) {
+      const s = a.scholars || {};
+      const resp = responses ? responses.find(function(r) { return r.scholar_id === a.scholar_id; }) : null;
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">' +
+        '<div><div style="font-size:14px;font-weight:500">' + (s.name || '—') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">' + (s.group_name || '') + ' · Batch ' + (s.batch_no || '—') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">Poll answer: ' + (resp && resp.poll_options ? resp.poll_options.option_text : 'No response') + '</div></div>' +
+        '<span class="badge badge-green">Attended</span></div>';
+    }).join('');
+
+    document.getElementById('attendanceBody').innerHTML =
+      '<div style="margin-bottom:14px;font-size:13px;color:var(--muted);font-weight:500">' + attended.length + ' scholar' + (attended.length !== 1 ? 's' : '') + ' attended</div>' + html;
+  }
+
+  // ── CHANGE PASSWORD ──
+  document.getElementById('admSendResetBtn').addEventListener('click', async function() {
     const newPassword = document.getElementById('adm_cp_email').value.trim();
     const msgEl = document.getElementById('adm_cp_msg');
-
     function showMsg(type, text) {
       msgEl.style.cssText = type === 'err'
         ? 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
         : 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
       msgEl.textContent = text;
     }
-
-    if (!newPassword || newPassword.length < 6) {
-      showMsg('err', 'Password must be at least 6 characters.');
-      return;
-    }
-
-    this.disabled = true;
-    this.textContent = 'Saving…';
+    if (!newPassword || newPassword.length < 6) { showMsg('err', 'Password must be at least 6 characters.'); return; }
+    this.disabled = true; this.textContent = 'Saving…';
     msgEl.style.display = 'none';
-
     const adminEmail = sessionStorage.getItem('admin_email');
-    const { error } = await sb.from('admins')
-      .update({ password: newPassword })
-      .eq('email', adminEmail);
-
-    this.disabled = false;
-    this.textContent = 'Save New Password';
-
+    const { error } = await sb.from('admins').update({ password: newPassword }).eq('email', adminEmail);
+    this.disabled = false; this.textContent = 'Save New Password';
     if (error) { showMsg('err', error.message); return; }
-
     showMsg('ok', '✅ Password changed! Use your new password next time you log in.');
     document.getElementById('adm_cp_email').value = '';
   });
 
   // ── BOOT ──
-  window.addEventListener('DOMContentLoaded', async function () {
-    if (sessionStorage.getItem('vho_role') !== 'admin') {
-      window.location.href = 'index.html';
-      return;
-    }
-
-    // Populate admin info from sessionStorage
-    const adminName  = sessionStorage.getItem('admin_name')  || 'Admin User';
+  window.addEventListener('DOMContentLoaded', async function() {
+    if (sessionStorage.getItem('vho_role') !== 'admin') { window.location.href = 'index.html'; return; }
+    const adminName = sessionStorage.getItem('admin_name') || 'Admin User';
     const adminEmail = sessionStorage.getItem('admin_email') || 'Administrator';
-    const adminIni   = adminName.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    const adminIni = adminName.split(' ').map(function(w) { return w[0]; }).slice(0,2).join('').toUpperCase();
     document.getElementById('adminAvatar').textContent = adminIni;
-    document.getElementById('adminName').textContent   = adminName;
-    document.getElementById('adminEmail').textContent  = adminEmail;
-
-    // Update dashboard greeting
+    document.getElementById('adminName').textContent = adminName;
+    document.getElementById('adminEmail').textContent = adminEmail;
     const firstName = adminName.split(' ')[0];
-    document.querySelector('#page-dashboard .page-header-left h1').textContent = `Good day, ${firstName} ♥`;
-
-    document.getElementById('dashStats').innerHTML = `<div style="padding:20px;color:var(--muted)">Loading data…</div>`;
+    document.querySelector('#page-dashboard .page-header-left h1').textContent = 'Good day, ' + firstName + ' ♥';
+    document.getElementById('dashStats').innerHTML = '<div style="padding:20px;color:var(--muted)">Loading data…</div>';
     await loadAll();
     renderDash();
   });
