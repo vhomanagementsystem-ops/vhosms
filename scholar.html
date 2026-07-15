@@ -9,12 +9,9 @@
 <style>
 .quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
 .quick-btn{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text)}
-.quick-btn:hover{border-color:var(--blue);background:var(--blue-pale);transform:translateY(-2px)}
+.quick-btn:hover{border-color:var(--blue);transform:translateY(-2px)}
 .quick-btn .qicon{font-size:24px;margin-bottom:8px}
 .quick-btn .qlabel{font-size:13px;font-weight:500}
-.doc-upload-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px}
-.doc-upload-card h3{font-size:15px;font-weight:500;margin-bottom:4px}
-.doc-upload-card p{font-size:12px;color:var(--muted);margin-bottom:14px}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;color:#fff;margin:0 auto 10px;flex-shrink:0}
 .profile-name{font-size:20px;font-weight:600;text-align:center}
 .profile-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:14px}
@@ -24,16 +21,6 @@
 .info-item label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
 .info-item .info-val{font-size:14px;font-weight:500}
 .edit-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
-.verif-box{border-radius:var(--radius);border:2px solid var(--border);padding:18px;text-align:center}
-.verif-box.pending{border-color:#f59e0b;background:#fffbeb}
-.verif-box.verified{border-color:#22c55e;background:#f0fdf4}
-.verif-box.rejected{border-color:#ef4444;background:#fef2f2}
-.verif-box.not_submitted{border-color:var(--border);background:#f9f9fb}
-.verif-icon{font-size:36px;margin-bottom:8px}
-.verif-title{font-size:16px;font-weight:600;margin-bottom:4px}
-.verif-desc{font-size:12px;color:var(--muted)}
-.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #f4f4f8}
-.checklist-item:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -49,10 +36,6 @@
       <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7A1 1 0 0 0 3 11h1v6a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3h2v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-6h1a1 1 0 0 0 .707-1.707l-7-7z"/></svg>Home</a>
     <a class="nav-item" id="nav-profile">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7 9a7 7 0 1 1 14 0H3z"/></svg>My Profile</a>
-    <a class="nav-item" id="nav-documents">
-      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h4.586A2 2 0 0 1 12 2.586L15.414 6A2 2 0 0 1 16 7.414V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 6a1 1 0 0 1 1-1h6a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm1 3a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H7z"/></svg>Documents</a>
-    <a class="nav-item" id="nav-verification">
-      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 0 0 1.745-.723 3.066 3.066 0 0 1 3.976 0 3.066 3.066 0 0 0 1.745.723 3.066 3.066 0 0 1 2.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 0 1 0 3.976 3.066 3.066 0 0 0-.723 1.745 3.066 3.066 0 0 1-2.812 2.812 3.066 3.066 0 0 0-1.745.723 3.066 3.066 0 0 1-3.976 0 3.066 3.066 0 0 0-1.745-.723 3.066 3.066 0 0 1-2.812-2.812 3.066 3.066 0 0 0-.723-1.745 3.066 3.066 0 0 1 0-3.976 3.066 3.066 0 0 0 .723-1.745 3.066 3.066 0 0 1 2.812-2.812zm7.44 5.252a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4z"/></svg>Verification</a>
     <div class="nav-group-label">Updates</div>
     <a class="nav-item" id="nav-announcements">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l6.553 3.276A1 1 0 0 0 18 15V3z"/></svg>Announcements<span class="nav-badge" id="nb-announcements" style="display:none">!</span></a>
@@ -89,9 +72,9 @@
       <div class="stat-grid" id="homeStats"></div>
       <div class="quick-grid">
         <div class="quick-btn" id="qbtn-profile"><div class="qicon">👤</div><div class="qlabel">Edit Profile</div></div>
-        <div class="quick-btn" id="qbtn-documents"><div class="qicon">📄</div><div class="qlabel">Upload Docs</div></div>
-        <div class="quick-btn" id="qbtn-verification"><div class="qicon">✅</div><div class="qlabel">Verification</div></div>
         <div class="quick-btn" id="qbtn-announcements"><div class="qicon">📢</div><div class="qlabel">Announcements</div></div>
+        <div class="quick-btn" id="qbtn-notifications"><div class="qicon">🔔</div><div class="qlabel">Notifications</div></div>
+        <div class="quick-btn" id="qbtn-changepassword"><div class="qicon">🔒</div><div class="qlabel">Change Password</div></div>
       </div>
       <div class="card">
         <div class="card-header"><span class="card-title">Scholarship Status</span></div>
@@ -170,53 +153,6 @@
       </div>
     </div>
 
-    <!-- DOCUMENTS -->
-    <div id="page-documents" class="page" style="display:none">
-      <div class="page-header"><div class="page-header-left"><h1>Documents</h1><p>Upload your required scholarship documents (PDF only, max 10MB)</p></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="doc-upload-card">
-          <h3>📋 Certificate of Registration (COR)</h3>
-          <p>Upload your Certificate of Registration / Enrollment from your school.</p>
-          <div id="certBadge" style="margin-bottom:12px"></div>
-          <div class="upload-zone" id="uploadZoneCert">
-            <svg width="28" height="28" fill="none" stroke="var(--light)" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-            <p><strong>Click to upload</strong> PDF</p>
-          </div>
-          <input type="file" id="up_cert" accept=".pdf" style="display:none">
-        </div>
-        <div class="doc-upload-card">
-          <h3>📊 Grade Report</h3>
-          <p>Upload your latest report card, grade sheet, or transcript of records.</p>
-          <div id="rcBadge" style="margin-bottom:12px"></div>
-          <div class="upload-zone" id="uploadZoneGrade">
-            <svg width="28" height="28" fill="none" stroke="var(--light)" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-            <p><strong>Click to upload</strong> PDF</p>
-          </div>
-          <input type="file" id="up_rc" accept=".pdf" style="display:none">
-        </div>
-      </div>
-      <div class="card" style="margin-top:14px">
-        <div class="card-header"><span class="card-title">Upload History</span></div>
-        <div class="table-wrap"><table><thead><tr><th>File Name</th><th>Type</th><th>Date</th><th>Status</th><th>Remarks</th></tr></thead><tbody id="docHistory"></tbody></table></div>
-      </div>
-    </div>
-
-    <!-- VERIFICATION -->
-    <div id="page-verification" class="page" style="display:none">
-      <div class="page-header"><div class="page-header-left"><h1>Verification Status</h1><p>Track the review status of your submitted documents</p></div></div>
-      <div style="max-width:520px">
-        <div class="verif-box not_submitted" id="verifBox" style="margin-bottom:16px">
-          <div class="verif-icon" id="verifIcon">📭</div>
-          <div class="verif-title" id="verifTitle">No Documents Submitted</div>
-          <div class="verif-desc" id="verifDesc">Upload your documents to begin the verification process.</div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">Document Checklist</span></div>
-          <div class="card-body" id="verifChecklist"><div class="empty"><p>Loading…</p></div></div>
-        </div>
-      </div>
-    </div>
-
     <!-- ANNOUNCEMENTS -->
     <div id="page-announcements" class="page" style="display:none">
       <div class="page-header"><div class="page-header-left"><h1>Announcements</h1><p>Events and polls from VHO Admin</p></div></div>
@@ -253,7 +189,7 @@
             <div style="display:flex;flex-direction:column;gap:12px">
               <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:13px">Enter your active Gmail and click <strong>Send Reset Link</strong></div></div>
               <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:13px">Check your Gmail inbox for a reset link from VHO</div></div>
-              <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:13px">Click the link — it will open a page where you set your new password</div></div>
+              <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:13px">Click the link — it opens a page to set your new password</div></div>
               <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:13px">Use your new password to log in next time</div></div>
             </div>
           </div>
@@ -284,7 +220,7 @@
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentUser = null;
-  let myDocs = [];
+  let seenNotifications = JSON.parse(localStorage.getItem('vho_seen_notifs') || '[]');
 
   const YEAR_LEVELS = {
     'Junior High School': ['Grade 7','Grade 8','Grade 9','Grade 10'],
@@ -294,565 +230,398 @@
 
   // ── HELPERS ──
   function populateYearLevel(selectId, gradeLevel, currentValue) {
-    const sel = document.getElementById(selectId);
-    if (!sel) return;
+    const sel = document.getElementById(selectId); if (!sel) return;
     const opts = YEAR_LEVELS[gradeLevel] || [];
     sel.innerHTML = '<option value="">— Select Year Level —</option>' +
-      opts.map(function(o) { return '<option value="' + o + '"' + (o === currentValue ? ' selected' : '') + '>' + o + '</option>'; }).join('');
+      opts.map(function(o){ return '<option value="'+o+'"'+(o===currentValue?' selected':'')+'>'+o+'</option>'; }).join('');
   }
   function calcAge(dob) {
     if (!dob) return '—';
-    const b = new Date(dob + 'T00:00:00'), now = new Date();
-    let age = now.getFullYear() - b.getFullYear();
-    const m = now.getMonth() - b.getMonth();
-    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+    const b = new Date(dob+'T00:00:00'), now = new Date();
+    let age = now.getFullYear()-b.getFullYear();
+    const m = now.getMonth()-b.getMonth();
+    if (m<0||(m===0&&now.getDate()<b.getDate())) age--;
     return age;
   }
-  function ini(name) { return (name || '?').split(' ').map(function(w) { return w[0]; }).slice(0, 2).join('').toUpperCase(); }
-  function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
-  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
-  function openModal(id) { document.getElementById(id).classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-  function toast(msg, icon) {
-    icon = icon || 'ℹ️';
-    const c = document.getElementById('toasts');
-    const t = document.createElement('div'); t.className = 'toast';
-    t.innerHTML = '<span class="toast-icon">' + icon + '</span><div><strong>' + msg + '</strong></div>';
-    c.appendChild(t); setTimeout(function() { t.remove(); }, 3500);
+  function ini(name){ return (name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase(); }
+  function fmtDate(iso){ return iso?new Date(iso).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'—'; }
+  function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):'—'; }
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  function toast(msg, icon){
+    icon = icon||'ℹ️';
+    const c=document.getElementById('toasts');
+    const t=document.createElement('div'); t.className='toast';
+    t.innerHTML='<span class="toast-icon">'+icon+'</span><div><strong>'+msg+'</strong></div>';
+    c.appendChild(t); setTimeout(function(){ t.remove(); }, 3500);
   }
-  function infoItem(label, val) {
-    return '<div class="info-item"><label>' + label + '</label><div class="info-val">' + (val || '—') + '</div></div>';
+  function infoItem(label, val){
+    return '<div class="info-item"><label>'+label+'</label><div class="info-val">'+(val||'—')+'</div></div>';
   }
 
   // ── DATA LOAD ──
-  async function loadProfile() {
+  async function loadProfile(){
     const scholarId = sessionStorage.getItem('scholar_id');
-    const { data, error } = await sb.from('scholars').select('*').eq('id', scholarId).single();
-    if (error || !data) { toast('Failed to load profile', '❌'); return false; }
-    currentUser = data;
-    return true;
-  }
-  async function loadDocs() {
-    const { data, error } = await sb.from('documents').select('*').eq('scholar_id', currentUser.id).order('uploaded_at', { ascending: false });
-    if (!error) myDocs = data || [];
+    const {data,error} = await sb.from('scholars').select('*').eq('id',scholarId).single();
+    if (error||!data){ toast('Failed to load profile','❌'); return false; }
+    currentUser = data; return true;
   }
 
   // ── NAV ──
-  const navPages = ['home', 'profile', 'documents', 'verification', 'announcements', 'notifications', 'changepassword'];
-  const pageTitles = { home: 'Home', profile: 'My Profile', documents: 'Documents', verification: 'Verification', announcements: 'Announcements', notifications: 'Notifications', changepassword: 'Change Password' };
+  const navPages = ['home','profile','announcements','notifications','changepassword'];
+  const pageTitles = {home:'Home',profile:'My Profile',announcements:'Announcements',notifications:'Notifications',changepassword:'Change Password'};
 
-  function gotoPage(page) {
-    navPages.forEach(function(p) {
-      const el = document.getElementById('page-' + p);
-      if (el) el.style.display = p === page ? 'block' : 'none';
-      const nav = document.getElementById('nav-' + p);
-      if (nav) nav.classList.toggle('active', p === page);
+  function gotoPage(page){
+    navPages.forEach(function(p){
+      const el=document.getElementById('page-'+p); if(el) el.style.display=p===page?'block':'none';
+      const nav=document.getElementById('nav-'+p); if(nav) nav.classList.toggle('active',p===page);
     });
-    document.getElementById('pageTitle').textContent = pageTitles[page] || page;
-    if (page === 'home') renderHome();
-    if (page === 'profile') renderProfile();
-    if (page === 'documents') loadDocs().then(renderDocs);
-    if (page === 'verification') loadDocs().then(renderVerification);
-    if (page === 'announcements') renderAnnouncements();
-    if (page === 'notifications') renderNotifications();
+    document.getElementById('pageTitle').textContent = pageTitles[page]||page;
+    if (page==='home') renderHome();
+    if (page==='profile') renderProfile();
+    if (page==='announcements') renderAnnouncements();
+    if (page==='notifications') renderNotifications();
     closeSidebar();
   }
 
-  navPages.forEach(function(p) {
-    const el = document.getElementById('nav-' + p);
-    if (el) el.addEventListener('click', function() { gotoPage(p); });
+  navPages.forEach(function(p){
+    const el=document.getElementById('nav-'+p);
+    if(el) el.addEventListener('click',function(){ gotoPage(p); });
   });
-  document.getElementById('qbtn-profile').addEventListener('click', function() { gotoPage('profile'); });
-  document.getElementById('qbtn-documents').addEventListener('click', function() { gotoPage('documents'); });
-  document.getElementById('qbtn-verification').addEventListener('click', function() { gotoPage('verification'); });
-  document.getElementById('qbtn-announcements').addEventListener('click', function() { gotoPage('announcements'); });
+  ['profile','announcements','notifications','changepassword'].forEach(function(p){
+    const btn=document.getElementById('qbtn-'+p);
+    if(btn) btn.addEventListener('click',function(){ gotoPage(p); });
+  });
 
+  function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
   document.getElementById('hamburger').addEventListener('click', toggleSidebar);
   document.getElementById('overlay').addEventListener('click', closeSidebar);
-  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
-  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
-
-  document.getElementById('logoutBtn').addEventListener('click', function() { openModal('mLogoutConfirm'); });
-  document.getElementById('cancelLogoutBtn').addEventListener('click', function() { closeModal('mLogoutConfirm'); });
-  document.getElementById('mLogoutConfirm').addEventListener('click', function(e) { if(e.target===this) closeModal('mLogoutConfirm'); });
-  document.getElementById('confirmLogoutBtn').addEventListener('click', async function() {
+  document.getElementById('logoutBtn').addEventListener('click', function(){ openModal('mLogoutConfirm'); });
+  document.getElementById('cancelLogoutBtn').addEventListener('click', function(){ closeModal('mLogoutConfirm'); });
+  document.getElementById('mLogoutConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mLogoutConfirm'); });
+  document.getElementById('confirmLogoutBtn').addEventListener('click', async function(){
     await sb.auth.signOut();
-    sessionStorage.removeItem('vho_role');
-    sessionStorage.removeItem('scholar_id');
+    sessionStorage.removeItem('vho_role'); sessionStorage.removeItem('scholar_id');
     window.location.href = 'index.html';
   });
 
-  // ── SIDEBAR USER ──
-  function setupSidebar() {
-    const name = currentUser.name || 'Scholar';
+  function setupSidebar(){
+    const name = currentUser.name||'Scholar';
     document.getElementById('avatarEl').textContent = ini(name);
     document.getElementById('nameEl').textContent = name;
-    document.getElementById('roleEl').textContent = [currentUser.grade_level, currentUser.year_level, currentUser.school].filter(Boolean).join(' · ') || 'Scholar';
+    document.getElementById('roleEl').textContent = [currentUser.grade_level,currentUser.year_level,currentUser.school].filter(Boolean).join(' · ')||'Scholar';
   }
 
   // ── HOME ──
-  function renderHome() {
+  function renderHome(){
     if (!currentUser) return;
     const s = currentUser;
-    const cor = myDocs.find(function(d) { return d.document_type === 'Certificate of Registration'; });
-    const grade = myDocs.find(function(d) { return d.document_type === 'Grade Report'; });
-    const docsCount = (cor ? 1 : 0) + (grade ? 1 : 0);
-    let verifStatus = 'Not Submitted';
-    if (myDocs.length > 0) {
-      if (myDocs.every(function(d) { return d.verification_status === 'Verified'; })) verifStatus = 'Verified';
-      else if (myDocs.some(function(d) { return d.verification_status === 'Rejected'; })) verifStatus = 'Rejected';
-      else verifStatus = 'Pending';
-    }
-    const verifColor = { Pending: 'amber', Verified: 'green', Rejected: 'pink', 'Not Submitted': '' };
-    document.getElementById('homeGreet').textContent = 'Welcome back, ' + s.name + ' ♥';
-    document.getElementById('homeSubtitle').textContent = [s.grade_level, s.year_level, s.school].filter(Boolean).join(' · ') || 'VHO Scholar';
+    document.getElementById('homeGreet').textContent = 'Welcome back, '+s.name+' ♥';
+    document.getElementById('homeSubtitle').textContent = [s.grade_level,s.year_level,s.school].filter(Boolean).join(' · ')||'VHO Scholar';
     document.getElementById('homeStats').innerHTML =
-      '<div class="stat-card blue"><div class="stat-label">Scholar Status</div><div class="stat-val" style="font-size:18px">' + cap(s.scholar_status) + '</div><div class="stat-sub">Current standing</div></div>' +
-      '<div class="stat-card green"><div class="stat-label">Documents</div><div class="stat-val">' + docsCount + '/2</div><div class="stat-sub">' + (docsCount === 2 ? 'All uploaded' : 'Pending upload') + '</div></div>' +
-      '<div class="stat-card ' + (verifColor[verifStatus] || 'amber') + '"><div class="stat-label">Verification</div><div class="stat-val" style="font-size:18px">' + verifStatus + '</div><div class="stat-sub">Document review</div></div>' +
-      '<div class="stat-card pink"><div class="stat-label">Batch No.</div><div class="stat-val">' + (s.batch_no || '—') + '</div><div class="stat-sub">Year Joined: ' + (s.year_joined || '—') + '</div></div>';
-    const statusMap = {
-      active: { icon: '🟢', color: '#22c55e', desc: 'Your scholarship is currently active.' },
-      inactive: { icon: '🔴', color: '#ef4444', desc: 'Your scholarship is currently inactive.' },
-      graduated: { icon: '🎓', color: '#6366f1', desc: 'Congratulations! You have graduated.' }
-    };
-    const ss = statusMap[s.scholar_status] || statusMap.active;
-    document.getElementById('homeStatus').innerHTML =
-      '<div style="display:flex;align-items:center;gap:14px;padding:10px 0"><div style="font-size:36px">' + ss.icon + '</div><div><div style="font-size:16px;font-weight:600;color:' + ss.color + '">' + cap(s.scholar_status) + '</div><div style="font-size:13px;color:var(--muted);margin-top:2px">' + ss.desc + '</div></div></div>';
+      '<div class="stat-card blue"><div class="stat-label">Scholar Status</div><div class="stat-val" style="font-size:18px">'+cap(s.scholar_status)+'</div><div class="stat-sub">Current standing</div></div>'+
+      '<div class="stat-card green"><div class="stat-label">Grade Level</div><div class="stat-val" style="font-size:16px">'+(s.grade_level||'—')+'</div><div class="stat-sub">'+(s.year_level||'—')+'</div></div>'+
+      '<div class="stat-card pink"><div class="stat-label">Batch No.</div><div class="stat-val">'+(s.batch_no||'—')+'</div><div class="stat-sub">Year Joined: '+(s.year_joined||'—')+'</div></div>'+
+      '<div class="stat-card purple"><div class="stat-label">Group</div><div class="stat-val" style="font-size:16px">'+(s.group_name||'—')+'</div><div class="stat-sub">VHO Scholar</div></div>';
+    const statusMap={active:{icon:'🟢',color:'#22c55e',desc:'Your scholarship is currently active.'},inactive:{icon:'🔴',color:'#ef4444',desc:'Your scholarship is currently inactive.'},graduated:{icon:'🎓',color:'#6366f1',desc:'Congratulations! You have graduated.'}};
+    const ss=statusMap[s.scholar_status]||statusMap.active;
+    document.getElementById('homeStatus').innerHTML='<div style="display:flex;align-items:center;gap:14px;padding:10px 0"><div style="font-size:36px">'+ss.icon+'</div><div><div style="font-size:16px;font-weight:600;color:'+ss.color+'">'+cap(s.scholar_status)+'</div><div style="font-size:13px;color:var(--muted);margin-top:2px">'+ss.desc+'</div></div></div>';
   }
 
   // ── PROFILE VIEW ──
-  function renderProfile() {
+  function renderProfile(){
     if (!currentUser) return;
     const s = currentUser;
-    const status = s.scholar_status || 'active';
-    const ssBadge = { active: 'badge-green', inactive: 'badge-gray', graduated: 'badge-blue' };
+    const status = s.scholar_status||'active';
+    const ssBadge={active:'badge-green',inactive:'badge-gray',graduated:'badge-blue'};
     document.getElementById('profileAvatar').textContent = ini(s.name);
-    document.getElementById('profileFullName').textContent = s.name || '—';
-    document.getElementById('profileSub').textContent = [s.grade_level, s.school].filter(Boolean).join(' · ') || '—';
+    document.getElementById('profileFullName').textContent = s.name||'—';
+    document.getElementById('profileSub').textContent = [s.grade_level,s.school].filter(Boolean).join(' · ')||'—';
     document.getElementById('profileBadges').innerHTML =
-      '<span class="badge ' + (ssBadge[status] || 'badge-gray') + '">' + cap(status) + '</span>' +
-      '<span class="badge badge-blue">Batch ' + (s.batch_no || '—') + '</span>' +
-      '<span class="badge badge-purple">' + (s.group_name || '—') + '</span>';
-    const bd = s.birthdate ? new Date(s.birthdate + 'T00:00:00').toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
-    const age = calcAge(s.birthdate);
-    document.getElementById('profileInfoGrid').innerHTML =
-      infoItem('Full Name', s.name) + infoItem('Email', s.email) + infoItem('Birthdate', bd) +
-      infoItem('Age', typeof age === 'number' ? age + ' years old' : '—') + infoItem('Phone Number', s.phone_number);
-    document.getElementById('profileAcadGrid').innerHTML =
-      infoItem('School', s.school) + infoItem('Grade Level', s.grade_level) + infoItem('Year Level', s.year_level) +
-      infoItem('Year of Graduation', s.graduation_year) + infoItem('Group', s.group_name) +
-      infoItem('Year Joined', s.year_joined) + infoItem('Scholarship Status', cap(status));
+      '<span class="badge '+(ssBadge[status]||'badge-gray')+'">'+cap(status)+'</span>'+
+      '<span class="badge badge-blue">Batch '+(s.batch_no||'—')+'</span>'+
+      '<span class="badge badge-purple">'+(s.group_name||'—')+'</span>';
+    const bd=s.birthdate?new Date(s.birthdate+'T00:00:00').toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'}):'—';
+    const age=calcAge(s.birthdate);
+    document.getElementById('profileInfoGrid').innerHTML=
+      infoItem('Full Name',s.name)+infoItem('Email',s.email)+infoItem('Birthdate',bd)+
+      infoItem('Age',typeof age==='number'?age+' years old':'—')+infoItem('Phone Number',s.phone_number);
+    document.getElementById('profileAcadGrid').innerHTML=
+      infoItem('School',s.school)+infoItem('Grade Level',s.grade_level)+infoItem('Year Level',s.year_level)+
+      infoItem('Year of Graduation',s.graduation_year)+infoItem('Group',s.group_name)+
+      infoItem('Year Joined',s.year_joined)+infoItem('Scholarship Status',cap(status));
   }
 
   // ── PROFILE EDIT ──
   document.getElementById('editToggleBtn').addEventListener('click', openEdit);
-  document.getElementById('ef_gradeLevel').addEventListener('change', function() { populateYearLevel('ef_yearLevel', this.value, ''); });
+  document.getElementById('ef_gradeLevel').addEventListener('change', function(){ populateYearLevel('ef_yearLevel',this.value,''); });
   document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
   document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
 
-  function openEdit() {
-    const s = currentUser;
-    document.getElementById('ef_name').value = s.name || '';
-    document.getElementById('ef_email').value = s.email || '';
-    document.getElementById('ef_birthdate').value = s.birthdate || '';
-    document.getElementById('ef_phone').value = s.phone_number || '';
-    document.getElementById('ef_school').value = s.school || '';
-    document.getElementById('ef_gradeLevel').value = s.grade_level || '';
-    populateYearLevel('ef_yearLevel', s.grade_level || '', s.year_level || '');
-    document.getElementById('ef_gradYear').value = s.graduation_year || '';
-    document.getElementById('scholarshipReadOnly').innerHTML =
-      infoItem('Group', s.group_name) + infoItem('Batch No.', s.batch_no) +
-      infoItem('Year Joined', s.year_joined) + infoItem('Scholar Status', cap(s.scholar_status));
-    document.getElementById('profileView').style.display = 'none';
-    document.getElementById('profileEdit').style.display = 'block';
-    document.getElementById('editToggleBtn').style.display = 'none';
+  function openEdit(){
+    const s=currentUser;
+    document.getElementById('ef_name').value=s.name||'';
+    document.getElementById('ef_email').value=s.email||'';
+    document.getElementById('ef_birthdate').value=s.birthdate||'';
+    document.getElementById('ef_phone').value=s.phone_number||'';
+    document.getElementById('ef_school').value=s.school||'';
+    document.getElementById('ef_gradeLevel').value=s.grade_level||'';
+    populateYearLevel('ef_yearLevel',s.grade_level||'',s.year_level||'');
+    document.getElementById('ef_gradYear').value=s.graduation_year||'';
+    document.getElementById('scholarshipReadOnly').innerHTML=
+      infoItem('Group',s.group_name)+infoItem('Batch No.',s.batch_no)+
+      infoItem('Year Joined',s.year_joined)+infoItem('Scholar Status',cap(s.scholar_status));
+    document.getElementById('profileView').style.display='none';
+    document.getElementById('profileEdit').style.display='block';
+    document.getElementById('editToggleBtn').style.display='none';
   }
-  function cancelEdit() {
-    document.getElementById('profileView').style.display = 'block';
-    document.getElementById('profileEdit').style.display = 'none';
-    document.getElementById('editToggleBtn').style.display = '';
+  function cancelEdit(){
+    document.getElementById('profileView').style.display='block';
+    document.getElementById('profileEdit').style.display='none';
+    document.getElementById('editToggleBtn').style.display='';
   }
-  async function saveProfile() {
-    const name = document.getElementById('ef_name').value.trim();
-    if (!name) { toast('Full name is required', '⚠️'); return; }
-    const btn = document.getElementById('saveProfileBtn');
-    btn.disabled = true; btn.textContent = 'Saving…';
-    const bd = document.getElementById('ef_birthdate').value;
-    const updates = {
-      name: name,
-      email: document.getElementById('ef_email').value.trim() || currentUser.email,
-      birthdate: bd || null,
-      phone_number: document.getElementById('ef_phone').value.trim(),
-      school: document.getElementById('ef_school').value.trim(),
-      grade_level: document.getElementById('ef_gradeLevel').value || null,
-      year_level: document.getElementById('ef_yearLevel').value || null,
-      graduation_year: document.getElementById('ef_gradYear').value ? parseInt(document.getElementById('ef_gradYear').value) : null,
-      age: typeof calcAge(bd) === 'number' ? calcAge(bd) : null
+  async function saveProfile(){
+    const name=document.getElementById('ef_name').value.trim();
+    if(!name){ toast('Full name is required','⚠️'); return; }
+    const btn=document.getElementById('saveProfileBtn');
+    btn.disabled=true; btn.textContent='Saving…';
+    const bd=document.getElementById('ef_birthdate').value;
+    const updates={
+      name:name,email:document.getElementById('ef_email').value.trim()||currentUser.email,
+      birthdate:bd||null,phone_number:document.getElementById('ef_phone').value.trim(),
+      school:document.getElementById('ef_school').value.trim(),
+      grade_level:document.getElementById('ef_gradeLevel').value||null,
+      year_level:document.getElementById('ef_yearLevel').value||null,
+      graduation_year:document.getElementById('ef_gradYear').value?parseInt(document.getElementById('ef_gradYear').value):null,
+      age:typeof calcAge(bd)==='number'?calcAge(bd):null
     };
-    const { data: updated, error } = await sb.from('scholars').update(updates).eq('id', currentUser.id).select().single();
-    btn.disabled = false; btn.textContent = 'Save Changes';
-    if (error) { toast(error.message, '❌'); return; }
-    currentUser = updated;
-    setupSidebar();
-    cancelEdit();
-    renderProfile();
-    toast('Profile updated successfully', '✅');
-  }
-
-  // ── DOCUMENTS ──
-  document.getElementById('uploadZoneCert').addEventListener('click', function() { document.getElementById('up_cert').click(); });
-  document.getElementById('uploadZoneGrade').addEventListener('click', function() { document.getElementById('up_rc').click(); });
-  document.getElementById('up_cert').addEventListener('change', function() { handleUpload('Certificate of Registration', this); });
-  document.getElementById('up_rc').addEventListener('change', function() { handleUpload('Grade Report', this); });
-
-  function renderDocs() {
-    const cor = myDocs.find(function(d) { return d.document_type === 'Certificate of Registration'; });
-    const grade = myDocs.find(function(d) { return d.document_type === 'Grade Report'; });
-    function badge(doc, label) {
-      if (!doc) return '<span class="badge badge-gray">' + label + ' — Not uploaded</span>';
-      const m = { Pending: 'badge-amber', Verified: 'badge-green', Rejected: 'badge-pink' };
-      return '<span class="badge ' + (m[doc.verification_status] || 'badge-gray') + '">✓ ' + label + ' — ' + doc.verification_status + '</span>';
-    }
-    document.getElementById('certBadge').innerHTML = badge(cor, 'COR');
-    document.getElementById('rcBadge').innerHTML = badge(grade, 'Grade Report');
-    if (!myDocs.length) {
-      document.getElementById('docHistory').innerHTML = '<tr><td colspan="5"><div class="empty"><p>No uploads yet.</p></div></td></tr>';
-      return;
-    }
-    const m = { Pending: 'badge-amber', Verified: 'badge-green', Rejected: 'badge-pink' };
-    document.getElementById('docHistory').innerHTML = myDocs.map(function(doc) {
-      return '<tr><td>' + doc.file_name + '</td><td>' + doc.document_type + '</td><td>' + fmtDate(doc.uploaded_at) + '</td><td><span class="badge ' + (m[doc.verification_status] || 'badge-gray') + '">' + (doc.verification_status || 'Pending') + '</span></td><td style="font-size:12px;color:var(--muted);max-width:200px">' + (doc.remarks || '—') + '</td></tr>';
-    }).join('');
-  }
-
-  async function handleUpload(documentType, input) {
-    if (!input.files.length) return;
-    const file = input.files[0];
-    if (!file.name.toLowerCase().endsWith('.pdf')) { toast('Only PDF files are accepted', '⚠️'); input.value = ''; return; }
-    if (file.size > 10 * 1024 * 1024) { toast('File must be under 10MB', '⚠️'); input.value = ''; return; }
-    document.getElementById('uploadZoneCert').style.pointerEvents = 'none';
-    document.getElementById('uploadZoneGrade').style.pointerEvents = 'none';
-    toast('Uploading…', '⏳');
-    try {
-      const filePath = currentUser.id + '/' + documentType.replace(/ /g, '_') + '/' + Date.now() + '_' + file.name;
-      const { error: upErr } = await sb.storage.from('scholar-documents').upload(filePath, file);
-      if (upErr) { toast(upErr.message, '❌'); input.value = ''; return; }
-      const { data: urlData } = sb.storage.from('scholar-documents').getPublicUrl(filePath);
-      const { error: dbErr } = await sb.from('documents').insert({
-        scholar_id: currentUser.id, document_type: documentType, file_name: file.name,
-        file_url: urlData.publicUrl, verification_status: 'Pending', uploaded_at: new Date().toISOString()
-      });
-      if (dbErr) { toast(dbErr.message, '❌'); input.value = ''; return; }
-      toast('Document uploaded!', '✅');
-      input.value = '';
-      await loadDocs();
-      renderDocs();
-      renderVerification();
-    } catch (err) {
-      console.error(err);
-      toast('Upload failed. Please try again.', '❌');
-      input.value = '';
-    } finally {
-      document.getElementById('uploadZoneCert').style.pointerEvents = '';
-      document.getElementById('uploadZoneGrade').style.pointerEvents = '';
-    }
-  }
-
-  // ── VERIFICATION ──
-  function renderVerification() {
-    const cor = myDocs.find(function(d) { return d.document_type === 'Certificate of Registration'; });
-    const grade = myDocs.find(function(d) { return d.document_type === 'Grade Report'; });
-    let status = 'not_submitted';
-    if (myDocs.length > 0) {
-      if (myDocs.every(function(d) { return d.verification_status === 'Verified'; })) status = 'verified';
-      else if (myDocs.some(function(d) { return d.verification_status === 'Rejected'; })) status = 'rejected';
-      else status = 'pending';
-    }
-    document.getElementById('verifBox').className = 'verif-box ' + status;
-    const icons = { pending: '⏳', verified: '✅', rejected: '❌', not_submitted: '📭' };
-    const titles = { pending: 'Under Review', verified: 'All Verified', rejected: 'Action Required', not_submitted: 'No Documents Submitted' };
-    const descs = {
-      pending: 'Your documents are under review by the admin. Please wait.',
-      verified: 'All your documents have been verified. Great job!',
-      rejected: 'One or more documents were rejected. Check the remarks below and re-upload.',
-      not_submitted: 'Upload your COR and Grade Report to begin verification.'
-    };
-    document.getElementById('verifIcon').textContent = icons[status];
-    document.getElementById('verifTitle').textContent = titles[status];
-    document.getElementById('verifDesc').textContent = descs[status];
-    function checkItem(label, doc) {
-      if (!doc) return '<div class="checklist-item"><span style="font-size:22px">⬜</span><div><div style="font-weight:500">' + label + '</div><div style="font-size:12px;color:var(--muted)">Not uploaded</div></div></div>';
-      const icns = { Pending: '⏳', Verified: '✅', Rejected: '❌' };
-      const remarksHtml = doc.remarks ? '<div style="font-size:12px;color:var(--red);margin-top:4px">Admin remark: ' + doc.remarks + '</div>' : '';
-      return '<div class="checklist-item"><span style="font-size:22px">' + (icns[doc.verification_status] || '⏳') + '</span><div><div style="font-weight:500">' + label + '</div><div style="font-size:12px;color:var(--muted)">' + doc.file_name + ' · ' + fmtDate(doc.uploaded_at) + '</div>' + remarksHtml + '</div></div>';
-    }
-    document.getElementById('verifChecklist').innerHTML = checkItem('Certificate of Registration (COR)', cor) + checkItem('Grade Report', grade);
+    const {data:updated,error}=await sb.from('scholars').update(updates).eq('id',currentUser.id).select().single();
+    btn.disabled=false; btn.textContent='Save Changes';
+    if(error){ toast(error.message,'❌'); return; }
+    currentUser=updated; setupSidebar(); cancelEdit(); renderProfile();
+    toast('Profile updated successfully','✅');
   }
 
   // ── ANNOUNCEMENTS ──
-  async function renderAnnouncements() {
-    const container = document.getElementById('scholarAnnouncementsList');
-    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
-    const { data: anns, error } = await sb.from('announcements').select('*').order('created_at', { ascending: false });
-    if (error || !anns || !anns.length) {
-      container.innerHTML = '<div class="card"><div class="empty"><p>No announcements yet.</p></div></div>';
-      updateAnnouncementBadge(0);
-      return;
+  async function renderAnnouncements(){
+    const container=document.getElementById('scholarAnnouncementsList');
+    container.innerHTML='<div class="empty"><p>Loading...</p></div>';
+    const {data:anns,error}=await sb.from('announcements').select('*').order('created_at',{ascending:false});
+    if(error||!anns||!anns.length){
+      container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet.</p></div></div>';
+      updateAnnouncementBadge(0); return;
     }
-    const { data: myResponses } = await sb.from('poll_responses').select('*, poll_options(option_text)').eq('scholar_id', currentUser.id);
-    const { data: myAttendance } = await sb.from('attendance').select('*').eq('scholar_id', currentUser.id);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const htmlParts = [];
-    for (const ann of anns) {
-      const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', ann.id);
-      const myResponse = myResponses ? myResponses.find(function(r) { return r.announcement_id === ann.id; }) : null;
-      const myAtt = myAttendance ? myAttendance.find(function(a) { return a.announcement_id === ann.id; }) : null;
-      const eventDate = ann.event_date ? new Date(ann.event_date + 'T00:00:00') : null;
-      const eventDateStr = eventDate ? eventDate.toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}) : null;
-      const hasOptions = options && options.length > 0;
-      const isPast = eventDate && eventDate < today;
-      const isToday = eventDate && eventDate.toDateString() === today.toDateString();
+    const {data:myResponses}=await sb.from('poll_responses').select('*, poll_options(option_text)').eq('scholar_id',currentUser.id);
+    const {data:myAttendance}=await sb.from('attendance').select('*').eq('scholar_id',currentUser.id);
+    const today=new Date(); today.setHours(0,0,0,0);
+    const htmlParts=[];
+    for(const ann of anns){
+      const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',ann.id);
+      const myResponse=myResponses?myResponses.find(function(r){return r.announcement_id===ann.id;}):null;
+      const myAtt=myAttendance?myAttendance.find(function(a){return a.announcement_id===ann.id;}):null;
+      const eventDate=ann.event_date?new Date(ann.event_date+'T00:00:00'):null;
+      const eventDateStr=eventDate?eventDate.toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}):null;
+      const hasOptions=options&&options.length>0;
+      const isPast=eventDate&&eventDate<today;
+      const isToday=eventDate&&eventDate.toDateString()===today.toDateString();
 
       // Poll section
-      let pollHtml = '';
-      if (hasOptions) {
-        let pollContent = '';
-        if (myResponse) {
-          // Scholar already answered — show answer + Edit button
-          pollContent =
-            '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
-              '<span>You answered: <strong>' + (myResponse.poll_options ? myResponse.poll_options.option_text : '—') + '</strong></span>' +
-              '<button class="btn btn-ghost btn-sm" data-action="editPoll" data-ann="' + ann.id + '" data-resp="' + myResponse.id + '" style="font-size:12px">✏️ Edit Answer</button>' +
-            '</div>' +
-            // Hidden edit form (shown when Edit is clicked)
-            '<div id="editPollForm_' + ann.id + '" style="display:none;margin-top:10px">' +
-              options.map(function(opt) {
-                const isSelected = myResponse.poll_option_id === opt.id;
-                return '<button class="btn ' + (isSelected ? 'btn-primary' : 'btn-ghost') + '" style="text-align:left;justify-content:flex-start;margin-bottom:6px" data-action="updatePoll" data-ann="' + ann.id + '" data-opt="' + opt.id + '" data-resp="' + myResponse.id + '">' + (isSelected ? '✓ ' : '') + opt.option_text + '</button>';
-              }).join('') +
-              '<button class="btn btn-ghost btn-sm" data-action="cancelEditPoll" data-ann="' + ann.id + '" style="margin-top:4px;font-size:12px">Cancel</button>' +
+      let pollHtml='';
+      if(hasOptions){
+        let pollContent='';
+        if(myResponse){
+          pollContent=
+            '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+              '<span>You answered: <strong>'+(myResponse.poll_options?myResponse.poll_options.option_text:'—')+'</strong></span>'+
+              '<button class="btn btn-ghost btn-sm" data-action="editPoll" data-ann="'+ann.id+'" data-resp="'+myResponse.id+'" style="font-size:12px">✏️ Edit Answer</button>'+
+            '</div>'+
+            '<div id="editPollForm_'+ann.id+'" style="display:none;margin-top:10px">'+
+              options.map(function(opt){
+                const isSel=myResponse.poll_option_id===opt.id;
+                return '<button class="btn '+(isSel?'btn-primary':'btn-ghost')+'" style="text-align:left;justify-content:flex-start;margin-bottom:6px;width:100%" data-action="updatePoll" data-ann="'+ann.id+'" data-opt="'+opt.id+'" data-resp="'+myResponse.id+'">'+(isSel?'✓ ':'')+opt.option_text+'</button>';
+              }).join('')+
+              '<button class="btn btn-ghost btn-sm" data-action="cancelEditPoll" data-ann="'+ann.id+'" style="margin-top:4px;font-size:12px">Cancel</button>'+
             '</div>';
         } else {
-          pollContent = options.map(function(opt) {
-            return '<button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;margin-bottom:6px" data-action="answerPoll" data-ann="' + ann.id + '" data-opt="' + opt.id + '">' + opt.option_text + '</button>';
+          pollContent=options.map(function(opt){
+            return '<button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;margin-bottom:6px;width:100%" data-action="answerPoll" data-ann="'+ann.id+'" data-opt="'+opt.id+'">'+opt.option_text+'</button>';
           }).join('');
         }
-        pollHtml = '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + (ann.poll_question || 'POLL') + '</div><div style="display:flex;flex-direction:column">' + pollContent + '</div></div>';
+        pollHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+(ann.poll_question||'POLL')+'</div><div style="display:flex;flex-direction:column">'+pollContent+'</div></div>';
       }
 
-      // Attendance section - show on event day or after
-      let attendanceHtml = '';
-      if (eventDate && (isToday || isPast)) {
-        const attLabel = isToday ? 'EVENT ATTENDANCE — Today!' : 'EVENT ATTENDANCE';
-        if (myAtt) {
-          // Already marked — show status with option to change
-          if (myAtt.attended) {
-            attendanceHtml =
-              '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">' +
-              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + attLabel + '</div>' +
-              '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
-                '<span><span style="font-size:18px">✅</span> You marked: <strong>Attended</strong></span>' +
-                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="' + ann.id + '" style="font-size:12px">Change</button>' +
-              '</div>' +
-              '<div id="attForm_' + ann.id + '" style="display:none;margin-top:10px;display:none">' +
-                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="' + ann.id + '" data-val="true">✅ Attended</button>' +
-                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '" data-val="false">❌ Did Not Attend</button>' +
-              '</div>' +
-              '</div>';
+      // Attendance section
+      let attendanceHtml='';
+      if(eventDate&&(isToday||isPast)){
+        const attLabel='EVENT ATTENDANCE'+(isToday?' — Today!':'');
+        if(myAtt){
+          if(myAtt.attended){
+            attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
+              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
+              '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+                '<span>✅ You marked: <strong>Attended</strong></span>'+
+                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
+              '</div>'+
+              '<div id="attForm_'+ann.id+'" style="display:none;margin-top:10px">'+
+                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ Attended</button>'+
+                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="'+ann.id+'" data-val="false">❌ Did Not Attend</button>'+
+              '</div></div>';
           } else {
-            attendanceHtml =
-              '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">' +
-              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + attLabel + '</div>' +
-              '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:12px;font-size:13px;color:#e05065;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
-                '<span><span style="font-size:18px">❌</span> You marked: <strong>Did Not Attend</strong></span>' +
-                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="' + ann.id + '" style="font-size:12px">Change</button>' +
-              '</div>' +
-              '<div id="attForm_' + ann.id + '" style="display:none;margin-top:10px">' +
-                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="' + ann.id + '" data-val="true">✅ Attended</button>' +
-                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '" data-val="false">❌ Did Not Attend</button>' +
-              '</div>' +
-              '</div>';
+            attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
+              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
+              '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:12px;font-size:13px;color:#e05065;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+                '<span>❌ You marked: <strong>Did Not Attend</strong></span>'+
+                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
+              '</div>'+
+              '<div id="attForm_'+ann.id+'" style="display:none;margin-top:10px">'+
+                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ Attended</button>'+
+                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="'+ann.id+'" data-val="false">❌ Did Not Attend</button>'+
+              '</div></div>';
           }
         } else {
-          // Not yet marked
-          attendanceHtml =
-            '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">' +
-            '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">' + attLabel + '</div>' +
-            '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Please mark your actual attendance for this event:</div>' +
-            '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="' + ann.id + '" data-val="true">✅ I Attended</button>' +
-            '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="' + ann.id + '" data-val="false">❌ I Did Not Attend</button>' +
+          attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
+            '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
+            '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Please mark your actual attendance for this event:</div>'+
+            '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ I Attended</button>'+
+            '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="'+ann.id+'" data-val="false">❌ I Did Not Attend</button>'+
             '</div>';
         }
       }
 
-      const dateStr = new Date(ann.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
-      let card = '<div class="card" style="margin-bottom:14px"><div class="card-header"><div><span class="card-title">' + ann.title + '</span>';
-      if (eventDateStr) {
-        card += '<div style="font-size:12px;color:var(--muted);margin-top:2px">' +
-          (isToday ? '<span style="background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;margin-right:6px">TODAY</span>' : '') +
-          (isPast && !isToday ? '<span style="background:#f3f4f6;color:#6b7280;padding:1px 6px;border-radius:4px;font-size:11px;margin-right:6px">PAST</span>' : '') +
-          'Event Date: ' + eventDateStr + (ann.event_location ? ' &middot; ' + ann.event_location : '') + '</div>';
+      const dateStr=new Date(ann.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+      let card='<div class="card" style="margin-bottom:14px"><div class="card-header"><div><span class="card-title">'+ann.title+'</span>';
+      if(eventDateStr){
+        card+='<div style="font-size:12px;color:var(--muted);margin-top:2px">'+
+          (isToday?'<span style="background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;margin-right:6px">TODAY</span>':'')+
+          (isPast&&!isToday?'<span style="background:#f3f4f6;color:#6b7280;padding:1px 6px;border-radius:4px;font-size:11px;margin-right:6px">PAST</span>':'')+
+          'Event Date: '+eventDateStr+(ann.event_location?' · '+ann.event_location:'')+'</div>';
       }
-      card += '</div><span style="font-size:11px;color:var(--muted)">' + dateStr + '</span></div>';
-      if (ann.description) card += '<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">' + ann.description + '</p></div>';
-      if (pollHtml) card += '<div class="card-body">' + pollHtml + '</div>';
-      if (attendanceHtml) card += '<div class="card-body">' + attendanceHtml + '</div>';
-      card += '</div>';
+      card+='</div><span style="font-size:11px;color:var(--muted)">'+dateStr+'</span></div>';
+      if(ann.description) card+='<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">'+ann.description+'</p></div>';
+      if(pollHtml) card+='<div class="card-body">'+pollHtml+'</div>';
+      if(attendanceHtml) card+='<div class="card-body">'+attendanceHtml+'</div>';
+      card+='</div>';
       htmlParts.push(card);
     }
-    container.innerHTML = htmlParts.join('');
-    const myResponseIds = myResponses ? myResponses.map(function(r) { return r.announcement_id; }) : [];
-    const unanswered = anns.filter(function(a) { return a.poll_question && !myResponseIds.includes(a.id); }).length;
+    container.innerHTML=htmlParts.join('');
+    const myResponseIds=myResponses?myResponses.map(function(r){return r.announcement_id;}):[];
+    const unanswered=anns.filter(function(a){return a.poll_question&&!myResponseIds.includes(a.id);}).length;
     updateAnnouncementBadge(unanswered);
   }
 
-  function updateAnnouncementBadge(count) {
-    const badge = document.getElementById('nb-announcements');
-    badge.style.display = count ? '' : 'none';
-    if (count) badge.textContent = count;
+  function updateAnnouncementBadge(count){
+    const badge=document.getElementById('nb-announcements');
+    badge.style.display=count?'':'none';
+    if(count) badge.textContent=count;
   }
 
-  document.getElementById('scholarAnnouncementsList').addEventListener('click', async function(e) {
+  document.getElementById('scholarAnnouncementsList').addEventListener('click', async function(e){
     // Answer poll
-    const pollBtn = e.target.closest('[data-action="answerPoll"]');
-    if (pollBtn && !pollBtn.disabled) {
-      pollBtn.disabled = true;
-      const { error } = await sb.from('poll_responses').insert({
-        announcement_id: pollBtn.dataset.ann,
-        poll_option_id: pollBtn.dataset.opt,
-        scholar_id: currentUser.id,
-        responded_at: new Date().toISOString()
-      });
-      if (error) { toast(error.message, '❌'); pollBtn.disabled = false; return; }
-      toast('Response recorded!', '✅');
-      renderAnnouncements();
-      return;
+    const pollBtn=e.target.closest('[data-action="answerPoll"]');
+    if(pollBtn&&!pollBtn.disabled){
+      pollBtn.disabled=true;
+      const {error}=await sb.from('poll_responses').insert({announcement_id:pollBtn.dataset.ann,poll_option_id:pollBtn.dataset.opt,scholar_id:currentUser.id,responded_at:new Date().toISOString()});
+      if(error){ toast(error.message,'❌'); pollBtn.disabled=false; return; }
+      toast('Response recorded!','✅'); renderAnnouncements(); return;
     }
-    // Edit poll answer — show edit form
-    const editBtn = e.target.closest('[data-action="editPoll"]');
-    if (editBtn) {
-      const annId = editBtn.dataset.ann;
-      const form = document.getElementById('editPollForm_' + annId);
-      if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
-      return;
-    }
-
+    // Edit poll toggle
+    const editBtn=e.target.closest('[data-action="editPoll"]');
+    if(editBtn){ const f=document.getElementById('editPollForm_'+editBtn.dataset.ann); if(f) f.style.display=f.style.display==='none'?'block':'none'; return; }
     // Cancel edit poll
-    const cancelEditBtn = e.target.closest('[data-action="cancelEditPoll"]');
-    if (cancelEditBtn) {
-      const annId = cancelEditBtn.dataset.ann;
-      const form = document.getElementById('editPollForm_' + annId);
-      if (form) form.style.display = 'none';
-      return;
+    const cancelEditPollBtn=e.target.closest('[data-action="cancelEditPoll"]');
+    if(cancelEditPollBtn){ const f=document.getElementById('editPollForm_'+cancelEditPollBtn.dataset.ann); if(f) f.style.display='none'; return; }
+    // Update poll
+    const updateBtn=e.target.closest('[data-action="updatePoll"]');
+    if(updateBtn&&!updateBtn.disabled){
+      updateBtn.disabled=true; updateBtn.textContent='Saving...';
+      const {error}=await sb.from('poll_responses').update({poll_option_id:updateBtn.dataset.opt,responded_at:new Date().toISOString()}).eq('id',updateBtn.dataset.resp);
+      if(error){ toast(error.message,'❌'); updateBtn.disabled=false; return; }
+      toast('Answer updated!','✅'); renderAnnouncements(); return;
     }
-
-    // Update poll answer
-    const updateBtn = e.target.closest('[data-action="updatePoll"]');
-    if (updateBtn && !updateBtn.disabled) {
-      updateBtn.disabled = true;
-      updateBtn.textContent = 'Saving...';
-      const respId = updateBtn.dataset.resp;
-      const optId = updateBtn.dataset.opt;
-      // Update the existing response
-      const { error } = await sb.from('poll_responses')
-        .update({ poll_option_id: optId, responded_at: new Date().toISOString() })
-        .eq('id', respId);
-      if (error) { toast(error.message, '❌'); updateBtn.disabled = false; return; }
-      toast('Answer updated!', '✅');
-      renderAnnouncements();
-      return;
-    }
-
-    // Change attendance — toggle the form
-    const changeAttBtn = e.target.closest('[data-action="changeAttendance"]');
-    if (changeAttBtn) {
-      const annId = changeAttBtn.dataset.ann;
-      const form = document.getElementById('attForm_' + annId);
-      if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
-      return;
-    }
-
-    // Mark attended or not attended
-    const attBtn = e.target.closest('[data-action="markAttended"]');
-    if (attBtn && !attBtn.disabled) {
-      const attended = attBtn.dataset.val === 'true';
-      const origText = attBtn.textContent;
-      attBtn.disabled = true;
-      attBtn.textContent = 'Saving...';
-      const { error } = await sb.from('attendance').upsert({
-        announcement_id: attBtn.dataset.ann,
-        scholar_id: currentUser.id,
-        attended: attended,
-        marked_at: new Date().toISOString()
-      }, { onConflict: 'announcement_id,scholar_id' });
-      if (error) { toast(error.message, '❌'); attBtn.disabled = false; attBtn.textContent = origText; return; }
-      toast(attended ? 'Attendance marked! Thank you.' : 'Noted — marked as Did Not Attend.', '✅');
+    // Change attendance toggle
+    const changeAttBtn=e.target.closest('[data-action="changeAttendance"]');
+    if(changeAttBtn){ const f=document.getElementById('attForm_'+changeAttBtn.dataset.ann); if(f) f.style.display=f.style.display==='none'?'block':'none'; return; }
+    // Mark attended
+    const attBtn=e.target.closest('[data-action="markAttended"]');
+    if(attBtn&&!attBtn.disabled){
+      const attended=attBtn.dataset.val==='true';
+      const origText=attBtn.textContent;
+      attBtn.disabled=true; attBtn.textContent='Saving...';
+      const {error}=await sb.from('attendance').upsert({announcement_id:attBtn.dataset.ann,scholar_id:currentUser.id,attended:attended,marked_at:new Date().toISOString()},{onConflict:'announcement_id,scholar_id'});
+      if(error){ toast(error.message,'❌'); attBtn.disabled=false; attBtn.textContent=origText; return; }
+      toast(attended?'Attendance marked! Thank you.':'Noted — marked as Did Not Attend.','✅');
       renderAnnouncements();
     }
   });
 
   // ── NOTIFICATIONS ──
-  async function renderNotifications() {
-    const container = document.getElementById('notificationsList');
-    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
-    const { data: anns } = await sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(20);
-    if (!anns || !anns.length) {
-      container.innerHTML = '<div class="empty"><p>No notifications yet.</p></div>';
-      document.getElementById('nb-notifications').style.display = 'none';
-      return;
+  async function renderNotifications(){
+    const container=document.getElementById('notificationsList');
+    container.innerHTML='<div class="empty"><p>Loading...</p></div>';
+    const {data:anns}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(20);
+    if(!anns||!anns.length){
+      container.innerHTML='<div class="empty"><p>No notifications yet.</p></div>';
+      document.getElementById('nb-notifications').style.display='none'; return;
     }
-    container.innerHTML = anns.map(function(ann) {
-      const date = new Date(ann.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
-      return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f4f4f8;cursor:pointer" data-action="goAnnouncement"><div style="width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📢</div><div style="flex:1"><div style="font-size:14px;font-weight:500">' + ann.title + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + (ann.description ? ann.description.slice(0,80) + (ann.description.length > 80 ? '...' : '') : 'New announcement from VHO Admin') + '</div><div style="font-size:11px;color:var(--muted);margin-top:4px">' + date + '</div></div></div>';
+    // Mark all as seen
+    const allIds=anns.map(function(a){return a.id;});
+    seenNotifications=allIds;
+    localStorage.setItem('vho_seen_notifs',JSON.stringify(seenNotifications));
+    // Clear badge
+    document.getElementById('nb-notifications').style.display='none';
+
+    container.innerHTML=anns.map(function(ann){
+      const date=new Date(ann.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+      return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f4f4f8;cursor:pointer" data-action="goAnnouncement">'+
+        '<div style="width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📢</div>'+
+        '<div style="flex:1"><div style="font-size:14px;font-weight:500">'+ann.title+'</div>'+
+        '<div style="font-size:12px;color:var(--muted);margin-top:2px">'+(ann.description?ann.description.slice(0,80)+(ann.description.length>80?'...':''):'New announcement from VHO Admin')+'</div>'+
+        '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+date+'</div></div></div>';
     }).join('');
-    const badge = document.getElementById('nb-notifications');
-    badge.style.display = anns.length ? '' : 'none';
-    if (anns.length) badge.textContent = anns.length;
   }
 
-  document.getElementById('notificationsList').addEventListener('click', function(e) {
-    if (e.target.closest('[data-action="goAnnouncement"]')) gotoPage('announcements');
+  document.getElementById('notificationsList').addEventListener('click', function(e){
+    if(e.target.closest('[data-action="goAnnouncement"]')) gotoPage('announcements');
   });
 
-  async function loadNotificationBadge() {
-    const { data: anns } = await sb.from('announcements').select('id');
-    if (anns && anns.length) {
-      document.getElementById('nb-notifications').style.display = '';
-      document.getElementById('nb-notifications').textContent = anns.length;
-    }
+  async function loadNotificationBadge(){
+    const {data:anns}=await sb.from('announcements').select('id');
+    if(!anns||!anns.length) return;
+    const unseen=anns.filter(function(a){return !seenNotifications.includes(a.id);}).length;
+    const badge=document.getElementById('nb-notifications');
+    badge.style.display=unseen?'':'none';
+    if(unseen) badge.textContent=unseen;
   }
 
   // ── CHANGE PASSWORD ──
-  document.getElementById('sendResetBtn').addEventListener('click', async function() {
-    const email = document.getElementById('cp_email').value.trim().toLowerCase();
-    const msgEl = document.getElementById('cp_msg');
-    function showMsg(type, text) {
-      msgEl.style.cssText = type === 'err'
-        ? 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
-        : 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
-      msgEl.textContent = text;
+  document.getElementById('sendResetBtn').addEventListener('click', async function(){
+    const email=document.getElementById('cp_email').value.trim().toLowerCase();
+    const msgEl=document.getElementById('cp_msg');
+    function showMsg(type,text){
+      msgEl.style.cssText=type==='err'
+        ?'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
+        :'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
+      msgEl.textContent=text;
     }
-    if (!email || !email.includes('@')) { showMsg('err', 'Please enter a valid email address.'); return; }
-    this.disabled = true; this.textContent = 'Sending…';
-    msgEl.style.display = 'none';
-    const { error: updateErr } = await sb.auth.updateUser({ email: email });
-    const base = window.location.origin + window.location.pathname.replace(/scholar\.html.*$/, '');
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: base + 'reset.html' });
-    this.disabled = false; this.textContent = 'Send Reset Link to Gmail';
-    if (error) { showMsg('err', error.message); return; }
-    await sb.from('scholars').update({ email: email }).eq('id', currentUser.id);
-    currentUser.email = email;
-    showMsg('ok', '✅ Reset link sent to ' + email + '! Check your Gmail inbox and click the link to set your new password.');
-    document.getElementById('cp_email').value = '';
+    if(!email||!email.includes('@')){ showMsg('err','Please enter a valid email address.'); return; }
+    this.disabled=true; this.textContent='Sending…'; msgEl.style.display='none';
+    await sb.auth.updateUser({email:email});
+    const base=window.location.origin+window.location.pathname.replace(/scholar\.html.*$/,'');
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:base+'reset.html'});
+    this.disabled=false; this.textContent='Send Reset Link to Gmail';
+    if(error){ showMsg('err',error.message); return; }
+    await sb.from('scholars').update({email:email}).eq('id',currentUser.id);
+    currentUser.email=email;
+    showMsg('ok','✅ Reset link sent to '+email+'! Check your Gmail inbox.');
+    document.getElementById('cp_email').value='';
   });
 
   // ── BOOT ──
-  window.addEventListener('DOMContentLoaded', async function() {
-    if (sessionStorage.getItem('vho_role') !== 'scholar') { window.location.href = 'index.html'; return; }
-    const ok = await loadProfile();
-    if (!ok) return;
-    await loadDocs();
+  window.addEventListener('DOMContentLoaded', async function(){
+    if(sessionStorage.getItem('vho_role')!=='scholar'){ window.location.href='index.html'; return; }
+    const ok=await loadProfile();
+    if(!ok) return;
     setupSidebar();
     renderHome();
     loadNotificationBadge();
