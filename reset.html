@@ -11,37 +11,41 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--pink:#e8d5d5;--blue:#6b7fad;--blue2:#4a5a8a;--red:#e05065;--text:#2c2c3e;--muted:#8a8a9e;--border:#e8e8f0;}
 body{font-family:'DM Sans',sans-serif;background:var(--pink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
-.wrap{background:#fff;border-radius:24px;width:min(440px,100%);padding:44px 40px;box-shadow:0 32px 80px rgba(74,90,138,.2);animation:up .5s cubic-bezier(.22,1,.36,1)}
+.wrap{background:#fff;border-radius:24px;width:min(460px,100%);padding:44px 40px;box-shadow:0 32px 80px rgba(74,90,138,.2);animation:up .5s cubic-bezier(.22,1,.36,1)}
 @keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 .logo-row{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-.logo-row svg{width:36px;height:36px}
 .brand-name{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text);line-height:1.3}
 .brand-name small{display:block;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:1px}
 h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:6px}
-p.sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
-.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fafafa;outline:none;transition:border .2s}
-.field input:focus{border-color:var(--blue);background:#fff}
+.pw-wrap{position:relative}
+.pw-wrap input{width:100%;padding:11px 40px 11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fafafa;outline:none;transition:border .2s}
+.pw-wrap input:focus{border-color:var(--blue);background:#fff}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;align-items:center}
+.eye-btn:hover{color:var(--blue2)}
+.pw-rule{font-size:12px;color:var(--muted);margin-top:6px}
 .btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;margin-top:4px}
 .btn:hover:not(:disabled){background:var(--blue2);transform:translateY(-1px)}
 .btn:disabled{opacity:.6;cursor:not-allowed}
 .msg{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
 .msg.err{background:#fff0f2;border:1px solid #fcc;color:var(--red)}
 .msg.ok{background:#f0fdf4;border:1px solid #86efac;color:#166534}
-.pw-rule{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
 .loading{text-align:center;padding:30px 0;color:var(--muted);font-size:14px}
 </style>
 </head>
 <body>
 <div class="wrap" id="wrap">
   <div class="logo-row">
-    <svg viewBox="0 0 44 44"><path d="M22 38s-16-10.5-16-21a10 10 0 0 1 16-8 10 10 0 0 1 16 8c0 10.5-16 21-16 21z" fill="#e05065"/><path d="M22 38s0-10.5 0-21a10 10 0 0 1 16-8c0 10.5-16 21-16 21z" fill="#a83248"/></svg>
+    <svg width="36" height="36" viewBox="0 0 44 44"><path d="M22 38s-16-10.5-16-21a10 10 0 0 1 16-8 10 10 0 0 1 16 8c0 10.5-16 21-16 21z" fill="#e05065"/><path d="M22 38s0-10.5 0-21a10 10 0 0 1 16-8c0 10.5-16 21-16 21z" fill="#a83248"/></svg>
     <div class="brand-name">Victoria Heartstrong<small>Organization</small></div>
   </div>
 
+  <!-- Loading state -->
   <div id="loadingState" class="loading">⏳ Verifying reset link…</div>
 
+  <!-- Form state -->
   <div id="formState" style="display:none">
     <h1>Set New Password</h1>
     <p class="sub">Enter and confirm your new password below.</p>
@@ -49,28 +53,40 @@ p.sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
     <div class="msg ok" id="okMsg"></div>
     <div class="field">
       <label>New Password</label>
-      <input type="password" id="newPw" placeholder="Enter new password">
+      <div class="pw-wrap">
+        <input type="password" id="newPw" placeholder="Enter new password">
+        <button class="eye-btn" id="toggleNewPw" type="button" tabindex="-1">
+          <svg id="eyeNew" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
       <div class="pw-rule">Minimum 6 characters</div>
     </div>
     <div class="field">
       <label>Confirm New Password</label>
-      <input type="password" id="confirmPw" placeholder="Re-enter new password">
+      <div class="pw-wrap">
+        <input type="password" id="confirmPw" placeholder="Re-enter new password">
+        <button class="eye-btn" id="toggleConfirmPw" type="button" tabindex="-1">
+          <svg id="eyeConfirm" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
     </div>
     <button class="btn" id="saveBtn">Save New Password</button>
   </div>
 
+  <!-- Expired/invalid link -->
   <div id="errorState" style="display:none">
     <h1>Link Expired</h1>
-    <p class="sub">This password reset link has expired or is invalid. Please request a new one from the Change Password page.</p>
-    <button class="btn" onclick="window.location.href='index.html'">Back to Login</button>
+    <p class="sub">This password reset link has expired or is invalid. Please request a new one from the Change Password page after logging in.</p>
+    <button class="btn" id="backToLoginBtn">Back to Login</button>
   </div>
 
+  <!-- Success state -->
   <div id="successState" style="display:none">
     <div style="text-align:center;padding:10px 0">
-      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <div style="font-size:56px;margin-bottom:16px">🎉</div>
       <h1 style="margin-bottom:8px">Password Updated!</h1>
-      <p class="sub">Your new password has been saved. You can now log in with your new password.</p>
-      <button class="btn" onclick="window.location.href='index.html'">Go to Login</button>
+      <p class="sub">Your new password has been saved. You can now log in using your new password.</p>
+      <button class="btn" id="goToLoginBtn">Go to Login</button>
     </div>
   </div>
 </div>
@@ -82,48 +98,62 @@ p.sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function show(id) {
-    ['loadingState','formState','errorState','successState'].forEach(s => {
+    ['loadingState','formState','errorState','successState'].forEach(function(s){
       document.getElementById(s).style.display = s === id ? 'block' : 'none';
     });
   }
-
   function showErr(msg) {
     const el = document.getElementById('errMsg');
     el.textContent = msg; el.style.display = 'block';
     document.getElementById('okMsg').style.display = 'none';
   }
 
-  // Supabase sends the token in the URL hash as #access_token=...&type=recovery
-  window.addEventListener('DOMContentLoaded', async function () {
-    // Listen for the auth state change — Supabase auto-handles the hash token
-    const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        // Valid recovery session — show the form
-        show('formState');
-      } else if (event === 'SIGNED_IN' && session) {
-        // Already signed in from recovery — show form
-        show('formState');
-      }
+  // Eye toggle helpers
+  function setupEye(btnId, inputId, iconId) {
+    document.getElementById(btnId).addEventListener('click', function(){
+      const inp = document.getElementById(inputId);
+      const isHidden = inp.type === 'password';
+      inp.type = isHidden ? 'text' : 'password';
+      document.getElementById(iconId).innerHTML = isHidden
+        ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
     });
+  }
+  setupEye('toggleNewPw', 'newPw', 'eyeNew');
+  setupEye('toggleConfirmPw', 'confirmPw', 'eyeConfirm');
 
-    // Check if there's a hash with error
+  // Back/Go to login buttons
+  document.getElementById('backToLoginBtn').addEventListener('click', function(){ window.location.href = 'index.html'; });
+  document.getElementById('goToLoginBtn').addEventListener('click', function(){ window.location.href = 'index.html'; });
+
+  // Detect recovery session from URL hash
+  window.addEventListener('DOMContentLoaded', async function(){
     const hash = window.location.hash;
+
+    // Check for error in hash
     if (hash.includes('error=')) {
       show('errorState');
       return;
     }
 
-    // If no hash at all and no session, show error
+    // Supabase sets session from hash automatically — listen for PASSWORD_RECOVERY event
+    sb.auth.onAuthStateChange(function(event, session){
+      if (event === 'PASSWORD_RECOVERY') {
+        show('formState');
+      }
+    });
+
+    // If no hash tokens at all, wait briefly then check session
     if (!hash.includes('access_token') && !hash.includes('type=recovery')) {
-      // Give Supabase a moment to process
-      setTimeout(async () => {
+      setTimeout(async function(){
         const { data: { session } } = await sb.auth.getSession();
         if (!session) show('errorState');
       }, 2000);
     }
   });
 
-  document.getElementById('saveBtn').addEventListener('click', async function () {
+  // Save new password
+  document.getElementById('saveBtn').addEventListener('click', async function(){
     const newPw = document.getElementById('newPw').value;
     const confirmPw = document.getElementById('confirmPw').value;
 
@@ -142,10 +172,16 @@ p.sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
 
     if (error) { showErr(error.message); return; }
 
-    // Sign out after password change so user logs in fresh
+    // Sign out after password reset so user logs in fresh with new password
     await sb.auth.signOut();
     show('successState');
   });
+
+  // Allow pressing Enter to submit
+  document.getElementById('confirmPw').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') document.getElementById('saveBtn').click();
+  });
+
 })();
 </script>
 </body>
