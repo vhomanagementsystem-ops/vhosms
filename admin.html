@@ -7,6 +7,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="shared.css">
 <style>
+.sponsor-tab{flex:1;padding:8px 14px;border:none;border-radius:8px;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);transition:all .2s;white-space:nowrap}
+.sponsor-tab.on{background:#fff;color:var(--blue2);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .dash-two{display:grid;grid-template-columns:1fr 320px;gap:16px}
 @media(max-width:900px){.dash-two{grid-template-columns:1fr}}
 .breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f4f4f8}
@@ -27,12 +29,15 @@
     <div class="nav-group-label">Scholars</div>
     <a class="nav-item" id="nav-scholars">
       <svg fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 1 1 6 0 3 3 0 0 1-6 0zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm14-1a5 5 0 0 1 4 5H13a5 5 0 0 1 4-5z"/></svg>All Scholars</a>
-    <a class="nav-item" id="nav-documents">
-      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h4.586A2 2 0 0 1 12 2.586L15.414 6A2 2 0 0 1 16 7.414V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 6a1 1 0 0 1 1-1h6a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm1 3a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H7z"/></svg>Document Verification<span class="nav-badge" id="nb-documents" style="display:none">0</span></a>
     <div class="nav-group-label">Engagement</div>
     <a class="nav-item" id="nav-announcements">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l6.553 3.276A1 1 0 0 0 18 15V3z"/></svg>Announcements<span class="nav-badge" id="nb-announcements" style="display:none">0</span></a>
+    <div class="nav-group-label">Partners</div>
+    <a class="nav-item" id="nav-sponsors">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a1 1 0 0 1-1.581.814L10 14.396l-4.419 2.418A1 1 0 0 1 4 16V4zm6 3a1 1 0 0 1 1 1v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1H8a1 1 0 1 1 0-2h1V8a1 1 0 0 1 1-1z"/></svg>Sponsor Database</a>
     <div class="nav-group-label">Settings</div>
+    <a class="nav-item" id="nav-admins">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0zm-6-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm-2 4a5 5 0 0 0-4.546 2.916A5.986 5.986 0 0 0 10 16a5.986 5.986 0 0 0 4.546-2.084A5 5 0 0 0 10 11z"/></svg>Admin Accounts</a>
     <a class="nav-item" id="nav-changepassword">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0 1 10 0v2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2zm8-2v2H7V7a3 3 0 0 1 6 0z"/></svg>Change Password</a>
   </nav>
@@ -60,13 +65,13 @@
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page">
       <div class="page-header">
-        <div class="page-header-left"><h1>Good day, Admin ♥</h1><p>VHO Scholarship Management Overview</p></div>
+        <div class="page-header-left"><h1 id="dashGreet">Good day, Admin ♥</h1><p>VHO Scholarship Management Overview</p></div>
       </div>
       <div class="stat-grid" id="dashStats"></div>
       <div class="dash-two">
         <div class="card">
           <div class="card-header"><span class="card-title">Recent Scholars</span><button class="btn btn-ghost btn-sm" id="dashViewAll">View all</button></div>
-          <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Grade Level</th><th>Year Level</th><th>Status</th><th>COR</th><th>Grades</th></tr></thead><tbody id="dashTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Grade Level</th><th>Year Level</th><th>Status</th></tr></thead><tbody id="dashTable"></tbody></table></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="card">
@@ -99,20 +104,7 @@
           <select id="sGradeLevel"><option value="">All Grade Levels</option><option>Junior High School</option><option>Senior High School</option><option>College</option></select>
           <select id="sStatus"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="graduated">Graduated</option></select>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Batch</th><th>Grade Level</th><th>Year Level</th><th>Status</th><th>Documents</th><th>Actions</th></tr></thead><tbody id="scholarsTable"></tbody></table></div>
-      </div>
-    </div>
-
-    <!-- DOCUMENT VERIFICATION -->
-    <div id="page-documents" class="page" style="display:none">
-      <div class="page-header"><div class="page-header-left"><h1>Document Verification</h1><p>Review submitted COR and Grades for each scholar</p></div></div>
-      <div class="card">
-        <div class="search-row">
-          <input id="dSearch" placeholder="Search scholar name…">
-          <select id="dType"><option value="">All Document Types</option><option value="Certificate of Registration">COR / Registration</option><option value="Grade Report">Grades / Report Card</option></select>
-          <select id="dStatus"><option value="">All Statuses</option><option value="Pending">Pending</option><option value="Verified">Verified</option><option value="Rejected">Rejected</option></select>
-        </div>
-        <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Document</th><th>File</th><th>Uploaded</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="docsTable"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Batch</th><th>Grade Level</th><th>Year Level</th><th>Status</th><th>Actions</th></tr></thead><tbody id="scholarsTable"></tbody></table></div>
       </div>
     </div>
 
@@ -125,6 +117,80 @@
       <div id="announcementsList"><div class="empty"><p>Loading...</p></div></div>
     </div>
 
+    <!-- ADMIN ACCOUNTS -->
+    <div id="page-admins" class="page" style="display:none">
+      <div class="page-header">
+        <div class="page-header-left"><h1>Admin Accounts</h1><p>Manage all admin users</p></div>
+        <button class="btn btn-primary" id="addAdminBtn">+ Add Admin</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="adminsTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- SPONSORS DATABASE -->
+    <div id="page-sponsors" class="page" style="display:none">
+      <div class="page-header">
+        <div class="page-header-left"><h1>Sponsor Database</h1><p>Manage VHO sponsors, partners, events and contributions</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="exportSponsorsBtn">📥 Export to Excel</button>
+          <button class="btn btn-primary" id="addSponsorBtn">+ Add Sponsor</button>
+        </div>
+      </div>
+
+      <!-- Sub tabs -->
+      <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:18px;width:fit-content">
+        <button class="sponsor-tab on" id="stab-sponsors" data-stab="sponsors">🏢 Sponsors</button>
+        <button class="sponsor-tab" id="stab-events" data-stab="events">📅 Event Tracker</button>
+        <button class="sponsor-tab" id="stab-contributions" data-stab="contributions">💰 Contributions</button>
+      </div>
+
+      <!-- SPONSORS LIST -->
+      <div id="spanel-sponsors">
+        <div class="card">
+          <div class="search-row">
+            <input id="spSearch" placeholder="Search company, contact, email…">
+            <select id="spRelStatus">
+              <option value="">All Relationship Status</option>
+              <option>Active Partner</option>
+              <option>Potential Partner</option>
+              <option>Inactive</option>
+              <option>MOU Signed</option>
+            </select>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Company</th><th>Contact Person</th><th>Relationship</th><th>Email</th><th>Contact No.</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- EVENT TRACKER -->
+      <div id="spanel-events" style="display:none">
+        <div class="page-header" style="padding:0 0 14px">
+          <div></div>
+          <button class="btn btn-primary" id="addEventBtn">+ Add Event</button>
+        </div>
+        <div class="card">
+          <div class="search-row">
+            <input id="evSearch" placeholder="Search event name or sponsor…">
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Event Name</th><th>Date</th><th>Sponsors Involved</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="eventsTable"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CONTRIBUTIONS TRACKER -->
+      <div id="spanel-contributions" style="display:none">
+        <div class="page-header" style="padding:0 0 14px">
+          <div></div>
+          <button class="btn btn-primary" id="addContribBtn">+ Add Contribution</button>
+        </div>
+        <div class="card">
+          <div class="search-row">
+            <input id="ctSearch" placeholder="Search donor or contribution…">
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Donor Name</th><th>Contribution</th><th>Date</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="contribTable"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
     <!-- CHANGE PASSWORD -->
     <div id="page-changepassword" class="page" style="display:none">
       <div class="page-header"><div class="page-header-left"><h1>Change Password</h1><p>Set a new password for your admin account</p></div></div>
@@ -133,11 +199,16 @@
           <div class="card-header"><span class="card-title">Set New Password</span></div>
           <div class="card-body">
             <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:18px;font-size:13px;color:#1e40af;line-height:1.6">
-              🔒 Enter your new password below. Make sure it is at least 6 characters. You will use this new password next time you log in.
+              🔒 Enter your new password below. Make sure it is at least 6 characters.
             </div>
             <div class="form-field" style="margin-bottom:14px">
               <label class="form-label">New Password</label>
-              <input class="form-input" id="adm_cp_email" type="password" placeholder="Enter new password (min 6 characters)">
+              <div style="position:relative">
+                <input class="form-input" id="adm_cp_email" type="password" placeholder="Enter new password (min 6 characters)" style="padding-right:40px">
+                <button type="button" id="toggleCpPw" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">
+                  <svg id="cpEyeIcon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
             </div>
             <div id="adm_cp_msg" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px"></div>
             <button class="btn btn-primary" id="admSendResetBtn" style="width:100%">Save New Password</button>
@@ -214,27 +285,6 @@
 <div class="modal-bg" id="mScholarDetail">
 <div class="modal" id="mScholarDetailBody"></div></div>
 
-<!-- Document Review -->
-<div class="modal-bg" id="mDocReview">
-<div class="modal">
-  <button class="modal-close" id="closeDocReview">✕</button>
-  <h2 class="modal-title" id="docReviewTitle">Review Document</h2>
-  <p class="modal-sub" id="docReviewSub"></p>
-  <div class="form-field"><label class="form-label">Remarks (visible to scholar)</label><textarea class="form-textarea" id="docReviewRemarks" placeholder="Add remarks…"></textarea></div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" id="cancelDocReview">Cancel</button>
-    <button class="btn btn-success" id="docReviewBtn">Confirm</button>
-  </div>
-</div></div>
-
-<!-- Document Preview -->
-<div class="modal-bg" id="mDocView">
-<div class="modal" style="max-width:760px">
-  <button class="modal-close" id="closeDocView">✕</button>
-  <h2 class="modal-title" id="docViewTitle">Document Preview</h2>
-  <iframe class="pdf-frame" id="docViewFrame" src="about:blank"></iframe>
-</div></div>
-
 <!-- Add/Edit Announcement -->
 <div class="modal-bg" id="mAnnouncementForm">
 <div class="modal" style="max-width:560px">
@@ -263,36 +313,171 @@
 <div class="modal" style="max-width:600px">
   <button class="modal-close" id="closePollResults">✕</button>
   <h2 class="modal-title" id="pollResultsTitle">Poll Results</h2>
-  <div id="pollResultsBody"></div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" id="closePollResultsBtn">Close</button>
-  </div>
+  <div id="pollResultsBody" style="max-height:400px;overflow-y:auto"></div>
+  <div class="modal-footer"><button class="btn btn-ghost" id="closePollResultsBtn">Close</button></div>
 </div></div>
 
-<!-- Attendance View Modal (admin read-only) -->
+<!-- Attendance View Modal -->
 <div class="modal-bg" id="mAttendance">
 <div class="modal" style="max-width:600px">
   <button class="modal-close" id="closeAttendance">✕</button>
-  <h2 class="modal-title" id="attendanceTitle">Actual Attendance</h2>
-  <p class="modal-sub" id="attendanceSub">Scholars who marked themselves as attended.</p>
-  <div id="attendanceBody"></div>
+  <h2 class="modal-title" id="attendanceTitle">Attendance</h2>
+  <p class="modal-sub" id="attendanceSub">Scholars who marked their attendance.</p>
+  <div id="attendanceBody" style="max-height:400px;overflow-y:auto"></div>
+  <div class="modal-footer"><button class="btn btn-ghost" id="closeAttendanceBtn">Close</button></div>
+</div></div>
+
+<!-- Add/Edit Admin Modal -->
+<div class="modal-bg" id="mAdminForm">
+<div class="modal" style="max-width:460px">
+  <button class="modal-close" id="closeAdminForm">✕</button>
+  <h2 class="modal-title" id="adminFormTitle">Add Admin</h2>
+  <p class="modal-sub" id="adminFormSub">Default password will be: ADMINfirstname</p>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">First Name *</label><input class="form-input" id="adm_fn" placeholder="Juan"></div>
+    <div class="form-field"><label class="form-label">Last Name *</label><input class="form-input" id="adm_ln" placeholder="Dela Cruz"></div>
+  </div>
+  <div class="form-field"><label class="form-label">Email *</label><input class="form-input" id="adm_em" type="email" placeholder="juan@vho.org"></div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" id="closeAttendanceBtn">Close</button>
+    <button class="btn btn-ghost" id="cancelAdminForm">Cancel</button>
+    <button class="btn btn-primary" id="adminFormSaveBtn">Add Admin</button>
   </div>
 </div></div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Add/Edit Sponsor Modal -->
+<div class="modal-bg" id="mSponsorForm">
+<div class="modal" style="max-width:620px">
+  <button class="modal-close" id="closeSponsorForm">✕</button>
+  <h2 class="modal-title" id="sponsorFormTitle">Add Sponsor</h2>
+  <p class="modal-sub">Fill in the sponsor/partner information.</p>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Company / Institution *</label><input class="form-input" id="sp_company" placeholder="e.g. ABC Corporation"></div>
+    <div class="form-field"><label class="form-label">Relationship Status</label>
+      <select class="form-select" id="sp_relstatus">
+        <option value="">— Select —</option>
+        <option>Active Partner</option>
+        <option>Potential Partner</option>
+        <option>MOU Signed</option>
+        <option>Inactive</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Contact Person</label><input class="form-input" id="sp_contact" placeholder="e.g. Juan Dela Cruz"></div>
+    <div class="form-field"><label class="form-label">Title / Position</label><input class="form-input" id="sp_title" placeholder="e.g. HR Manager"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" id="sp_email" type="email" placeholder="contact@company.com"></div>
+    <div class="form-field"><label class="form-label">Contact Number</label><input class="form-input" id="sp_phone" placeholder="09XXXXXXXXX"></div>
+  </div>
+  <div class="form-field"><label class="form-label">Company Address</label><input class="form-input" id="sp_address" placeholder="Street, City, Province"></div>
+  <div class="form-field">
+    <label class="form-label">What does this company offer? <span style="font-size:11px;color:var(--muted)">(e.g. internships, mentoring, employment, cash donations, training)</span></label>
+    <textarea class="form-textarea" id="sp_offers" placeholder="Describe what this company/institution can offer to VHO scholars..."></textarea>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelSponsorForm">Cancel</button>
+    <button class="btn btn-primary" id="sponsorFormSaveBtn">Add Sponsor</button>
+  </div>
+</div></div>
+
+<!-- Sponsor Detail View Modal -->
+<div class="modal-bg" id="mSponsorDetail">
+<div class="modal" style="max-width:560px">
+  <button class="modal-close" id="closeSponsorDetail">✕</button>
+  <div id="sponsorDetailBody"></div>
+</div></div>
+
+<!-- Add/Edit Event Modal -->
+<div class="modal-bg" id="mEventForm">
+<div class="modal" style="max-width:500px">
+  <button class="modal-close" id="closeEventForm">✕</button>
+  <h2 class="modal-title" id="eventFormTitle">Add Event</h2>
+  <div class="form-field"><label class="form-label">Event Name *</label><input class="form-input" id="ev_name" placeholder="e.g. Career Fair 2026"></div>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Date</label><input class="form-input" id="ev_date" type="date"></div>
+    <div class="form-field"><label class="form-label">Sponsors Involved</label><input class="form-input" id="ev_sponsors" placeholder="e.g. ABC Corp, XYZ Inc"></div>
+  </div>
+  <div class="form-field"><label class="form-label">Notes</label><textarea class="form-textarea" id="ev_notes" placeholder="Additional details about the event..."></textarea></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelEventForm">Cancel</button>
+    <button class="btn btn-primary" id="eventFormSaveBtn">Save Event</button>
+  </div>
+</div></div>
+
+<!-- Add/Edit Contribution Modal -->
+<div class="modal-bg" id="mContribForm">
+<div class="modal" style="max-width:500px">
+  <button class="modal-close" id="closeContribForm">✕</button>
+  <h2 class="modal-title" id="contribFormTitle">Add Contribution</h2>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Donor Name *</label><input class="form-input" id="ct_donor" placeholder="e.g. ABC Corporation"></div>
+    <div class="form-field"><label class="form-label">Date</label><input class="form-input" id="ct_date" type="date"></div>
+  </div>
+  <div class="form-field"><label class="form-label">Contribution *</label><input class="form-input" id="ct_contribution" placeholder="e.g. ₱50,000 cash donation, 10 laptops, Training session"></div>
+  <div class="form-field"><label class="form-label">Notes</label><textarea class="form-textarea" id="ct_notes" placeholder="Additional details..."></textarea></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelContribForm">Cancel</button>
+    <button class="btn btn-primary" id="contribFormSaveBtn">Save Contribution</button>
+  </div>
+</div></div>
+
+<!-- Delete Sponsor Confirmation -->
+<div class="modal-bg" id="mDeleteSponsorConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Sponsor</h2>
+  <p class="modal-sub">Are you sure you want to delete <strong id="deleteSponsorName"></strong>? All related events and contributions will also be deleted. This <strong>cannot be undone.</strong></p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteSponsorBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteSponsorBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
+<!-- Delete Event Confirmation -->
+<div class="modal-bg" id="mDeleteEventConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Event</h2>
+  <p class="modal-sub">Are you sure you want to delete this event record? This <strong>cannot be undone.</strong></p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteEventBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteEventBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
+<!-- Delete Contribution Confirmation -->
+<div class="modal-bg" id="mDeleteContribConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Contribution</h2>
+  <p class="modal-sub">Are you sure you want to delete this contribution record? This <strong>cannot be undone.</strong></p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteContribBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteContribBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
+<!-- Delete Scholar Confirmation -->
 <div class="modal-bg" id="mDeleteConfirm">
 <div class="modal" style="max-width:400px">
   <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Scholar</h2>
-  <p class="modal-sub">Are you sure you want to delete <strong id="deleteModalName"></strong>? This will also delete all their uploaded documents and <strong>cannot be undone.</strong></p>
+  <p class="modal-sub">Are you sure you want to delete <strong id="deleteModalName"></strong>? This <strong>cannot be undone.</strong></p>
   <div class="modal-footer">
     <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
     <button class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
   </div>
 </div></div>
 
-<!-- Logout Confirmation Modal -->
+<!-- Delete Admin Confirmation -->
+<div class="modal-bg" id="mDeleteAdminConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Admin</h2>
+  <p class="modal-sub">Are you sure you want to delete admin <strong id="deleteAdminName"></strong>? This <strong>cannot be undone.</strong></p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteAdminBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteAdminBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
+<!-- Logout Confirmation -->
 <div class="modal-bg" id="mLogoutConfirm">
 <div class="modal" style="max-width:380px">
   <h2 class="modal-title">Sign Out</h2>
@@ -320,19 +505,21 @@
   };
 
   let scholars = [];
-  let docs = [];
   let announcements = [];
+  let adminsList = [];
   let editingScholarId = null;
   let editingStatusId = null;
-  let reviewTarget = null;
   let editingAnnouncementId = null;
+  let editingAdminId = null;
+  let deletingScholarId = null;
+  let deletingAdminId = null;
 
   // ── HELPERS ──
   function populateYearLevel(selectId, gradeLevel, currentValue) {
     const sel = document.getElementById(selectId);
     const opts = YEAR_LEVELS[gradeLevel] || [];
     sel.innerHTML = '<option value="">— Select Year Level —</option>' +
-      opts.map(o => '<option value="' + o + '"' + (o === currentValue ? ' selected' : '') + '>' + o + '</option>').join('');
+      opts.map(function(o) { return '<option value="' + o + '"' + (o === currentValue ? ' selected' : '') + '>' + o + '</option>'; }).join('');
   }
   function calcAge(bd) {
     if (!bd) return '—';
@@ -343,702 +530,1094 @@
     if (m < 0 || (m === 0 && new Date().getDate() < b.getDate())) age--;
     return age;
   }
-  function ini(name) { return (name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
-  function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
+  function ini(name) { return (name || '?').split(' ').map(function(w) { return w[0]; }).slice(0,2).join('').toUpperCase(); }
+  function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}) : '—'; }
   function statusBadge(s) {
-    const m = { active: 'badge-green', inactive: 'badge-gray', graduated: 'badge-purple' };
-    const l = { active: 'Active', inactive: 'Inactive', graduated: 'Graduated' };
-    return '<span class="badge ' + (m[s] || 'badge-gray') + '">' + (l[s] || s || '—') + '</span>';
+    const m = {active:'badge-green',inactive:'badge-gray',graduated:'badge-purple'};
+    const l = {active:'Active',inactive:'Inactive',graduated:'Graduated'};
+    return '<span class="badge '+(m[s]||'badge-gray')+'">'+(l[s]||s||'—')+'</span>';
   }
-  function docBadge(status) {
-    if (!status) return '<span class="badge badge-gray">Not Submitted</span>';
-    const m = { Pending: 'badge-amber', Verified: 'badge-green', Rejected: 'badge-pink' };
-    return '<span class="badge ' + (m[status] || 'badge-gray') + '">' + status + '</span>';
-  }
-  function getDoc(scholarId, type) { return docs.find(d => d.scholar_id === scholarId && d.document_type === type); }
   function toast(msg, icon) {
     icon = icon || 'ℹ️';
     const c = document.getElementById('toasts');
     const t = document.createElement('div'); t.className = 'toast';
-    t.innerHTML = '<span class="toast-icon">' + icon + '</span><div><strong>' + msg + '</strong></div>';
-    c.appendChild(t); setTimeout(function() { t.remove(); }, 3500);
+    t.innerHTML = '<span class="toast-icon">'+icon+'</span><div><strong>'+msg+'</strong></div>';
+    c.appendChild(t); setTimeout(function(){ t.remove(); }, 3500);
   }
   function openModal(id) { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
   // ── DATA LOAD ──
   async function loadAll() {
-    const [s, d] = await Promise.all([
-      sb.from('scholars').select('*').order('created_at', { ascending: false }),
-      sb.from('documents').select('*').order('uploaded_at', { ascending: false })
+    const [s, a] = await Promise.all([
+      sb.from('scholars').select('*').order('created_at',{ascending:false}),
+      sb.from('admins').select('*').order('created_at',{ascending:false})
     ]);
     scholars = s.data || [];
-    docs = d.data || [];
+    adminsList = a.data || [];
   }
 
   // ── NAV ──
-  const pages = ['dashboard', 'scholars', 'documents', 'announcements', 'changepassword'];
-  const titles = { dashboard: 'Dashboard', scholars: 'All Scholars', documents: 'Document Verification', announcements: 'Announcements', changepassword: 'Change Password' };
+  const pages = ['dashboard','scholars','announcements','admins','sponsors','changepassword'];
+  const titles = {dashboard:'Dashboard',scholars:'All Scholars',announcements:'Announcements',admins:'Admin Accounts',sponsors:'Sponsor Database',changepassword:'Change Password'};
 
   function gotoPage(page) {
     pages.forEach(function(p) {
-      const el = document.getElementById('page-' + p);
-      if (el) el.style.display = p === page ? 'block' : 'none';
-      const nav = document.getElementById('nav-' + p);
-      if (nav) nav.classList.toggle('active', p === page);
+      const el = document.getElementById('page-'+p); if (el) el.style.display = p===page?'block':'none';
+      const nav = document.getElementById('nav-'+p); if (nav) nav.classList.toggle('active', p===page);
     });
-    document.getElementById('pageTitle').textContent = titles[page] || page;
-    if (page === 'dashboard') renderDash();
-    if (page === 'scholars') renderScholarsTable();
-    if (page === 'documents') renderDocsTable();
-    if (page === 'announcements') renderAnnouncements();
+    document.getElementById('pageTitle').textContent = titles[page]||page;
+    if (page==='dashboard') renderDash();
+    if (page==='scholars') renderScholarsTable();
+    if (page==='announcements') renderAnnouncements();
+    if (page==='admins') renderAdmins();
+    if (page==='sponsors') renderSponsors();
     closeSidebar();
   }
 
-  pages.forEach(function(p) { const el = document.getElementById('nav-' + p); if(el) el.addEventListener('click', function() { gotoPage(p); }); });
-  document.getElementById('dashViewAll').addEventListener('click', function() { gotoPage('scholars'); });
+  pages.forEach(function(p) { const el=document.getElementById('nav-'+p); if(el) el.addEventListener('click',function(){ gotoPage(p); }); });
+  document.getElementById('dashViewAll').addEventListener('click', function(){ gotoPage('scholars'); });
 
   // ── SIDEBAR ──
-  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
-  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+  function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
   document.getElementById('hamburger').addEventListener('click', toggleSidebar);
   document.getElementById('overlay').addEventListener('click', closeSidebar);
-  document.getElementById('logoutBtn').addEventListener('click', function() { openModal('mLogoutConfirm'); });
-  document.getElementById('cancelLogoutBtn').addEventListener('click', function() { closeModal('mLogoutConfirm'); });
-  document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
-    sessionStorage.removeItem('vho_role');
-    sessionStorage.removeItem('admin_name');
-    sessionStorage.removeItem('admin_email');
+  document.getElementById('logoutBtn').addEventListener('click', function(){ openModal('mLogoutConfirm'); });
+  document.getElementById('cancelLogoutBtn').addEventListener('click', function(){ closeModal('mLogoutConfirm'); });
+  document.getElementById('confirmLogoutBtn').addEventListener('click', function(){
+    sessionStorage.removeItem('vho_role'); sessionStorage.removeItem('admin_name'); sessionStorage.removeItem('admin_email');
     window.location.href = 'index.html';
   });
-  document.getElementById('mLogoutConfirm').addEventListener('click', function(e) { if(e.target===this) closeModal('mLogoutConfirm'); });
+  document.getElementById('mLogoutConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mLogoutConfirm'); });
+
+  // Eye toggle for change password
+  document.getElementById('toggleCpPw').addEventListener('click', function(){
+    const inp = document.getElementById('adm_cp_email');
+    const isHidden = inp.type === 'password';
+    inp.type = isHidden ? 'text' : 'password';
+    document.getElementById('cpEyeIcon').innerHTML = isHidden
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  });
 
   // ── DASHBOARD ──
   function renderDash() {
-    const active = scholars.filter(function(s) { return s.scholar_status === 'active'; }).length;
-    const inactive = scholars.filter(function(s) { return s.scholar_status === 'inactive'; }).length;
-    const graduated = scholars.filter(function(s) { return s.scholar_status === 'graduated'; }).length;
-    const pending = docs.filter(function(d) { return d.verification_status === 'Pending'; }).length;
-
+    const active = scholars.filter(function(s){ return s.scholar_status==='active'; }).length;
+    const inactive = scholars.filter(function(s){ return s.scholar_status==='inactive'; }).length;
+    const graduated = scholars.filter(function(s){ return s.scholar_status==='graduated'; }).length;
     document.getElementById('dashStats').innerHTML =
-      '<div class="stat-card blue"><div class="stat-label">Total Scholars</div><div class="stat-val">' + scholars.length + '</div><div class="stat-sub">All records</div></div>' +
-      '<div class="stat-card green"><div class="stat-label">Active</div><div class="stat-val">' + active + '</div><div class="stat-sub">Currently enrolled</div></div>' +
-      '<div class="stat-card"><div class="stat-label">Inactive</div><div class="stat-val">' + inactive + '</div><div class="stat-sub">Not continuing</div></div>' +
-      '<div class="stat-card purple"><div class="stat-label">Graduated</div><div class="stat-val">' + graduated + '</div><div class="stat-sub">Completed program</div></div>' +
-      '<div class="stat-card amber"><div class="stat-label">Pending Reviews</div><div class="stat-val">' + pending + '</div><div class="stat-sub">Awaiting review</div></div>';
+      '<div class="stat-card blue"><div class="stat-label">Total Scholars</div><div class="stat-val">'+scholars.length+'</div><div class="stat-sub">All records</div></div>'+
+      '<div class="stat-card green"><div class="stat-label">Active</div><div class="stat-val">'+active+'</div><div class="stat-sub">Currently enrolled</div></div>'+
+      '<div class="stat-card"><div class="stat-label">Inactive</div><div class="stat-val">'+inactive+'</div><div class="stat-sub">Not continuing</div></div>'+
+      '<div class="stat-card purple"><div class="stat-label">Graduated</div><div class="stat-val">'+graduated+'</div><div class="stat-sub">Completed program</div></div>'+
+      '<div class="stat-card amber"><div class="stat-label">Announcements</div><div class="stat-val">'+announcements.length+'</div><div class="stat-sub">Posted events</div></div>';
 
-    document.getElementById('dashTable').innerHTML = scholars.slice(0, 6).map(function(s) {
-      const cor = getDoc(s.id, 'Certificate of Registration');
-      const gr = getDoc(s.id, 'Grade Report');
-      return '<tr><td><div class="s-info-row"><div class="s-avatar">' + ini(s.name) + '</div><div><div class="s-name">' + s.name + '</div><div class="s-sub">' + s.email + '</div></div></div></td><td><span class="badge badge-blue">' + (s.group_name || '—') + '</span></td><td>' + (s.grade_level || '—') + '</td><td>' + (s.year_level || '—') + '</td><td>' + statusBadge(s.scholar_status) + '</td><td>' + docBadge(cor ? cor.verification_status : null) + '</td><td>' + docBadge(gr ? gr.verification_status : null) + '</td></tr>';
-    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No scholars yet.</p></div></td></tr>';
+    document.getElementById('dashTable').innerHTML = scholars.slice(0,6).map(function(s){
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">'+ini(s.name)+'</div><div><div class="s-name">'+s.name+'</div><div class="s-sub">'+s.email+'</div></div></div></td><td><span class="badge badge-blue">'+(s.group_name||'—')+'</span></td><td>'+(s.grade_level||'—')+'</td><td>'+(s.year_level||'—')+'</td><td>'+statusBadge(s.scholar_status)+'</td></tr>';
+    }).join('') || '<tr><td colspan="5"><div class="empty"><p>No scholars yet.</p></div></td></tr>';
 
-    const gc = {}; GROUPS.forEach(function(g) { gc[g] = 0; }); scholars.forEach(function(s) { gc[s.group_name] = (gc[s.group_name] || 0) + 1; });
-    document.getElementById('groupBreakdown').innerHTML = GROUPS.map(function(g) { return '<div class="breakdown-row"><span style="font-size:13px">' + g + '</span><span class="badge badge-blue">' + (gc[g] || 0) + '</span></div>'; }).join('');
-
-    const glc = {}; GRADE_LEVELS.forEach(function(g) { glc[g] = 0; }); scholars.forEach(function(s) { glc[s.grade_level] = (glc[s.grade_level] || 0) + 1; });
-    document.getElementById('glBreakdown').innerHTML = GRADE_LEVELS.map(function(g) { return '<div class="breakdown-row"><span style="font-size:13px">' + g + '</span><span class="badge badge-purple">' + (glc[g] || 0) + '</span></div>'; }).join('');
-
-    updateDocsBadge();
+    const gc={}; GROUPS.forEach(function(g){gc[g]=0;}); scholars.forEach(function(s){gc[s.group_name]=(gc[s.group_name]||0)+1;});
+    document.getElementById('groupBreakdown').innerHTML = GROUPS.map(function(g){ return '<div class="breakdown-row"><span style="font-size:13px">'+g+'</span><span class="badge badge-blue">'+(gc[g]||0)+'</span></div>'; }).join('');
+    const glc={}; GRADE_LEVELS.forEach(function(g){glc[g]=0;}); scholars.forEach(function(s){glc[s.grade_level]=(glc[s.grade_level]||0)+1;});
+    document.getElementById('glBreakdown').innerHTML = GRADE_LEVELS.map(function(g){ return '<div class="breakdown-row"><span style="font-size:13px">'+g+'</span><span class="badge badge-purple">'+(glc[g]||0)+'</span></div>'; }).join('');
   }
 
   // ── SCHOLARS TABLE ──
   function renderScholarsTable() {
-    const q = document.getElementById('sSearch').value.toLowerCase();
-    const grp = document.getElementById('sGroup').value;
-    const batch = document.getElementById('sBatch').value;
-    const yj = document.getElementById('sYearJoined').value;
-    const gl = document.getElementById('sGradeLevel').value;
-    const st = document.getElementById('sStatus').value;
-
-    const data = scholars.filter(function(s) {
-      return (!q || (s.name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q)) &&
-        (!grp || s.group_name === grp) && (!batch || String(s.batch_no) === batch) &&
-        (!yj || String(s.year_joined) === yj) && (!gl || s.grade_level === gl) && (!st || s.scholar_status === st);
+    const q=document.getElementById('sSearch').value.toLowerCase();
+    const grp=document.getElementById('sGroup').value;
+    const batch=document.getElementById('sBatch').value;
+    const yj=document.getElementById('sYearJoined').value;
+    const gl=document.getElementById('sGradeLevel').value;
+    const st=document.getElementById('sStatus').value;
+    const data=scholars.filter(function(s){
+      return (!q||(s.name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q))&&
+        (!grp||s.group_name===grp)&&(!batch||String(s.batch_no)===batch)&&
+        (!yj||String(s.year_joined)===yj)&&(!gl||s.grade_level===gl)&&(!st||s.scholar_status===st);
     });
-
-    document.getElementById('scholarsTable').innerHTML = data.map(function(s) {
-      const cor = getDoc(s.id, 'Certificate of Registration');
-      const gr = getDoc(s.id, 'Grade Report');
-      return '<tr><td><div class="s-info-row"><div class="s-avatar">' + ini(s.name) + '</div><div><div class="s-name">' + s.name + '</div><div class="s-sub">' + s.email + '</div></div></div></td><td><span class="badge badge-blue">' + (s.group_name || '—') + '</span></td><td>Batch ' + (s.batch_no || '—') + '</td><td>' + (s.grade_level || '—') + '</td><td>' + (s.year_level || '—') + '</td><td>' + statusBadge(s.scholar_status) + '</td><td><div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--muted);min-width:44px">COR</span>' + docBadge(cor ? cor.verification_status : null) + '</div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--muted);min-width:44px">Grades</span>' + docBadge(gr ? gr.verification_status : null) + '</div></div></td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="view" data-id="' + s.id + '">View</button><button class="btn btn-ghost btn-sm" data-action="edit" data-id="' + s.id + '">Edit</button><button class="btn btn-amber btn-sm" data-action="status" data-id="' + s.id + '">Status</button><button class="btn btn-danger btn-sm" data-action="delete" data-id="' + s.id + '">Delete</button></td></tr>';
-    }).join('') || '<tr><td colspan="8"><div class="empty"><p>No scholars found.</p></div></td></tr>';
+    document.getElementById('scholarsTable').innerHTML = data.map(function(s){
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">'+ini(s.name)+'</div><div><div class="s-name">'+s.name+'</div><div class="s-sub">'+s.email+'</div></div></div></td><td><span class="badge badge-blue">'+(s.group_name||'—')+'</span></td><td>Batch '+(s.batch_no||'—')+'</td><td>'+(s.grade_level||'—')+'</td><td>'+(s.year_level||'—')+'</td><td>'+statusBadge(s.scholar_status)+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="view" data-id="'+s.id+'">View</button><button class="btn btn-ghost btn-sm" data-action="edit" data-id="'+s.id+'">Edit</button><button class="btn btn-amber btn-sm" data-action="status" data-id="'+s.id+'">Status</button><button class="btn btn-danger btn-sm" data-action="delete" data-id="'+s.id+'">Delete</button></td></tr>';
+    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No scholars found.</p></div></td></tr>';
   }
 
-  ['sSearch','sGroup','sBatch','sYearJoined','sGradeLevel','sStatus'].forEach(function(id) {
+  ['sSearch','sGroup','sBatch','sYearJoined','sGradeLevel','sStatus'].forEach(function(id){
     document.getElementById(id).addEventListener('input', renderScholarsTable);
     document.getElementById(id).addEventListener('change', renderScholarsTable);
   });
 
-  document.getElementById('scholarsTable').addEventListener('click', function(e) {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-    if (action === 'view') viewScholar(id);
-    if (action === 'edit') openEditScholar(id);
-    if (action === 'status') openStatusModal(id);
-    if (action === 'delete') deleteScholar(id);
+  document.getElementById('scholarsTable').addEventListener('click', function(e){
+    const btn=e.target.closest('[data-action]'); if(!btn) return;
+    const id=btn.dataset.id; const action=btn.dataset.action;
+    if(action==='view') viewScholar(id);
+    if(action==='edit') openEditScholar(id);
+    if(action==='status') openStatusModal(id);
+    if(action==='delete') deleteScholar(id);
   });
 
-  // ── ADD / EDIT SCHOLAR ──
+  // ── ADD/EDIT SCHOLAR ──
   document.getElementById('addScholarBtn').addEventListener('click', openAddScholar);
-  document.getElementById('closeScholarForm').addEventListener('click', function() { closeModal('mScholarForm'); });
-  document.getElementById('cancelScholarForm').addEventListener('click', function() { closeModal('mScholarForm'); });
-  document.getElementById('mScholarForm').addEventListener('click', function(e) { if (e.target === this) closeModal('mScholarForm'); });
+  document.getElementById('closeScholarForm').addEventListener('click', function(){ closeModal('mScholarForm'); });
+  document.getElementById('cancelScholarForm').addEventListener('click', function(){ closeModal('mScholarForm'); });
+  document.getElementById('mScholarForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mScholarForm'); });
   document.getElementById('scholarFormSaveBtn').addEventListener('click', saveScholarForm);
-  document.getElementById('f_gradelevel').addEventListener('change', function() { populateYearLevel('f_yearlevel', this.value, ''); });
+  document.getElementById('f_gradelevel').addEventListener('change', function(){ populateYearLevel('f_yearlevel',this.value,''); });
 
-  function openAddScholar() {
-    editingScholarId = null;
-    ['f_name','f_em','f_phone','f_bd','f_school','f_yog'].forEach(function(id) { document.getElementById(id).value = ''; });
-    document.getElementById('f_group').value = 'CKC';
-    document.getElementById('f_batch').value = '1';
-    document.getElementById('f_yj').value = '2026';
-    document.getElementById('f_gradelevel').value = 'College';
-    populateYearLevel('f_yearlevel', 'College', '');
-    document.getElementById('scholarFormTitle').textContent = 'Add New Scholar';
-    document.getElementById('scholarFormSub').textContent = "Fill in the scholar's information. Default login password: VHO + first name (e.g. VHOdanica)";
-    document.getElementById('scholarFormSaveBtn').textContent = 'Add Scholar';
+  function openAddScholar(){
+    editingScholarId=null;
+    ['f_name','f_em','f_phone','f_bd','f_school','f_yog'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('f_group').value='CKC'; document.getElementById('f_batch').value='1';
+    document.getElementById('f_yj').value='2026'; document.getElementById('f_gradelevel').value='College';
+    populateYearLevel('f_yearlevel','College','');
+    document.getElementById('scholarFormTitle').textContent='Add New Scholar';
+    document.getElementById('scholarFormSub').textContent="Default login password: VHO + first name (e.g. VHOdanica)";
+    document.getElementById('scholarFormSaveBtn').textContent='Add Scholar';
     openModal('mScholarForm');
   }
 
-  function openEditScholar(id) {
-    const s = scholars.find(function(x) { return x.id === id; });
-    if (!s) return;
-    editingScholarId = id;
-    document.getElementById('f_name').value = s.name || '';
-    document.getElementById('f_em').value = s.email || '';
-    document.getElementById('f_phone').value = s.phone_number || '';
-    document.getElementById('f_bd').value = s.birthdate || '';
-    document.getElementById('f_group').value = s.group_name || 'CKC';
-    document.getElementById('f_batch').value = String(s.batch_no || '1');
-    document.getElementById('f_yj').value = String(s.year_joined || '2026');
-    document.getElementById('f_gradelevel').value = s.grade_level || 'College';
-    populateYearLevel('f_yearlevel', s.grade_level || 'College', s.year_level || '');
-    document.getElementById('f_school').value = s.school || '';
-    document.getElementById('f_yog').value = s.graduation_year || '';
-    document.getElementById('scholarFormTitle').textContent = 'Edit Scholar';
-    document.getElementById('scholarFormSub').textContent = 'Update ' + s.name + '\'s information.';
-    document.getElementById('scholarFormSaveBtn').textContent = 'Save Changes';
-    closeModal('mScholarDetail');
-    openModal('mScholarForm');
+  function openEditScholar(id){
+    const s=scholars.find(function(x){ return x.id===id; }); if(!s) return;
+    editingScholarId=id;
+    document.getElementById('f_name').value=s.name||''; document.getElementById('f_em').value=s.email||'';
+    document.getElementById('f_phone').value=s.phone_number||''; document.getElementById('f_bd').value=s.birthdate||'';
+    document.getElementById('f_group').value=s.group_name||'CKC'; document.getElementById('f_batch').value=String(s.batch_no||'1');
+    document.getElementById('f_yj').value=String(s.year_joined||'2026'); document.getElementById('f_gradelevel').value=s.grade_level||'College';
+    populateYearLevel('f_yearlevel',s.grade_level||'College',s.year_level||'');
+    document.getElementById('f_school').value=s.school||''; document.getElementById('f_yog').value=s.graduation_year||'';
+    document.getElementById('scholarFormTitle').textContent='Edit Scholar';
+    document.getElementById('scholarFormSub').textContent='Update '+s.name+"'s information.";
+    document.getElementById('scholarFormSaveBtn').textContent='Save Changes';
+    closeModal('mScholarDetail'); openModal('mScholarForm');
   }
 
-  async function saveScholarForm() {
-    const name = document.getElementById('f_name').value.trim();
-    const email = document.getElementById('f_em').value.trim().toLowerCase();
-    const phone = document.getElementById('f_phone').value.trim();
-    const group = document.getElementById('f_group').value;
-    const batch = parseInt(document.getElementById('f_batch').value);
-    const yj = parseInt(document.getElementById('f_yj').value);
-    const bd = document.getElementById('f_bd').value;
-    const school = document.getElementById('f_school').value.trim();
-    const gl = document.getElementById('f_gradelevel').value;
-    const year_level = document.getElementById('f_yearlevel').value;
-    const yog = document.getElementById('f_yog').value ? parseInt(document.getElementById('f_yog').value) : null;
-
-    if (!name || !email || !bd || !school || !gl || !year_level) { toast('Please fill in all required fields including Year Level', '⚠️'); return; }
-
-    const btn = document.getElementById('scholarFormSaveBtn');
-    btn.disabled = true; btn.textContent = 'Saving…';
-
+  async function saveScholarForm(){
+    const name=document.getElementById('f_name').value.trim();
+    const email=document.getElementById('f_em').value.trim().toLowerCase();
+    const phone=document.getElementById('f_phone').value.trim();
+    const group=document.getElementById('f_group').value;
+    const batch=parseInt(document.getElementById('f_batch').value);
+    const yj=parseInt(document.getElementById('f_yj').value);
+    const bd=document.getElementById('f_bd').value;
+    const school=document.getElementById('f_school').value.trim();
+    const gl=document.getElementById('f_gradelevel').value;
+    const year_level=document.getElementById('f_yearlevel').value;
+    const yog=document.getElementById('f_yog').value?parseInt(document.getElementById('f_yog').value):null;
+    if(!name||!email||!bd||!school||!gl||!year_level){ toast('Please fill in all required fields','⚠️'); return; }
+    const btn=document.getElementById('scholarFormSaveBtn');
+    btn.disabled=true; btn.textContent='Saving…';
     try {
-      const age = calcAge(bd);
-      if (editingScholarId === null) {
-        const { data: newS, error: dbErr } = await sb.from('scholars').insert({
-          name, group_name: group, batch_no: batch, year_joined: yj,
-          birthdate: bd, age: typeof age === 'number' ? age : null,
-          school, grade_level: gl, year_level, graduation_year: yog,
-          email, phone_number: phone, scholar_status: 'active'
+      const age=calcAge(bd);
+      if(editingScholarId===null){
+        const {data:newS,error:dbErr}=await sb.from('scholars').insert({
+          name,group_name:group,batch_no:batch,year_joined:yj,birthdate:bd,
+          age:typeof age==='number'?age:null,school,grade_level:gl,year_level,
+          graduation_year:yog,email,phone_number:phone,scholar_status:'active'
         }).select().single();
-        if (dbErr) { toast(dbErr.message, '❌'); btn.disabled = false; btn.textContent = 'Add Scholar'; return; }
+        if(dbErr){ toast(dbErr.message,'❌'); btn.disabled=false; btn.textContent='Add Scholar'; return; }
         scholars.unshift(newS);
-        const firstName = name.split(' ')[0];
-        toast(name + ' added! Default password: VHO' + firstName, '🎓');
+        toast(name+' added! Default password: VHO'+name.split(' ')[0],'🎓');
       } else {
-        const { data: upd, error } = await sb.from('scholars').update({
-          name, group_name: group, batch_no: batch, year_joined: yj,
-          birthdate: bd, age: typeof age === 'number' ? age : null,
-          school, grade_level: gl, year_level, graduation_year: yog,
-          email, phone_number: phone
-        }).eq('id', editingScholarId).select().single();
-        if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Save Changes'; return; }
-        const idx = scholars.findIndex(function(x) { return x.id === editingScholarId; });
-        if (idx !== -1) scholars[idx] = upd;
-        toast('Scholar updated', '✅');
+        const {data:upd,error}=await sb.from('scholars').update({
+          name,group_name:group,batch_no:batch,year_joined:yj,birthdate:bd,
+          age:typeof age==='number'?age:null,school,grade_level:gl,year_level,
+          graduation_year:yog,email,phone_number:phone
+        }).eq('id',editingScholarId).select().single();
+        if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+        const idx=scholars.findIndex(function(x){ return x.id===editingScholarId; });
+        if(idx!==-1) scholars[idx]=upd;
+        toast('Scholar updated','✅');
       }
-      closeModal('mScholarForm');
-      renderScholarsTable();
-      renderDash();
-    } catch (err) { console.error(err); toast('An error occurred: ' + err.message, '❌'); }
-    btn.disabled = false;
-    btn.textContent = editingScholarId ? 'Save Changes' : 'Add Scholar';
+      closeModal('mScholarForm'); renderScholarsTable(); renderDash();
+    } catch(err){ console.error(err); toast('An error occurred','❌'); }
+    btn.disabled=false; btn.textContent=editingScholarId?'Save Changes':'Add Scholar';
   }
 
   // ── STATUS ──
-  document.getElementById('closeStatus').addEventListener('click', function() { closeModal('mStatus'); });
-  document.getElementById('cancelStatus').addEventListener('click', function() { closeModal('mStatus'); });
-  document.getElementById('mStatus').addEventListener('click', function(e) { if (e.target === this) closeModal('mStatus'); });
+  document.getElementById('closeStatus').addEventListener('click', function(){ closeModal('mStatus'); });
+  document.getElementById('cancelStatus').addEventListener('click', function(){ closeModal('mStatus'); });
+  document.getElementById('mStatus').addEventListener('click', function(e){ if(e.target===this) closeModal('mStatus'); });
   document.getElementById('saveStatusBtn').addEventListener('click', saveStatus);
 
-  function openStatusModal(id) {
-    const s = scholars.find(function(x) { return x.id === id; });
-    if (!s) return;
-    editingStatusId = id;
-    document.getElementById('statusModalSub').textContent = 'Update the scholarship status for ' + s.name + '.';
-    document.getElementById('statusSelect').value = s.scholar_status || 'active';
-    closeModal('mScholarDetail');
-    openModal('mStatus');
+  function openStatusModal(id){
+    const s=scholars.find(function(x){ return x.id===id; }); if(!s) return;
+    editingStatusId=id;
+    document.getElementById('statusModalSub').textContent='Update status for '+s.name+'.';
+    document.getElementById('statusSelect').value=s.scholar_status||'active';
+    closeModal('mScholarDetail'); openModal('mStatus');
   }
 
-  async function saveStatus() {
-    const status = document.getElementById('statusSelect').value;
-    const { data: upd, error } = await sb.from('scholars').update({ scholar_status: status }).eq('id', editingStatusId).select().single();
-    if (error) { toast(error.message, '❌'); return; }
-    const idx = scholars.findIndex(function(x) { return x.id === editingStatusId; });
-    if (idx !== -1) scholars[idx] = upd;
-    closeModal('mStatus');
-    renderScholarsTable(); renderDash();
-    toast('Status updated to: ' + status.charAt(0).toUpperCase() + status.slice(1), '✅');
+  async function saveStatus(){
+    const status=document.getElementById('statusSelect').value;
+    const {data:upd,error}=await sb.from('scholars').update({scholar_status:status}).eq('id',editingStatusId).select().single();
+    if(error){ toast(error.message,'❌'); return; }
+    const idx=scholars.findIndex(function(x){ return x.id===editingStatusId; });
+    if(idx!==-1) scholars[idx]=upd;
+    closeModal('mStatus'); renderScholarsTable(); renderDash();
+    toast('Status updated to: '+status.charAt(0).toUpperCase()+status.slice(1),'✅');
   }
 
-  // ── DELETE ──
-  let deletingScholarId = null;
-  function deleteScholar(id) {
-    const s = scholars.find(function(x) { return x.id === id; });
-    if (!s) return;
-    deletingScholarId = id;
-    document.getElementById('deleteModalName').textContent = s.name;
+  // ── DELETE SCHOLAR ──
+  function deleteScholar(id){
+    const s=scholars.find(function(x){ return x.id===id; }); if(!s) return;
+    deletingScholarId=id;
+    document.getElementById('deleteModalName').textContent=s.name;
     openModal('mDeleteConfirm');
   }
-  document.getElementById('cancelDeleteBtn').addEventListener('click', function() { closeModal('mDeleteConfirm'); });
-  document.getElementById('mDeleteConfirm').addEventListener('click', function(e) { if(e.target===this) closeModal('mDeleteConfirm'); });
-  document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-    if (!deletingScholarId) return;
-    const id = deletingScholarId;
-    this.disabled = true; this.textContent = 'Deleting…';
-    await sb.from('documents').delete().eq('scholar_id', id);
-    const { error } = await sb.from('scholars').delete().eq('id', id);
-    this.disabled = false; this.textContent = 'Yes, Delete';
-    if (error) { toast(error.message, '❌'); return; }
-    scholars = scholars.filter(function(x) { return x.id !== id; });
-    docs = docs.filter(function(x) { return x.scholar_id !== id; });
-    closeModal('mDeleteConfirm');
-    deletingScholarId = null;
-    renderScholarsTable(); renderDash(); renderDocsTable();
-    toast('Scholar deleted', '🗑️');
+  document.getElementById('cancelDeleteBtn').addEventListener('click', function(){ closeModal('mDeleteConfirm'); });
+  document.getElementById('mDeleteConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteConfirm'); });
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async function(){
+    if(!deletingScholarId) return;
+    const id=deletingScholarId;
+    this.disabled=true; this.textContent='Deleting…';
+    const {error}=await sb.from('scholars').delete().eq('id',id);
+    this.disabled=false; this.textContent='Yes, Delete';
+    if(error){ toast(error.message,'❌'); return; }
+    scholars=scholars.filter(function(x){ return x.id!==id; });
+    closeModal('mDeleteConfirm'); deletingScholarId=null;
+    renderScholarsTable(); renderDash();
+    toast('Scholar deleted','🗑️');
   });
 
   // ── SCHOLAR DETAIL ──
-  document.getElementById('mScholarDetail').addEventListener('click', function(e) {
-    if (e.target === this) closeModal('mScholarDetail');
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const id = btn.dataset.id;
-    if (btn.dataset.action === 'status') openStatusModal(id);
-    if (btn.dataset.action === 'edit') openEditScholar(id);
-    if (btn.dataset.action === 'closeDetail') closeModal('mScholarDetail');
+  document.getElementById('mScholarDetail').addEventListener('click', function(e){
+    if(e.target===this) closeModal('mScholarDetail');
+    const btn=e.target.closest('[data-action]'); if(!btn) return;
+    const id=btn.dataset.id;
+    if(btn.dataset.action==='status') openStatusModal(id);
+    if(btn.dataset.action==='edit') openEditScholar(id);
+    if(btn.dataset.action==='closeDetail') closeModal('mScholarDetail');
   });
 
-  function viewScholar(id) {
-    const s = scholars.find(function(x) { return x.id === id; });
-    if (!s) return;
-    const cor = getDoc(s.id, 'Certificate of Registration');
-    const gr = getDoc(s.id, 'Grade Report');
-    const fields = [['Group',s.group_name],['Batch No.','Batch '+(s.batch_no||'—')],['Year Joined',s.year_joined],['Birthdate',s.birthdate||'—'],['Age',calcAge(s.birthdate)],['School',s.school||'—'],['Grade Level',s.grade_level||'—'],['Year Level',s.year_level||'—'],['Year of Graduation',s.graduation_year||'—'],['Phone',s.phone_number||'—'],['Status',statusBadge(s.scholar_status)]];
-    document.getElementById('mScholarDetailBody').innerHTML =
-      '<button class="modal-close" data-action="closeDetail" data-id="' + s.id + '">✕</button>' +
-      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px"><div style="width:52px;height:52px;border-radius:50%;background:var(--pink2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--blue2)">' + ini(s.name) + '</div><div><h2 class="modal-title" style="margin-bottom:2px">' + s.name + '</h2><p style="font-size:13px;color:var(--muted)">' + s.email + '</p></div></div>' +
-      '<div class="info-grid" style="margin-bottom:16px">' + fields.map(function(f) { return '<div class="info-item"><div class="info-label">' + f[0] + '</div><div class="info-value">' + f[1] + '</div></div>'; }).join('') + '</div>' +
-      '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px">Documents</div>' +
-      '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted)">COR:</span>' + docBadge(cor?cor.verification_status:null) + '</div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted)">Grades:</span>' + docBadge(gr?gr.verification_status:null) + '</div></div>' +
-      (cor&&cor.remarks?'<div class="remarks-box '+(cor.verification_status==='Rejected'?'rejected':'')+'"><strong>COR Remarks: </strong>'+cor.remarks+'</div>':'') +
-      (gr&&gr.remarks?'<div class="remarks-box '+(gr.verification_status==='Rejected'?'rejected':'')+'"><strong>Grades Remarks: </strong>'+gr.remarks+'</div>':'') +
-      '<div class="modal-footer"><button class="btn btn-ghost" data-action="closeDetail" data-id="' + s.id + '">Close</button><button class="btn btn-amber btn-sm" data-action="status" data-id="' + s.id + '">Change Status</button><button class="btn btn-primary" data-action="edit" data-id="' + s.id + '">Edit Info</button></div>';
+  function viewScholar(id){
+    const s=scholars.find(function(x){ return x.id===id; }); if(!s) return;
+    const fields=[['Group',s.group_name],['Batch No.','Batch '+(s.batch_no||'—')],['Year Joined',s.year_joined],
+      ['Birthdate',s.birthdate||'—'],['Age',calcAge(s.birthdate)],['School',s.school||'—'],
+      ['Grade Level',s.grade_level||'—'],['Year Level',s.year_level||'—'],
+      ['Year of Graduation',s.graduation_year||'—'],['Phone',s.phone_number||'—'],
+      ['Status',statusBadge(s.scholar_status)]];
+    document.getElementById('mScholarDetailBody').innerHTML=
+      '<button class="modal-close" data-action="closeDetail" data-id="'+s.id+'">✕</button>'+
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">'+
+      '<div style="width:52px;height:52px;border-radius:50%;background:var(--pink2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--blue2)">'+ini(s.name)+'</div>'+
+      '<div><h2 class="modal-title" style="margin-bottom:2px">'+s.name+'</h2><p style="font-size:13px;color:var(--muted)">'+s.email+'</p></div></div>'+
+      '<div class="info-grid" style="margin-bottom:16px">'+fields.map(function(f){ return '<div class="info-item"><div class="info-label">'+f[0]+'</div><div class="info-value">'+f[1]+'</div></div>'; }).join('')+'</div>'+
+      '<div class="modal-footer"><button class="btn btn-ghost" data-action="closeDetail" data-id="'+s.id+'">Close</button>'+
+      '<button class="btn btn-amber btn-sm" data-action="status" data-id="'+s.id+'">Change Status</button>'+
+      '<button class="btn btn-primary" data-action="edit" data-id="'+s.id+'">Edit Info</button></div>';
     openModal('mScholarDetail');
   }
 
-  // ── DOCUMENTS TABLE ──
-  function renderDocsTable() {
-    const q = document.getElementById('dSearch').value.toLowerCase();
-    const ty = document.getElementById('dType').value;
-    const st = document.getElementById('dStatus').value;
-    let rows = docs.map(function(doc) { return { doc: doc, scholar: scholars.find(function(s) { return s.id === doc.scholar_id; }) }; }).filter(function(r) { return r.scholar; });
-    if (q) rows = rows.filter(function(r) { return r.scholar.name.toLowerCase().includes(q); });
-    if (ty) rows = rows.filter(function(r) { return r.doc.document_type === ty; });
-    if (st) rows = rows.filter(function(r) { return r.doc.verification_status === st; });
-    document.getElementById('docsTable').innerHTML = rows.map(function(r) {
-      const doc = r.doc; const s = r.scholar;
-      return '<tr><td><div class="s-info-row"><div class="s-avatar">' + ini(s.name) + '</div><div><div class="s-name">' + s.name + '</div><div class="s-sub">' + (s.group_name||'—') + ' · Batch ' + (s.batch_no||'—') + '</div></div></div></td><td>' + doc.document_type + '</td><td style="font-size:12px;color:var(--muted)">' + (doc.file_name||'—') + '</td><td style="font-size:12px;color:var(--muted);white-space:nowrap">' + fmtDate(doc.uploaded_at) + '</td><td>' + docBadge(doc.verification_status) + '</td><td style="font-size:12px;color:var(--muted);max-width:220px">' + (doc.remarks||'—') + '</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="viewDoc" data-id="' + doc.id + '">View</button><button class="btn btn-success btn-sm" data-action="verify" data-id="' + doc.id + '"' + (doc.verification_status==='Verified'?' disabled':'') + '>Verify</button><button class="btn btn-danger btn-sm" data-action="reject" data-id="' + doc.id + '"' + (doc.verification_status==='Rejected'?' disabled':'') + '>Reject</button></td></tr>';
-    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No documents found.</p></div></td></tr>';
-  }
-
-  ['dSearch','dType','dStatus'].forEach(function(id) {
-    document.getElementById(id).addEventListener('input', renderDocsTable);
-    document.getElementById(id).addEventListener('change', renderDocsTable);
-  });
-
-  document.getElementById('docsTable').addEventListener('click', function(e) {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const id = btn.dataset.id;
-    if (btn.dataset.action === 'viewDoc') viewDoc(id);
-    if (btn.dataset.action === 'verify') openDocReview(id, 'verified');
-    if (btn.dataset.action === 'reject') openDocReview(id, 'rejected');
-  });
-
-  function updateDocsBadge() {
-    const count = docs.filter(function(d) { return d.verification_status === 'Pending'; }).length;
-    const el = document.getElementById('nb-documents');
-    el.style.display = count ? '' : 'none';
-    if (count) el.textContent = count;
-  }
-
-  // ── DOC REVIEW ──
-  document.getElementById('closeDocReview').addEventListener('click', function() { closeModal('mDocReview'); });
-  document.getElementById('cancelDocReview').addEventListener('click', function() { closeModal('mDocReview'); });
-  document.getElementById('mDocReview').addEventListener('click', function(e) { if (e.target === this) closeModal('mDocReview'); });
-  document.getElementById('docReviewBtn').addEventListener('click', confirmDocReview);
-
-  function openDocReview(docId, action) {
-    const doc = docs.find(function(d) { return d.id === docId; });
-    if (!doc) return;
-    const s = scholars.find(function(x) { return x.id === doc.scholar_id; });
-    reviewTarget = { docId: docId, action: action };
-    document.getElementById('docReviewTitle').textContent = action === 'verified' ? 'Verify Document' : 'Reject Document';
-    document.getElementById('docReviewSub').textContent = (s ? s.name : '—') + ' — ' + doc.document_type + ' (' + doc.file_name + ')';
-    document.getElementById('docReviewRemarks').value = action === 'rejected' ? (doc.remarks || '') : '';
-    document.getElementById('docReviewBtn').textContent = action === 'verified' ? 'Mark as Verified' : 'Mark as Rejected';
-    document.getElementById('docReviewBtn').className = action === 'verified' ? 'btn btn-success' : 'btn btn-danger';
-    openModal('mDocReview');
-  }
-
-  async function confirmDocReview() {
-    if (!reviewTarget) return;
-    const docId = reviewTarget.docId; const action = reviewTarget.action;
-    const remarks = document.getElementById('docReviewRemarks').value.trim();
-    const newStatus = action === 'verified' ? 'Verified' : 'Rejected';
-    const { data: upd, error } = await sb.from('documents').update({ verification_status: newStatus, remarks: remarks, verified_at: new Date().toISOString() }).eq('id', docId).select().single();
-    if (error) { toast(error.message, '❌'); return; }
-    const idx = docs.findIndex(function(d) { return d.id === docId; });
-    if (idx !== -1) docs[idx] = upd;
-    if (action === 'rejected') {
-      const s = scholars.find(function(x) { return x.id === upd.scholar_id; });
-      if (s && s.scholar_status === 'active') {
-        const { data: us } = await sb.from('scholars').update({ scholar_status: 'inactive' }).eq('id', s.id).select().single();
-        if (us) { const si = scholars.findIndex(function(x) { return x.id === s.id; }); if (si !== -1) scholars[si] = us; }
-        toast('Document rejected — scholar marked Inactive', '⚠️');
-      } else toast('Document rejected', '⚠️');
-    } else toast('Document verified', '✅');
-    closeModal('mDocReview');
-    renderDocsTable(); renderScholarsTable(); renderDash();
-    reviewTarget = null;
-  }
-
-  // ── DOC PREVIEW ──
-  document.getElementById('closeDocView').addEventListener('click', function() { closeModal('mDocView'); });
-  document.getElementById('mDocView').addEventListener('click', function(e) { if (e.target === this) closeModal('mDocView'); });
-
-  function viewDoc(docId) {
-    const doc = docs.find(function(d) { return d.id === docId; });
-    if (!doc) return;
-    const s = scholars.find(function(x) { return x.id === doc.scholar_id; });
-    document.getElementById('docViewTitle').textContent = (s ? s.name : '—') + ' — ' + doc.document_type;
-    document.getElementById('docViewFrame').src = doc.file_url || 'about:blank';
-    if (!doc.file_url) toast('No file URL available', '⚠️');
-    openModal('mDocView');
-  }
-
   // ── EXPORT ──
-  document.getElementById('exportBtn').addEventListener('click', function() {
-    const headers = ['Name','Group','Batch No.','Year Joined','Birthdate','Age','School','Grade Level','Year Level','Year of Graduation','Email','Phone Number','Scholarship Status','COR Status','Grades Status','COR Remarks','Grades Remarks'];
-    const rows = scholars.map(function(s) {
-      const cor = getDoc(s.id, 'Certificate of Registration');
-      const gr = getDoc(s.id, 'Grade Report');
-      return [s.name,s.group_name,s.batch_no,s.year_joined,s.birthdate||'',calcAge(s.birthdate),s.school,s.grade_level,s.year_level||'',s.graduation_year||'',s.email,s.phone_number||'',s.scholar_status,cor?cor.verification_status:'not submitted',gr?gr.verification_status:'not submitted',cor?cor.remarks||'':'',gr?gr.remarks||'':''];
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    const headers=['Name','Group','Batch No.','Year Joined','Birthdate','Age','School','Grade Level','Year Level','Year of Graduation','Email','Phone Number','Scholarship Status'];
+    const rows=scholars.map(function(s){
+      return [s.name,s.group_name,s.batch_no,s.year_joined,s.birthdate||'',calcAge(s.birthdate),s.school,s.grade_level,s.year_level||'',s.graduation_year||'',s.email,s.phone_number||'',s.scholar_status];
     });
-    const csv = [headers].concat(rows).map(function(r) { return r.map(function(v) { return '"' + String(v != null ? v : '').replace(/"/g,'""') + '"'; }).join(','); }).join('\r\n');
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
-    a.download = 'VHO_Scholars_Report_' + new Date().toISOString().slice(0,10) + '.csv';
-    a.click();
-    toast('Report exported!','📄');
+    const csv=[headers].concat(rows).map(function(r){ return r.map(function(v){ return '"'+String(v!=null?v:'').replace(/"/g,'""')+'"'; }).join(','); }).join('\r\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+    a.download='VHO_Scholars_'+new Date().toISOString().slice(0,10)+'.csv';
+    a.click(); toast('Report exported!','📄');
   });
 
   // ── ANNOUNCEMENTS ──
   document.getElementById('addAnnouncementBtn').addEventListener('click', openAddAnnouncement);
-  document.getElementById('closeAnnouncementForm').addEventListener('click', function() { closeModal('mAnnouncementForm'); });
-  document.getElementById('cancelAnnouncementForm').addEventListener('click', function() { closeModal('mAnnouncementForm'); });
-  document.getElementById('mAnnouncementForm').addEventListener('click', function(e) { if(e.target===this) closeModal('mAnnouncementForm'); });
+  document.getElementById('closeAnnouncementForm').addEventListener('click', function(){ closeModal('mAnnouncementForm'); });
+  document.getElementById('cancelAnnouncementForm').addEventListener('click', function(){ closeModal('mAnnouncementForm'); });
+  document.getElementById('mAnnouncementForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mAnnouncementForm'); });
   document.getElementById('saveAnnouncementBtn').addEventListener('click', saveAnnouncement);
-  document.getElementById('closePollResults').addEventListener('click', function() { closeModal('mPollResults'); });
-  document.getElementById('closePollResultsBtn').addEventListener('click', function() { closeModal('mPollResults'); });
-  document.getElementById('mPollResults').addEventListener('click', function(e) { if(e.target===this) closeModal('mPollResults'); });
-  document.getElementById('closeAttendance').addEventListener('click', function() { closeModal('mAttendance'); });
-  document.getElementById('closeAttendanceBtn').addEventListener('click', function() { closeModal('mAttendance'); });
-  document.getElementById('mAttendance').addEventListener('click', function(e) { if(e.target===this) closeModal('mAttendance'); });
+  document.getElementById('closePollResults').addEventListener('click', function(){ closeModal('mPollResults'); });
+  document.getElementById('closePollResultsBtn').addEventListener('click', function(){ closeModal('mPollResults'); });
+  document.getElementById('mPollResults').addEventListener('click', function(e){ if(e.target===this) closeModal('mPollResults'); });
+  document.getElementById('closeAttendance').addEventListener('click', function(){ closeModal('mAttendance'); });
+  document.getElementById('closeAttendanceBtn').addEventListener('click', function(){ closeModal('mAttendance'); });
+  document.getElementById('mAttendance').addEventListener('click', function(e){ if(e.target===this) closeModal('mAttendance'); });
 
-  function openAddAnnouncement() {
-    editingAnnouncementId = null;
-    document.getElementById('ann_title').value = '';
-    document.getElementById('ann_desc').value = '';
-    document.getElementById('ann_date').value = '';
-    document.getElementById('ann_location').value = '';
-    document.getElementById('ann_poll_question').value = '';
-    document.getElementById('ann_poll_options').value = '';
-    document.getElementById('announcementFormTitle').textContent = 'New Announcement';
-    document.getElementById('saveAnnouncementBtn').textContent = 'Post Announcement';
+  function openAddAnnouncement(){
+    editingAnnouncementId=null;
+    ['ann_title','ann_desc','ann_date','ann_location','ann_poll_question','ann_poll_options'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('announcementFormTitle').textContent='New Announcement';
+    document.getElementById('saveAnnouncementBtn').textContent='Post Announcement';
     openModal('mAnnouncementForm');
   }
 
-  async function openEditAnnouncement(id) {
-    const ann = announcements.find(function(a) { return a.id === id; });
-    if (!ann) return;
-    editingAnnouncementId = id;
-    document.getElementById('ann_title').value = ann.title || '';
-    document.getElementById('ann_desc').value = ann.description || '';
-    document.getElementById('ann_date').value = ann.event_date || '';
-    document.getElementById('ann_location').value = ann.event_location || '';
-    document.getElementById('ann_poll_question').value = ann.poll_question || '';
-    const { data: opts } = await sb.from('poll_options').select('*').eq('announcement_id', id);
-    document.getElementById('ann_poll_options').value = opts ? opts.map(function(o) { return o.option_text; }).join('\n') : '';
-    document.getElementById('announcementFormTitle').textContent = 'Edit Announcement';
-    document.getElementById('saveAnnouncementBtn').textContent = 'Save Changes';
+  async function openEditAnnouncement(id){
+    const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
+    editingAnnouncementId=id;
+    document.getElementById('ann_title').value=ann.title||'';
+    document.getElementById('ann_desc').value=ann.description||'';
+    document.getElementById('ann_date').value=ann.event_date||'';
+    document.getElementById('ann_location').value=ann.event_location||'';
+    document.getElementById('ann_poll_question').value=ann.poll_question||'';
+    // Load existing options WITHOUT removing existing responses
+    const {data:opts}=await sb.from('poll_options').select('*').eq('announcement_id',id);
+    document.getElementById('ann_poll_options').value=opts?opts.map(function(o){ return o.option_text; }).join('\n'):'';
+    document.getElementById('announcementFormTitle').textContent='Edit Announcement';
+    document.getElementById('saveAnnouncementBtn').textContent='Save Changes';
     openModal('mAnnouncementForm');
   }
 
-  async function saveAnnouncement() {
-    const title = document.getElementById('ann_title').value.trim();
-    if (!title) { toast('Title is required', '⚠️'); return; }
-    const btn = document.getElementById('saveAnnouncementBtn');
-    btn.disabled = true; btn.textContent = 'Saving…';
-
-    const payload = {
-      title: title,
-      description: document.getElementById('ann_desc').value.trim() || null,
-      event_date: document.getElementById('ann_date').value || null,
-      event_location: document.getElementById('ann_location').value.trim() || null,
-      poll_question: document.getElementById('ann_poll_question').value.trim() || null,
-      updated_at: new Date().toISOString()
+  async function saveAnnouncement(){
+    const title=document.getElementById('ann_title').value.trim();
+    if(!title){ toast('Title is required','⚠️'); return; }
+    const btn=document.getElementById('saveAnnouncementBtn');
+    btn.disabled=true; btn.textContent='Saving…';
+    const payload={
+      title:title,
+      description:document.getElementById('ann_desc').value.trim()||null,
+      event_date:document.getElementById('ann_date').value||null,
+      event_location:document.getElementById('ann_location').value.trim()||null,
+      poll_question:document.getElementById('ann_poll_question').value.trim()||null,
+      updated_at:new Date().toISOString()
     };
+    const optionsText=document.getElementById('ann_poll_options').value.trim();
+    const optionLines=optionsText?optionsText.split('\n').map(function(s){ return s.trim(); }).filter(Boolean):[];
+    let annId=editingAnnouncementId;
 
-    const optionsText = document.getElementById('ann_poll_options').value.trim();
-    const optionLines = optionsText ? optionsText.split('\n').map(function(s) { return s.trim(); }).filter(Boolean) : [];
-    let annId = editingAnnouncementId;
-
-    if (!editingAnnouncementId) {
-      const { data: newAnn, error } = await sb.from('announcements').insert(payload).select().single();
-      if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Post Announcement'; return; }
-      annId = newAnn.id;
-      toast('Announcement posted!', '📢');
+    if(!editingAnnouncementId){
+      const {data:newAnn,error}=await sb.from('announcements').insert(payload).select().single();
+      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Post Announcement'; return; }
+      annId=newAnn.id;
+      toast('Announcement posted!','📢');
     } else {
-      const { error } = await sb.from('announcements').update(payload).eq('id', annId);
-      if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Save Changes'; return; }
-      await sb.from('poll_options').delete().eq('announcement_id', annId);
-      toast('Announcement updated!', '✅');
+      const {error}=await sb.from('announcements').update(payload).eq('id',annId);
+      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+      // When editing: only add NEW options, do NOT delete old ones (preserves existing responses)
+      const {data:existingOpts}=await sb.from('poll_options').select('option_text').eq('announcement_id',annId);
+      const existingTexts=existingOpts?existingOpts.map(function(o){ return o.option_text; }):[];
+      const newOpts=optionLines.filter(function(opt){ return !existingTexts.includes(opt); });
+      if(newOpts.length>0){
+        await sb.from('poll_options').insert(newOpts.map(function(opt){ return {announcement_id:annId,option_text:opt}; }));
+      }
+      toast('Announcement updated!','✅');
     }
 
-    if (optionLines.length > 0) {
-      await sb.from('poll_options').insert(optionLines.map(function(opt) { return { announcement_id: annId, option_text: opt }; }));
+    if(!editingAnnouncementId && optionLines.length>0){
+      await sb.from('poll_options').insert(optionLines.map(function(opt){ return {announcement_id:annId,option_text:opt}; }));
     }
 
-    btn.disabled = false;
-    btn.textContent = editingAnnouncementId ? 'Save Changes' : 'Post Announcement';
+    btn.disabled=false; btn.textContent=editingAnnouncementId?'Save Changes':'Post Announcement';
     closeModal('mAnnouncementForm');
     renderAnnouncements();
   }
 
-  async function deleteAnnouncement(id) {
-    const ann = announcements.find(function(a) { return a.id === id; });
-    if (!ann || !confirm('Delete "' + ann.title + '"? This cannot be undone.')) return;
-    await sb.from('poll_responses').delete().eq('announcement_id', id);
-    await sb.from('poll_options').delete().eq('announcement_id', id);
-    await sb.from('attendance').delete().eq('announcement_id', id);
-    await sb.from('announcements').delete().eq('id', id);
-    toast('Announcement deleted', '🗑️');
+  async function deleteAnnouncement(id){
+    const ann=announcements.find(function(a){ return a.id===id; });
+    if(!ann||!confirm('Delete "'+ann.title+'"? This cannot be undone.')) return;
+    await sb.from('poll_responses').delete().eq('announcement_id',id);
+    await sb.from('poll_options').delete().eq('announcement_id',id);
+    await sb.from('attendance').delete().eq('announcement_id',id);
+    await sb.from('announcements').delete().eq('id',id);
+    toast('Announcement deleted','🗑️');
     renderAnnouncements();
   }
 
-  async function renderAnnouncements() {
-    const container = document.getElementById('announcementsList');
-    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
-
-    const { data: anns, error } = await sb.from('announcements').select('*').order('created_at', { ascending: false });
-    if (error || !anns || !anns.length) {
-      container.innerHTML = '<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
-      document.getElementById('nb-announcements').style.display = 'none';
+  async function renderAnnouncements(){
+    const container=document.getElementById('announcementsList');
+    container.innerHTML='<div class="empty"><p>Loading...</p></div>';
+    const {data:anns,error}=await sb.from('announcements').select('*').order('created_at',{ascending:false});
+    if(error||!anns||!anns.length){
+      container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
+      document.getElementById('nb-announcements').style.display='none';
+      announcements=[];
       return;
     }
-    announcements = anns;
+    announcements=anns;
 
-    const htmlParts = [];
-    for (const ann of anns) {
-      const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', ann.id);
-      const { data: responses } = await sb.from('poll_responses').select('*').eq('announcement_id', ann.id);
-      const { data: attended } = await sb.from('attendance').select('*').eq('announcement_id', ann.id).eq('attended', true);
-      const totalResponses = responses ? responses.length : 0;
-      const attendedCount = attended ? attended.length : 0;
-      const hasOptions = options && options.length > 0;
-      const eventDate = ann.event_date ? new Date(ann.event_date + 'T00:00:00').toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}) : null;
-
-      let pollBar = '';
-      if (hasOptions) {
-        pollBar = options.map(function(o) {
-          const count = responses ? responses.filter(function(r) { return r.poll_option_id === o.id; }).length : 0;
-          const pct = totalResponses ? Math.round(count / totalResponses * 100) : 0;
-          return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>' + o.option_text + '</span><span style="color:var(--muted)">' + count + ' (' + pct + '%)</span></div><div style="height:6px;background:#f0f0f5;border-radius:3px"><div style="height:100%;width:' + pct + '%;background:var(--blue);border-radius:3px"></div></div></div>';
+    const htmlParts=[];
+    for(const ann of anns){
+      const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',ann.id);
+      const {data:responses}=await sb.from('poll_responses').select('*').eq('announcement_id',ann.id);
+      const {data:allAtt}=await sb.from('attendance').select('*').eq('announcement_id',ann.id);
+      const totalResponses=responses?responses.length:0;
+      const attendedCount=allAtt?allAtt.filter(function(a){ return a.attended===true; }).length:0;
+      const notAttendedCount=allAtt?allAtt.filter(function(a){ return a.attended===false; }).length:0;
+      const hasOptions=options&&options.length>0;
+      const eventDate=ann.event_date?new Date(ann.event_date+'T00:00:00').toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}):null;
+      let pollBar='';
+      if(hasOptions){
+        pollBar=options.map(function(o){
+          const count=responses?responses.filter(function(r){ return r.poll_option_id===o.id; }).length:0;
+          const pct=totalResponses?Math.round(count/totalResponses*100):0;
+          return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>'+o.option_text+'</span><span style="color:var(--muted)">'+count+' ('+pct+'%)</span></div><div style="height:6px;background:#f0f0f5;border-radius:3px"><div style="height:100%;width:'+pct+'%;background:var(--blue);border-radius:3px"></div></div></div>';
         }).join('');
       }
-
       htmlParts.push(
-        '<div class="card" style="margin-bottom:14px">' +
-        '<div class="card-header"><div><span class="card-title">' + ann.title + '</span>' +
-        (eventDate ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 ' + eventDate + (ann.event_location ? ' · 📍 ' + ann.event_location : '') + '</div>' : '') +
-        '</div><div style="display:flex;gap:6px;flex-wrap:wrap">' +
-        (hasOptions ? '<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="' + ann.id + '">📊 Poll Results (' + totalResponses + ')</button>' : '') +
-        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="' + ann.id + '">👥 Attendees (' + attendedCount + ')</button>' +
-        '<button class="btn btn-ghost btn-sm" data-action="editAnn" data-id="' + ann.id + '">Edit</button>' +
-        '<button class="btn btn-danger btn-sm" data-action="deleteAnn" data-id="' + ann.id + '">Delete</button>' +
-        '</div></div>' +
-        (ann.description ? '<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">' + ann.description + '</p></div>' : '') +
-        (hasOptions ? '<div class="card-body" style="border-top:1px solid var(--border)"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">' + (ann.poll_question || 'POLL') + '</div>' + pollBar + '</div>' : '') +
+        '<div class="card" style="margin-bottom:14px">'+
+        '<div class="card-header"><div><span class="card-title">'+ann.title+'</span>'+
+        (eventDate?'<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 '+eventDate+(ann.event_location?' · 📍 '+ann.event_location:'')+'</div>':'')+
+        '</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        (hasOptions?'<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="'+ann.id+'">📊 Poll Results ('+totalResponses+')</button>':'')+
+        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="'+ann.id+'">👥 Attended ('+attendedCount+') / Not ('+notAttendedCount+')</button>'+
+        '<button class="btn btn-ghost btn-sm" data-action="editAnn" data-id="'+ann.id+'">Edit</button>'+
+        '<button class="btn btn-danger btn-sm" data-action="deleteAnn" data-id="'+ann.id+'">Delete</button>'+
+        '</div></div>'+
+        (ann.description?'<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">'+ann.description+'</p></div>':'')+
+        (hasOptions?'<div class="card-body" style="border-top:1px solid var(--border)"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">'+(ann.poll_question||'POLL')+'</div>'+pollBar+'</div>':'')+
         '</div>'
       );
     }
-
-    container.innerHTML = htmlParts.join('');
-
-    const badge = document.getElementById('nb-announcements');
-    badge.style.display = anns.length ? '' : 'none';
-    if (anns.length) badge.textContent = anns.length;
+    container.innerHTML=htmlParts.join('');
+    const badge=document.getElementById('nb-announcements');
+    badge.style.display=anns.length?'':'none';
+    if(anns.length) badge.textContent=anns.length;
   }
 
-  document.getElementById('announcementsList').addEventListener('click', function(e) {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-    if (action === 'pollResults') openPollResults(id);
-    if (action === 'viewAttendance') openAttendance(id);
-    if (action === 'editAnn') openEditAnnouncement(id);
-    if (action === 'deleteAnn') deleteAnnouncement(id);
+  document.getElementById('announcementsList').addEventListener('click', function(e){
+    const btn=e.target.closest('[data-action]'); if(!btn) return;
+    const id=btn.dataset.id; const action=btn.dataset.action;
+    if(action==='pollResults') openPollResults(id);
+    if(action==='viewAttendance') openAttendance(id);
+    if(action==='editAnn') openEditAnnouncement(id);
+    if(action==='deleteAnn') deleteAnnouncement(id);
   });
 
-  async function openPollResults(id) {
-    const ann = announcements.find(function(a) { return a.id === id; });
-    if (!ann) return;
-    document.getElementById('pollResultsTitle').textContent = ann.title + ' — Poll Results';
-    document.getElementById('pollResultsBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+  async function openPollResults(id){
+    const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
+    document.getElementById('pollResultsTitle').textContent=ann.title+' — Poll Results';
+    document.getElementById('pollResultsBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
     openModal('mPollResults');
-
-    const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', id);
-    const { data: responses } = await sb.from('poll_responses').select('*, scholars(name), poll_options(option_text)').eq('announcement_id', id);
-    const total = responses ? responses.length : 0;
-
-    if (!options || !options.length) {
-      document.getElementById('pollResultsBody').innerHTML = '<p style="color:var(--muted);font-size:13px">No poll options for this announcement.</p>';
-      return;
-    }
-
-    const html = options.map(function(opt) {
-      const responders = responses ? responses.filter(function(r) { return r.poll_option_id === opt.id; }) : [];
-      const pct = total ? Math.round(responders.length / total * 100) : 0;
-      return '<div style="margin-bottom:18px">' +
-        '<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin-bottom:4px"><span>' + opt.option_text + '</span><span style="color:var(--muted)">' + responders.length + ' / ' + total + ' (' + pct + '%)</span></div>' +
-        '<div style="height:8px;background:#f0f0f5;border-radius:4px;margin-bottom:8px"><div style="height:100%;width:' + pct + '%;background:var(--blue);border-radius:4px"></div></div>' +
-        (responders.length ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + responders.map(function(r) { return '<span class="badge badge-blue">' + (r.scholars ? r.scholars.name : '—') + '</span>'; }).join('') + '</div>' : '<span style="font-size:12px;color:var(--muted)">No responses yet</span>') +
+    const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',id);
+    const {data:responses}=await sb.from('poll_responses').select('*, scholars(name), poll_options(option_text)').eq('announcement_id',id);
+    const total=responses?responses.length:0;
+    if(!options||!options.length){ document.getElementById('pollResultsBody').innerHTML='<p style="color:var(--muted);font-size:13px">No poll options.</p>'; return; }
+    const html=options.map(function(opt){
+      const responders=responses?responses.filter(function(r){ return r.poll_option_id===opt.id; }):[];
+      const pct=total?Math.round(responders.length/total*100):0;
+      return '<div style="margin-bottom:18px">'+
+        '<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin-bottom:4px"><span>'+opt.option_text+'</span><span style="color:var(--muted)">'+responders.length+' / '+total+' ('+pct+'%)</span></div>'+
+        '<div style="height:8px;background:#f0f0f5;border-radius:4px;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:var(--blue);border-radius:4px"></div></div>'+
+        (responders.length?'<div style="display:flex;flex-wrap:wrap;gap:6px">'+responders.map(function(r){ return '<span class="badge badge-blue">'+(r.scholars?r.scholars.name:'—')+'</span>'; }).join('')+'</div>':'<span style="font-size:12px;color:var(--muted)">No responses yet</span>')+
         '</div>';
     }).join('');
-
-    document.getElementById('pollResultsBody').innerHTML =
-      '<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">' + (ann.poll_question || 'Poll') + ' · ' + total + ' total response' + (total !== 1 ? 's' : '') + '</div>' + html;
+    document.getElementById('pollResultsBody').innerHTML='<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">'+(ann.poll_question||'Poll')+' · '+total+' total response'+(total!==1?'s':'')+'</div>'+html;
   }
 
-  async function openAttendance(id) {
-    const ann = announcements.find(function(a) { return a.id === id; });
-    if (!ann) return;
-    document.getElementById('attendanceTitle').textContent = ann.title + ' — Attendance';
-    document.getElementById('attendanceSub').textContent = 'Scholars who marked their attendance for this event.';
-    document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+  async function openAttendance(id){
+    const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
+    document.getElementById('attendanceTitle').textContent=ann.title+' — Attendance';
+    document.getElementById('attendanceSub').textContent='Scholars who marked their attendance.';
+    document.getElementById('attendanceBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
     openModal('mAttendance');
-
-    const { data: allRecords } = await sb.from('attendance').select('*, scholars(name, group_name, batch_no)').eq('announcement_id', id);
-    const { data: responses } = await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id', id);
-    const records = allRecords || [];
-
-    if (!records.length) {
-      document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked their attendance yet.</div>';
-      return;
-    }
-
-    const attended = records.filter(function(r) { return r.attended === true; });
-    const notAttended = records.filter(function(r) { return r.attended === false; });
-
-    function scholarRow(a, didAttend) {
-      const s = a.scholars || {};
-      const resp = responses ? responses.find(function(r) { return r.scholar_id === a.scholar_id; }) : null;
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">' +
-        '<div><div style="font-size:14px;font-weight:500">' + (s.name || '—') + '</div>' +
-        '<div style="font-size:12px;color:var(--muted)">' + (s.group_name || '') + ' · Batch ' + (s.batch_no || '—') + '</div>' +
-        '<div style="font-size:12px;color:var(--muted)">Poll answer: ' + (resp && resp.poll_options ? resp.poll_options.option_text : 'No response') + '</div></div>' +
-        (didAttend ? '<span class="badge badge-green">✅ Attended</span>' : '<span class="badge badge-pink">❌ Did Not Attend</span>') +
+    const {data:allRecords}=await sb.from('attendance').select('*, scholars(name,group_name,batch_no)').eq('announcement_id',id);
+    const {data:responses}=await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id',id);
+    const records=allRecords||[];
+    if(!records.length){ document.getElementById('attendanceBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked their attendance yet.</div>'; return; }
+    const attended=records.filter(function(r){ return r.attended===true; });
+    const notAttended=records.filter(function(r){ return r.attended===false; });
+    function scholarRow(a,didAttend){
+      const s=a.scholars||{};
+      const resp=responses?responses.find(function(r){ return r.scholar_id===a.scholar_id; }):null;
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
+        '<div><div style="font-size:14px;font-weight:500">'+(s.name||'—')+'</div>'+
+        '<div style="font-size:12px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div>'+
+        '<div style="font-size:12px;color:var(--muted)">Poll: '+(resp&&resp.poll_options?resp.poll_options.option_text:'No response')+'</div></div>'+
+        (didAttend?'<span class="badge badge-green">✅ Attended</span>':'<span class="badge badge-pink">❌ Did Not Attend</span>')+
         '</div>';
     }
-
-    let html = '<div style="margin-bottom:16px">' +
-      '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">' +
-        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;color:#166534;font-weight:500">✅ Attended: ' + attended.length + '</div>' +
-        '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 16px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: ' + notAttended.length + '</div>' +
-        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:500">Total Responded: ' + records.length + '</div>' +
+    let html='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">'+
+      '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;color:#166534;font-weight:500">✅ Attended: '+attended.length+'</div>'+
+      '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 16px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: '+notAttended.length+'</div>'+
+      '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:500">Total: '+records.length+'</div>'+
       '</div>';
-
-    if (attended.length) {
-      html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended (' + attended.length + ')</div>' +
-        attended.map(function(a) { return scholarRow(a, true); }).join('');
-    }
-    if (notAttended.length) {
-      html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px">Did Not Attend (' + notAttended.length + ')</div>' +
-        notAttended.map(function(a) { return scholarRow(a, false); }).join('');
-    }
-    html += '</div>';
-
-    document.getElementById('attendanceBody').innerHTML = html;
+    if(attended.length) html+='<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended ('+attended.length+')</div>'+attended.map(function(a){ return scholarRow(a,true); }).join('');
+    if(notAttended.length) html+='<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px">Did Not Attend ('+notAttended.length+')</div>'+notAttended.map(function(a){ return scholarRow(a,false); }).join('');
+    document.getElementById('attendanceBody').innerHTML=html;
   }
 
-  // ── CHANGE PASSWORD ──
-  document.getElementById('admSendResetBtn').addEventListener('click', async function() {
-    const newPassword = document.getElementById('adm_cp_email').value.trim();
-    const msgEl = document.getElementById('adm_cp_msg');
-    function showMsg(type, text) {
-      msgEl.style.cssText = type === 'err'
-        ? 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
-        : 'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
-      msgEl.textContent = text;
+  // ── ADMIN ACCOUNTS ──
+  document.getElementById('addAdminBtn').addEventListener('click', openAddAdmin);
+  document.getElementById('closeAdminForm').addEventListener('click', function(){ closeModal('mAdminForm'); });
+  document.getElementById('cancelAdminForm').addEventListener('click', function(){ closeModal('mAdminForm'); });
+  document.getElementById('mAdminForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mAdminForm'); });
+  document.getElementById('adminFormSaveBtn').addEventListener('click', saveAdmin);
+  document.getElementById('cancelDeleteAdminBtn').addEventListener('click', function(){ closeModal('mDeleteAdminConfirm'); });
+  document.getElementById('mDeleteAdminConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAdminConfirm'); });
+  document.getElementById('confirmDeleteAdminBtn').addEventListener('click', async function(){
+    if(!deletingAdminId) return;
+    const {error}=await sb.from('admins').delete().eq('id',deletingAdminId);
+    if(error){ toast(error.message,'❌'); return; }
+    adminsList=adminsList.filter(function(a){ return a.id!==deletingAdminId; });
+    closeModal('mDeleteAdminConfirm'); deletingAdminId=null;
+    renderAdmins(); toast('Admin deleted','🗑️');
+  });
+
+  function openAddAdmin(){
+    editingAdminId=null;
+    document.getElementById('adm_fn').value=''; document.getElementById('adm_ln').value=''; document.getElementById('adm_em').value='';
+    document.getElementById('adminFormTitle').textContent='Add Admin';
+    document.getElementById('adminFormSub').textContent='Default password will be: ADMIN + first name (e.g. ADMINjuan)';
+    document.getElementById('adminFormSaveBtn').textContent='Add Admin';
+    openModal('mAdminForm');
+  }
+
+  function openEditAdmin(id){
+    const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+    editingAdminId=id;
+    const nameParts=(a.name||'').split(' ');
+    document.getElementById('adm_fn').value=nameParts[0]||'';
+    document.getElementById('adm_ln').value=nameParts.slice(1).join(' ')||'';
+    document.getElementById('adm_em').value=a.email||'';
+    document.getElementById('adminFormTitle').textContent='Edit Admin';
+    document.getElementById('adminFormSub').textContent='Update admin information.';
+    document.getElementById('adminFormSaveBtn').textContent='Save Changes';
+    openModal('mAdminForm');
+  }
+
+  async function saveAdmin(){
+    const fn=document.getElementById('adm_fn').value.trim();
+    const ln=document.getElementById('adm_ln').value.trim();
+    const email=document.getElementById('adm_em').value.trim().toLowerCase();
+    if(!fn||!email){ toast('First name and email are required','⚠️'); return; }
+    const fullName=(fn+(ln?' '+ln:'')).trim();
+    const btn=document.getElementById('adminFormSaveBtn');
+    btn.disabled=true; btn.textContent='Saving…';
+    if(editingAdminId===null){
+      const defaultPw='ADMIN'+fn;
+      const {data:newA,error}=await sb.from('admins').insert({name:fullName,email:email,password:defaultPw}).select().single();
+      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Add Admin'; return; }
+      adminsList.unshift(newA);
+      toast(fullName+' added! Default password: '+defaultPw,'✅');
+    } else {
+      const {data:upd,error}=await sb.from('admins').update({name:fullName,email:email}).eq('id',editingAdminId).select().single();
+      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+      const idx=adminsList.findIndex(function(x){ return x.id===editingAdminId; });
+      if(idx!==-1) adminsList[idx]=upd;
+      toast('Admin updated','✅');
     }
-    if (!newPassword || newPassword.length < 6) { showMsg('err', 'Password must be at least 6 characters.'); return; }
-    this.disabled = true; this.textContent = 'Saving…';
-    msgEl.style.display = 'none';
-    const adminEmail = sessionStorage.getItem('admin_email');
-    const { error } = await sb.from('admins').update({ password: newPassword }).eq('email', adminEmail);
-    this.disabled = false; this.textContent = 'Save New Password';
-    if (error) { showMsg('err', error.message); return; }
-    showMsg('ok', '✅ Password changed! Use your new password next time you log in.');
-    document.getElementById('adm_cp_email').value = '';
+    btn.disabled=false; btn.textContent=editingAdminId?'Save Changes':'Add Admin';
+    closeModal('mAdminForm'); renderAdmins();
+  }
+
+  function renderAdmins(){
+    const currentEmail=sessionStorage.getItem('admin_email');
+    document.getElementById('adminsTable').innerHTML=adminsList.map(function(a){
+      const isMe=a.email===currentEmail;
+      const isActive=a.is_active!==false;
+      return '<tr style="opacity:'+(isActive?'1':'0.6')+'">'+
+        '<td><div class="s-info-row"><div class="s-avatar" style="background:'+(isActive?'var(--blue)':'var(--muted)')+'">'+ini(a.name)+'</div>'+
+        '<div><div class="s-name">'+a.name+(isMe?' <span class="badge badge-blue" style="font-size:10px">You</span>':'')+'</div>'+
+        '<div class="s-sub">'+(isActive?'<span style="color:#22c55e;font-size:11px">● Active</span>':'<span style="color:#ef4444;font-size:11px">● Deactivated</span>')+'</div>'+
+        '</div></div></td>'+
+        '<td style="font-size:13px">'+a.email+'</td>'+
+        '<td>'+(isActive?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Deactivated</span>')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(a.created_at)+'</td>'+
+        '<td style="display:flex;gap:4px;flex-wrap:wrap">'+
+          '<button class="btn btn-ghost btn-sm" data-action="editAdmin" data-id="'+a.id+'">Edit</button>'+
+          (!isMe&&isActive?'<button class="btn btn-amber btn-sm" data-action="deactivateAdmin" data-id="'+a.id+'">Deactivate</button>':'')+
+          (!isMe&&!isActive?'<button class="btn btn-success btn-sm" data-action="activateAdmin" data-id="'+a.id+'">Activate</button>':'')+
+          (!isMe?'<button class="btn btn-danger btn-sm" data-action="deleteAdmin" data-id="'+a.id+'">Delete</button>':'')+
+        '</td></tr>';
+    }).join('')||'<tr><td colspan="4"><div class="empty"><p>No admins found.</p></div></td></tr>';
+  }
+
+  document.getElementById('adminsTable').addEventListener('click', async function(e){
+    const btn=e.target.closest('[data-action]'); if(!btn) return;
+    const id=btn.dataset.id; const action=btn.dataset.action;
+    if(action==='editAdmin') openEditAdmin(id);
+    if(action==='deleteAdmin'){
+      const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+      deletingAdminId=id;
+      document.getElementById('deleteAdminName').textContent=a.name;
+      openModal('mDeleteAdminConfirm');
+    }
+    if(action==='deactivateAdmin'){
+      const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+      if(!confirm('Deactivate '+a.name+"? They won't be able to log in until reactivated.")) return;
+      btn.disabled=true; btn.textContent='Saving...';
+      const {error}=await sb.from('admins').update({is_active:false}).eq('id',id);
+      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Deactivate'; return; }
+      const idx=adminsList.findIndex(function(x){ return x.id===id; });
+      if(idx!==-1) adminsList[idx].is_active=false;
+      toast(a.name+' has been deactivated.','🔒');
+      renderAdmins();
+    }
+    if(action==='activateAdmin'){
+      const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+      btn.disabled=true; btn.textContent='Saving...';
+      const {error}=await sb.from('admins').update({is_active:true}).eq('id',id);
+      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Activate'; return; }
+      const idx=adminsList.findIndex(function(x){ return x.id===id; });
+      if(idx!==-1) adminsList[idx].is_active=true;
+      toast(a.name+' has been activated.','✅');
+      renderAdmins();
+    }
+  });
+
+  // ── SPONSORS DATABASE ──
+  let sponsors = [];
+  let sponsorEvents = [];
+  let contributions = [];
+  let editingSponsorId = null;
+  let editingEventId = null;
+  let editingContribId = null;
+  let deletingSponsorId = null;
+  let deletingEventId = null;
+  let deletingContribId = null;
+  let currentSponsorTab = 'sponsors';
+
+  // Sub-tab switching
+  document.querySelectorAll('.sponsor-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      currentSponsorTab = this.dataset.stab;
+      document.querySelectorAll('.sponsor-tab').forEach(function(t){ t.classList.remove('on'); });
+      this.classList.add('on');
+      ['sponsors','events','contributions'].forEach(function(p){
+        document.getElementById('spanel-'+p).style.display = p === currentSponsorTab ? 'block' : 'none';
+      });
+    });
+  });
+
+  // ── LOAD SPONSORS DATA ──
+  async function loadSponsors() {
+    const [s, e, c] = await Promise.all([
+      sb.from('sponsors').select('*').order('company_name', {ascending:true}),
+      sb.from('sponsor_events').select('*').order('event_date', {ascending:false}),
+      sb.from('sponsor_contributions').select('*').order('date', {ascending:false})
+    ]);
+    sponsors = s.data || [];
+    sponsorEvents = e.data || [];
+    contributions = c.data || [];
+  }
+
+  async function renderSponsors() {
+    await loadSponsors();
+    renderSponsorsTable();
+    renderEventsTable();
+    renderContribTable();
+  }
+
+  // ── SPONSORS TABLE ──
+  function renderSponsorsTable() {
+    const q = document.getElementById('spSearch').value.toLowerCase();
+    const rel = document.getElementById('spRelStatus').value;
+    const data = sponsors.filter(function(s) {
+      return (!q || (s.company_name||'').toLowerCase().includes(q) ||
+        (s.contact_person||'').toLowerCase().includes(q) ||
+        (s.email||'').toLowerCase().includes(q)) &&
+        (!rel || s.relationship_status === rel);
+    });
+    document.getElementById('sponsorsTable').innerHTML = data.map(function(s) {
+      const offersShort = s.offers ? (s.offers.length > 60 ? s.offers.slice(0,60)+'...' : s.offers) : '—';
+      return '<tr>' +
+        '<td><div class="s-info-row"><div class="s-avatar" style="background:var(--blue2);font-size:13px">'+ini(s.company_name)+'</div><div><div class="s-name">'+s.company_name+'</div><div class="s-sub">'+(s.company_address||'')+'</div></div></div></td>' +
+        '<td><div style="font-size:13px">'+(s.contact_person||'—')+'</div><div style="font-size:11px;color:var(--muted)">'+(s.title||'')+'</div></td>' +
+        '<td>'+(s.relationship_status?'<span class="badge badge-blue">'+s.relationship_status+'</span>':'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+(s.email||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+(s.contact_number||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);max-width:160px">'+offersShort+'</td>' +
+        '<td style="display:flex;gap:4px;flex-wrap:wrap">' +
+          '<button class="btn btn-ghost btn-sm" data-action="viewSponsor" data-id="'+s.id+'">View</button>' +
+          '<button class="btn btn-ghost btn-sm" data-action="editSponsor" data-id="'+s.id+'">Edit</button>' +
+          '<button class="btn btn-danger btn-sm" data-action="deleteSponsor" data-id="'+s.id+'">Delete</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No sponsors found. Click "+ Add Sponsor" to add one.</p></div></td></tr>';
+  }
+
+  ['spSearch','spRelStatus'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', renderSponsorsTable);
+    document.getElementById(id).addEventListener('change', renderSponsorsTable);
+  });
+
+  document.getElementById('sponsorsTable').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]'); if (!btn) return;
+    const id = btn.dataset.id; const action = btn.dataset.action;
+    if (action === 'viewSponsor') viewSponsor(id);
+    if (action === 'editSponsor') openEditSponsor(id);
+    if (action === 'deleteSponsor') {
+      const s = sponsors.find(function(x){ return x.id===id; }); if (!s) return;
+      deletingSponsorId = id;
+      document.getElementById('deleteSponsorName').textContent = s.company_name;
+      openModal('mDeleteSponsorConfirm');
+    }
+  });
+
+  // ── VIEW SPONSOR DETAIL ──
+  function viewSponsor(id) {
+    const s = sponsors.find(function(x){ return x.id===id; }); if (!s) return;
+    const fields = [
+      ['Company / Institution', s.company_name],
+      ['Contact Person', s.contact_person],
+      ['Title / Position', s.title],
+      ['Relationship Status', s.relationship_status],
+      ['Email Address', s.email],
+      ['Contact Number', s.contact_number],
+      ['Company Address', s.company_address]
+    ];
+    document.getElementById('sponsorDetailBody').innerHTML =
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">' +
+        '<div style="width:52px;height:52px;border-radius:50%;background:var(--blue2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#fff">'+ini(s.company_name)+'</div>' +
+        '<div><h2 class="modal-title" style="margin-bottom:2px">'+s.company_name+'</h2>' +
+        (s.relationship_status?'<span class="badge badge-blue">'+s.relationship_status+'</span>':'') +
+        '</div></div>' +
+      '<div class="info-grid" style="margin-bottom:16px">' +
+        fields.map(function(f){ return '<div class="info-item"><div class="info-label">'+f[0]+'</div><div class="info-value">'+(f[1]||'—')+'</div></div>'; }).join('') +
+      '</div>' +
+      (s.offers ? '<div style="margin-bottom:16px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">What they offer</div><div style="font-size:13px;background:#f9f9fb;border-radius:8px;padding:12px;line-height:1.7">'+s.offers+'</div></div>' : '') +
+      '<div class="modal-footer">' +
+        '<button class="btn btn-ghost" id="closeSponsorDetailBtn">Close</button>' +
+        '<button class="btn btn-primary" data-action="editSponsorDetail" data-id="'+s.id+'">Edit</button>' +
+      '</div>';
+    openModal('mSponsorDetail');
+  }
+
+  document.getElementById('closeSponsorDetail').addEventListener('click', function(){ closeModal('mSponsorDetail'); });
+  document.getElementById('mSponsorDetail').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('mSponsorDetail');
+    const btn = e.target.closest('[data-action]'); if (!btn) return;
+    if (btn.dataset.action === 'editSponsorDetail') { closeModal('mSponsorDetail'); openEditSponsor(btn.dataset.id); }
+    if (btn.id === 'closeSponsorDetailBtn') closeModal('mSponsorDetail');
+  });
+
+  // ── ADD/EDIT SPONSOR ──
+  document.getElementById('addSponsorBtn').addEventListener('click', openAddSponsor);
+  document.getElementById('closeSponsorForm').addEventListener('click', function(){ closeModal('mSponsorForm'); });
+  document.getElementById('cancelSponsorForm').addEventListener('click', function(){ closeModal('mSponsorForm'); });
+  document.getElementById('mSponsorForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mSponsorForm'); });
+  document.getElementById('sponsorFormSaveBtn').addEventListener('click', saveSponsor);
+
+  function openAddSponsor() {
+    editingSponsorId = null;
+    ['sp_company','sp_contact','sp_title','sp_email','sp_phone','sp_address','sp_offers'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('sp_relstatus').value = '';
+    document.getElementById('sponsorFormTitle').textContent = 'Add Sponsor';
+    document.getElementById('sponsorFormSaveBtn').textContent = 'Add Sponsor';
+    openModal('mSponsorForm');
+  }
+
+  function openEditSponsor(id) {
+    const s = sponsors.find(function(x){ return x.id===id; }); if (!s) return;
+    editingSponsorId = id;
+    document.getElementById('sp_company').value = s.company_name||'';
+    document.getElementById('sp_contact').value = s.contact_person||'';
+    document.getElementById('sp_title').value = s.title||'';
+    document.getElementById('sp_relstatus').value = s.relationship_status||'';
+    document.getElementById('sp_email').value = s.email||'';
+    document.getElementById('sp_phone').value = s.contact_number||'';
+    document.getElementById('sp_address').value = s.company_address||'';
+    document.getElementById('sp_offers').value = s.offers||'';
+    document.getElementById('sponsorFormTitle').textContent = 'Edit Sponsor';
+    document.getElementById('sponsorFormSaveBtn').textContent = 'Save Changes';
+    openModal('mSponsorForm');
+  }
+
+  async function saveSponsor() {
+    const company = document.getElementById('sp_company').value.trim();
+    if (!company) { toast('Company name is required','⚠️'); return; }
+    const btn = document.getElementById('sponsorFormSaveBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const payload = {
+      company_name: company,
+      contact_person: document.getElementById('sp_contact').value.trim()||null,
+      title: document.getElementById('sp_title').value.trim()||null,
+      relationship_status: document.getElementById('sp_relstatus').value||null,
+      email: document.getElementById('sp_email').value.trim()||null,
+      contact_number: document.getElementById('sp_phone').value.trim()||null,
+      company_address: document.getElementById('sp_address').value.trim()||null,
+      offers: document.getElementById('sp_offers').value.trim()||null,
+      updated_at: new Date().toISOString()
+    };
+    if (!editingSponsorId) {
+      const {data:newS, error} = await sb.from('sponsors').insert(payload).select().single();
+      if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Add Sponsor'; return; }
+      sponsors.unshift(newS);
+      toast(company+' added!','✅');
+    } else {
+      const {data:upd, error} = await sb.from('sponsors').update(payload).eq('id',editingSponsorId).select().single();
+      if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+      const idx = sponsors.findIndex(function(x){ return x.id===editingSponsorId; });
+      if (idx!==-1) sponsors[idx]=upd;
+      toast('Sponsor updated','✅');
+    }
+    btn.disabled=false; btn.textContent=editingSponsorId?'Save Changes':'Add Sponsor';
+    closeModal('mSponsorForm');
+    renderSponsorsTable();
+  }
+
+  // ── DELETE SPONSOR ──
+  document.getElementById('cancelDeleteSponsorBtn').addEventListener('click', function(){ closeModal('mDeleteSponsorConfirm'); });
+  document.getElementById('mDeleteSponsorConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteSponsorConfirm'); });
+  document.getElementById('confirmDeleteSponsorBtn').addEventListener('click', async function() {
+    if (!deletingSponsorId) return;
+    this.disabled=true; this.textContent='Deleting…';
+    await sb.from('sponsor_events').delete().eq('sponsor_id', deletingSponsorId);
+    await sb.from('sponsor_contributions').delete().eq('sponsor_id', deletingSponsorId);
+    const {error} = await sb.from('sponsors').delete().eq('id', deletingSponsorId);
+    this.disabled=false; this.textContent='Yes, Delete';
+    if (error){ toast(error.message,'❌'); return; }
+    sponsors = sponsors.filter(function(x){ return x.id!==deletingSponsorId; });
+    closeModal('mDeleteSponsorConfirm'); deletingSponsorId=null;
+    renderSponsorsTable(); toast('Sponsor deleted','🗑️');
+  });
+
+  // ── EVENTS TABLE ──
+  function renderEventsTable() {
+    const q = document.getElementById('evSearch').value.toLowerCase();
+    const data = sponsorEvents.filter(function(e) {
+      return !q || (e.event_name||'').toLowerCase().includes(q) || (e.sponsors_involved||'').toLowerCase().includes(q);
+    });
+    document.getElementById('eventsTable').innerHTML = data.map(function(e) {
+      return '<tr>' +
+        '<td style="font-weight:500">'+e.event_name+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);white-space:nowrap">'+(e.event_date?fmtDate(e.event_date):'—')+'</td>' +
+        '<td style="font-size:13px">'+(e.sponsors_involved||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);max-width:200px">'+(e.notes||'—')+'</td>' +
+        '<td style="display:flex;gap:4px">' +
+          '<button class="btn btn-ghost btn-sm" data-action="editEvent" data-id="'+e.id+'">Edit</button>' +
+          '<button class="btn btn-danger btn-sm" data-action="deleteEvent" data-id="'+e.id+'">Delete</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="5"><div class="empty"><p>No events yet. Click "+ Add Event" to add one.</p></div></td></tr>';
+  }
+
+  document.getElementById('evSearch').addEventListener('input', renderEventsTable);
+
+  document.getElementById('eventsTable').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]'); if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'editEvent') openEditEvent(id);
+    if (btn.dataset.action === 'deleteEvent') {
+      deletingEventId = id;
+      openModal('mDeleteEventConfirm');
+    }
+  });
+
+  // ── ADD/EDIT EVENT ──
+  document.getElementById('addEventBtn').addEventListener('click', openAddEvent);
+  document.getElementById('closeEventForm').addEventListener('click', function(){ closeModal('mEventForm'); });
+  document.getElementById('cancelEventForm').addEventListener('click', function(){ closeModal('mEventForm'); });
+  document.getElementById('mEventForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mEventForm'); });
+  document.getElementById('eventFormSaveBtn').addEventListener('click', saveEvent);
+
+  function openAddEvent() {
+    editingEventId = null;
+    ['ev_name','ev_date','ev_sponsors','ev_notes'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('eventFormTitle').textContent = 'Add Event';
+    document.getElementById('eventFormSaveBtn').textContent = 'Save Event';
+    openModal('mEventForm');
+  }
+
+  function openEditEvent(id) {
+    const ev = sponsorEvents.find(function(x){ return x.id===id; }); if (!ev) return;
+    editingEventId = id;
+    document.getElementById('ev_name').value = ev.event_name||'';
+    document.getElementById('ev_date').value = ev.event_date||'';
+    document.getElementById('ev_sponsors').value = ev.sponsors_involved||'';
+    document.getElementById('ev_notes').value = ev.notes||'';
+    document.getElementById('eventFormTitle').textContent = 'Edit Event';
+    document.getElementById('eventFormSaveBtn').textContent = 'Save Changes';
+    openModal('mEventForm');
+  }
+
+  async function saveEvent() {
+    const name = document.getElementById('ev_name').value.trim();
+    if (!name){ toast('Event name is required','⚠️'); return; }
+    const btn = document.getElementById('eventFormSaveBtn');
+    btn.disabled=true; btn.textContent='Saving…';
+    const payload = {
+      event_name: name,
+      event_date: document.getElementById('ev_date').value||null,
+      sponsors_involved: document.getElementById('ev_sponsors').value.trim()||null,
+      notes: document.getElementById('ev_notes').value.trim()||null
+    };
+    if (!editingEventId) {
+      const {data:newE,error} = await sb.from('sponsor_events').insert(payload).select().single();
+      if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Event'; return; }
+      sponsorEvents.unshift(newE);
+      toast('Event added!','✅');
+    } else {
+      const {data:upd,error} = await sb.from('sponsor_events').update(payload).eq('id',editingEventId).select().single();
+      if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+      const idx = sponsorEvents.findIndex(function(x){ return x.id===editingEventId; });
+      if (idx!==-1) sponsorEvents[idx]=upd;
+      toast('Event updated','✅');
+    }
+    btn.disabled=false; btn.textContent=editingEventId?'Save Changes':'Save Event';
+    closeModal('mEventForm'); renderEventsTable();
+  }
+
+  document.getElementById('cancelDeleteEventBtn').addEventListener('click', function(){ closeModal('mDeleteEventConfirm'); });
+  document.getElementById('mDeleteEventConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteEventConfirm'); });
+  document.getElementById('confirmDeleteEventBtn').addEventListener('click', async function() {
+    if (!deletingEventId) return;
+    this.disabled=true; this.textContent='Deleting…';
+    const {error} = await sb.from('sponsor_events').delete().eq('id',deletingEventId);
+    this.disabled=false; this.textContent='Yes, Delete';
+    if (error){ toast(error.message,'❌'); return; }
+    sponsorEvents = sponsorEvents.filter(function(x){ return x.id!==deletingEventId; });
+    closeModal('mDeleteEventConfirm'); deletingEventId=null;
+    renderEventsTable(); toast('Event deleted','🗑️');
+  });
+
+  // ── CONTRIBUTIONS TABLE ──
+  function renderContribTable() {
+    const q = document.getElementById('ctSearch').value.toLowerCase();
+    const data = contributions.filter(function(c) {
+      return !q || (c.donor_name||'').toLowerCase().includes(q) || (c.contribution||'').toLowerCase().includes(q);
+    });
+    document.getElementById('contribTable').innerHTML = data.map(function(c) {
+      return '<tr>' +
+        '<td style="font-weight:500">'+c.donor_name+'</td>' +
+        '<td style="font-size:13px">'+c.contribution+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);white-space:nowrap">'+(c.date?fmtDate(c.date):'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);max-width:200px">'+(c.notes||'—')+'</td>' +
+        '<td style="display:flex;gap:4px">' +
+          '<button class="btn btn-ghost btn-sm" data-action="editContrib" data-id="'+c.id+'">Edit</button>' +
+          '<button class="btn btn-danger btn-sm" data-action="deleteContrib" data-id="'+c.id+'">Delete</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="5"><div class="empty"><p>No contributions yet. Click "+ Add Contribution" to add one.</p></div></td></tr>';
+  }
+
+  document.getElementById('ctSearch').addEventListener('input', renderContribTable);
+
+  document.getElementById('contribTable').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]'); if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'editContrib') openEditContrib(id);
+    if (btn.dataset.action === 'deleteContrib') {
+      deletingContribId = id;
+      openModal('mDeleteContribConfirm');
+    }
+  });
+
+  // ── ADD/EDIT CONTRIBUTION ──
+  document.getElementById('addContribBtn').addEventListener('click', openAddContrib);
+  document.getElementById('closeContribForm').addEventListener('click', function(){ closeModal('mContribForm'); });
+  document.getElementById('cancelContribForm').addEventListener('click', function(){ closeModal('mContribForm'); });
+  document.getElementById('mContribForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mContribForm'); });
+  document.getElementById('contribFormSaveBtn').addEventListener('click', saveContrib);
+
+  function openAddContrib() {
+    editingContribId = null;
+    ['ct_donor','ct_date','ct_contribution','ct_notes'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('contribFormTitle').textContent = 'Add Contribution';
+    document.getElementById('contribFormSaveBtn').textContent = 'Save Contribution';
+    openModal('mContribForm');
+  }
+
+  function openEditContrib(id) {
+    const c = contributions.find(function(x){ return x.id===id; }); if (!c) return;
+    editingContribId = id;
+    document.getElementById('ct_donor').value = c.donor_name||'';
+    document.getElementById('ct_date').value = c.date||'';
+    document.getElementById('ct_contribution').value = c.contribution||'';
+    document.getElementById('ct_notes').value = c.notes||'';
+    document.getElementById('contribFormTitle').textContent = 'Edit Contribution';
+    document.getElementById('contribFormSaveBtn').textContent = 'Save Changes';
+    openModal('mContribForm');
+  }
+
+  async function saveContrib() {
+    const donor = document.getElementById('ct_donor').value.trim();
+    const contribution = document.getElementById('ct_contribution').value.trim();
+    if (!donor || !contribution){ toast('Donor name and contribution are required','⚠️'); return; }
+    const btn = document.getElementById('contribFormSaveBtn');
+    btn.disabled=true; btn.textContent='Saving…';
+    const payload = {
+      donor_name: donor,
+      contribution: contribution,
+      date: document.getElementById('ct_date').value||null,
+      notes: document.getElementById('ct_notes').value.trim()||null
+    };
+    if (!editingContribId) {
+      const {data:newC,error} = await sb.from('sponsor_contributions').insert(payload).select().single();
+      if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Contribution'; return; }
+      contributions.unshift(newC);
+      toast('Contribution added!','✅');
+    } else {
+      const {data:upd,error} = await sb.from('sponsor_contributions').update(payload).eq('id',editingContribId).select().single();
+      if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+      const idx = contributions.findIndex(function(x){ return x.id===editingContribId; });
+      if (idx!==-1) contributions[idx]=upd;
+      toast('Contribution updated','✅');
+    }
+    btn.disabled=false; btn.textContent=editingContribId?'Save Changes':'Save Contribution';
+    closeModal('mContribForm'); renderContribTable();
+  }
+
+  document.getElementById('cancelDeleteContribBtn').addEventListener('click', function(){ closeModal('mDeleteContribConfirm'); });
+  document.getElementById('mDeleteContribConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteContribConfirm'); });
+  document.getElementById('confirmDeleteContribBtn').addEventListener('click', async function() {
+    if (!deletingContribId) return;
+    this.disabled=true; this.textContent='Deleting…';
+    const {error} = await sb.from('sponsor_contributions').delete().eq('id',deletingContribId);
+    this.disabled=false; this.textContent='Yes, Delete';
+    if (error){ toast(error.message,'❌'); return; }
+    contributions = contributions.filter(function(x){ return x.id!==deletingContribId; });
+    closeModal('mDeleteContribConfirm'); deletingContribId=null;
+    renderContribTable(); toast('Contribution deleted','🗑️');
+  });
+
+  // ── EXPORT SPONSORS TO EXCEL ──
+  document.getElementById('exportSponsorsBtn').addEventListener('click', function() {
+    // Build CSV with all data
+    const rows = [];
+
+    // Sponsors sheet data
+    rows.push(['=== SPONSORS ===']);
+    rows.push(['Company','Contact Person','Title','Relationship Status','Email','Contact Number','Address','Offers']);
+    sponsors.forEach(function(s) {
+      rows.push([s.company_name,s.contact_person||'',s.title||'',s.relationship_status||'',s.email||'',s.contact_number||'',s.company_address||'',s.offers||'']);
+    });
+
+    rows.push([]);
+    rows.push(['=== EVENTS ===']);
+    rows.push(['Event Name','Date','Sponsors Involved','Notes']);
+    sponsorEvents.forEach(function(e) {
+      rows.push([e.event_name,e.event_date?fmtDate(e.event_date):'',e.sponsors_involved||'',e.notes||'']);
+    });
+
+    rows.push([]);
+    rows.push(['=== CONTRIBUTIONS ===']);
+    rows.push(['Donor Name','Contribution','Date','Notes']);
+    contributions.forEach(function(c) {
+      rows.push([c.donor_name,c.contribution,c.date?fmtDate(c.date):'',c.notes||'']);
+    });
+
+    const csv = rows.map(function(r) {
+      return r.map(function(v){ return '"'+String(v!=null?v:'').replace(/"/g,'""')+'"'; }).join(',');
+    }).join('
+');
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'}));
+    a.download = 'VHO_Sponsors_'+new Date().toISOString().slice(0,10)+'.csv';
+    a.click();
+    toast('Sponsor data exported!','📥');
+  });
+
+  // ── CHANGE PASSWORD ──
+  document.getElementById('admSendResetBtn').addEventListener('click', async function(){
+    const newPassword=document.getElementById('adm_cp_email').value.trim();
+    const msgEl=document.getElementById('adm_cp_msg');
+    function showMsg(type,text){
+      msgEl.style.cssText=type==='err'
+        ?'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#fff0f2;border:1px solid #fcc;color:#e05065'
+        :'display:block;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:#f0fdf4;border:1px solid #86efac;color:#166534';
+      msgEl.textContent=text;
+    }
+    if(!newPassword||newPassword.length<6){ showMsg('err','Password must be at least 6 characters.'); return; }
+    this.disabled=true; this.textContent='Saving…'; msgEl.style.display='none';
+    const adminEmail=sessionStorage.getItem('admin_email');
+    const {error}=await sb.from('admins').update({password:newPassword}).eq('email',adminEmail);
+    this.disabled=false; this.textContent='Save New Password';
+    if(error){ showMsg('err',error.message); return; }
+    showMsg('ok','✅ Password changed! Use your new password next time you log in.');
+    document.getElementById('adm_cp_email').value='';
   });
 
   // ── BOOT ──
-  window.addEventListener('DOMContentLoaded', async function() {
-    if (sessionStorage.getItem('vho_role') !== 'admin') { window.location.href = 'index.html'; return; }
-    const adminName = sessionStorage.getItem('admin_name') || 'Admin User';
-    const adminEmail = sessionStorage.getItem('admin_email') || 'Administrator';
-    const adminIni = adminName.split(' ').map(function(w) { return w[0]; }).slice(0,2).join('').toUpperCase();
-    document.getElementById('adminAvatar').textContent = adminIni;
-    document.getElementById('adminName').textContent = adminName;
-    document.getElementById('adminEmail').textContent = adminEmail;
-    const firstName = adminName.split(' ')[0];
-    document.querySelector('#page-dashboard .page-header-left h1').textContent = 'Good day, ' + firstName + ' ♥';
-    document.getElementById('dashStats').innerHTML = '<div style="padding:20px;color:var(--muted)">Loading data…</div>';
+  window.addEventListener('DOMContentLoaded', async function(){
+    if(sessionStorage.getItem('vho_role')!=='admin'){ window.location.href='index.html'; return; }
+    const adminName=sessionStorage.getItem('admin_name')||'Admin User';
+    const adminEmail=sessionStorage.getItem('admin_email')||'Administrator';
+    const adminIni=adminName.split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    document.getElementById('adminAvatar').textContent=adminIni;
+    document.getElementById('adminName').textContent=adminName;
+    document.getElementById('adminEmail').textContent=adminEmail;
+    document.getElementById('dashGreet').textContent='Good day, '+adminName.split(' ')[0]+' ♥';
+    document.getElementById('dashStats').innerHTML='<div style="padding:20px;color:var(--muted)">Loading data…</div>';
     await loadAll();
+    await renderAnnouncements();
     renderDash();
   });
 
