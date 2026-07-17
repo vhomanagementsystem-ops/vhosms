@@ -150,13 +150,7 @@
         <div class="card">
           <div class="search-row">
             <input id="spSearch" placeholder="Search company, contact, email…">
-            <select id="spRelStatus">
-              <option value="">All Relationship Status</option>
-              <option>Active Partner</option>
-              <option>Potential Partner</option>
-              <option>Inactive</option>
-              <option>MOU Signed</option>
-            </select>
+            <input id="spRelStatus" placeholder="Filter by relationship status...">
           </div>
           <div class="table-wrap"><table><thead><tr><th>Company</th><th>Contact Person</th><th>Relationship</th><th>Email</th><th>Contact No.</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
         </div>
@@ -171,6 +165,9 @@
         <div class="card">
           <div class="search-row">
             <input id="evSearch" placeholder="Search event name or sponsor…">
+            <input id="evDateFrom" type="date" title="From date">
+            <input id="evDateTo" type="date" title="To date">
+            <button class="btn btn-ghost btn-sm" id="evClearDates">Clear Dates</button>
           </div>
           <div class="table-wrap"><table><thead><tr><th>Event Name</th><th>Date</th><th>Sponsors Involved</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="eventsTable"></tbody></table></div>
         </div>
@@ -185,6 +182,9 @@
         <div class="card">
           <div class="search-row">
             <input id="ctSearch" placeholder="Search donor or contribution…">
+            <input id="ctDateFrom" type="date" title="From date">
+            <input id="ctDateTo" type="date" title="To date">
+            <button class="btn btn-ghost btn-sm" id="ctClearDates">Clear Dates</button>
           </div>
           <div class="table-wrap"><table><thead><tr><th>Donor Name</th><th>Contribution</th><th>Date</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="contribTable"></tbody></table></div>
         </div>
@@ -353,13 +353,7 @@
   <div class="form-row">
     <div class="form-field"><label class="form-label">Company / Institution *</label><input class="form-input" id="sp_company" placeholder="e.g. ABC Corporation"></div>
     <div class="form-field"><label class="form-label">Relationship Status</label>
-      <select class="form-select" id="sp_relstatus">
-        <option value="">— Select —</option>
-        <option>Active Partner</option>
-        <option>Potential Partner</option>
-        <option>MOU Signed</option>
-        <option>Inactive</option>
-      </select>
+      <input class="form-input" id="sp_relstatus" placeholder="e.g. Active Partner, MOU Signed, Donor...">
     </div>
   </div>
   <div class="form-row">
@@ -904,11 +898,28 @@
   async function deleteAnnouncement(id){
     const ann=announcements.find(function(a){ return a.id===id; });
     if(!ann||!confirm('Delete "'+ann.title+'"? This cannot be undone.')) return;
+
+    // Delete related records first
     await sb.from('poll_responses').delete().eq('announcement_id',id);
     await sb.from('poll_options').delete().eq('announcement_id',id);
     await sb.from('attendance').delete().eq('announcement_id',id);
-    await sb.from('announcements').delete().eq('id',id);
+    const {error}=await sb.from('announcements').delete().eq('id',id);
+
+    if(error){ toast(error.message,'❌'); return; }
+
+    // Remove from local array immediately so UI updates right away
+    announcements=announcements.filter(function(a){ return a.id!==id; });
     toast('Announcement deleted','🗑️');
+
+    // Re-render from updated local array
+    const container=document.getElementById('announcementsList');
+    if(!announcements.length){
+      container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
+      document.getElementById('nb-announcements').style.display='none';
+      return;
+    }
+
+    // Full re-render to refresh counts
     renderAnnouncements();
   }
 
@@ -1111,8 +1122,9 @@
     }).join('')||'<tr><td colspan="4"><div class="empty"><p>No admins found.</p></div></td></tr>';
   }
 
-  document.getElementById('adminsTable').addEventListener('click', async function(e){
-    const btn=e.target.closest('[data-action]'); if(!btn) return;
+  // Use document-level delegation for adminsTable since it is dynamically rendered
+  document.addEventListener('click', async function(e){
+    const btn=e.target.closest('#adminsTable [data-action]'); if(!btn) return;
     const id=btn.dataset.id; const action=btn.dataset.action;
     if(action==='editAdmin') openEditAdmin(id);
     if(action==='deleteAdmin'){
@@ -1190,12 +1202,12 @@
   // ── SPONSORS TABLE ──
   function renderSponsorsTable() {
     const q = document.getElementById('spSearch').value.toLowerCase();
-    const rel = document.getElementById('spRelStatus').value;
+    const rel = document.getElementById('spRelStatus').value.toLowerCase();
     const data = sponsors.filter(function(s) {
       return (!q || (s.company_name||'').toLowerCase().includes(q) ||
         (s.contact_person||'').toLowerCase().includes(q) ||
         (s.email||'').toLowerCase().includes(q)) &&
-        (!rel || s.relationship_status === rel);
+        (!rel || (s.relationship_status||'').toLowerCase().includes(rel));
     });
     document.getElementById('sponsorsTable').innerHTML = data.map(function(s) {
       const offersShort = s.offers ? (s.offers.length > 60 ? s.offers.slice(0,60)+'...' : s.offers) : '—';
@@ -1216,7 +1228,6 @@
 
   ['spSearch','spRelStatus'].forEach(function(id) {
     document.getElementById(id).addEventListener('input', renderSponsorsTable);
-    document.getElementById(id).addEventListener('change', renderSponsorsTable);
   });
 
   document.getElementById('sponsorsTable').addEventListener('click', function(e) {
@@ -1353,8 +1364,13 @@
   // ── EVENTS TABLE ──
   function renderEventsTable() {
     const q = document.getElementById('evSearch').value.toLowerCase();
+    const fromDate = document.getElementById('evDateFrom').value;
+    const toDate = document.getElementById('evDateTo').value;
     const data = sponsorEvents.filter(function(e) {
-      return !q || (e.event_name||'').toLowerCase().includes(q) || (e.sponsors_involved||'').toLowerCase().includes(q);
+      const matchQ = !q || (e.event_name||'').toLowerCase().includes(q) || (e.sponsors_involved||'').toLowerCase().includes(q);
+      const matchFrom = !fromDate || (e.event_date && e.event_date >= fromDate);
+      const matchTo = !toDate || (e.event_date && e.event_date <= toDate);
+      return matchQ && matchFrom && matchTo;
     });
     document.getElementById('eventsTable').innerHTML = data.map(function(e) {
       return '<tr>' +
@@ -1370,6 +1386,13 @@
   }
 
   document.getElementById('evSearch').addEventListener('input', renderEventsTable);
+  document.getElementById('evDateFrom').addEventListener('change', renderEventsTable);
+  document.getElementById('evDateTo').addEventListener('change', renderEventsTable);
+  document.getElementById('evClearDates').addEventListener('click', function(){
+    document.getElementById('evDateFrom').value='';
+    document.getElementById('evDateTo').value='';
+    renderEventsTable();
+  });
 
   document.getElementById('eventsTable').addEventListener('click', function(e) {
     const btn = e.target.closest('[data-action]'); if (!btn) return;
@@ -1451,8 +1474,13 @@
   // ── CONTRIBUTIONS TABLE ──
   function renderContribTable() {
     const q = document.getElementById('ctSearch').value.toLowerCase();
+    const fromDate = document.getElementById('ctDateFrom').value;
+    const toDate = document.getElementById('ctDateTo').value;
     const data = contributions.filter(function(c) {
-      return !q || (c.donor_name||'').toLowerCase().includes(q) || (c.contribution||'').toLowerCase().includes(q);
+      const matchQ = !q || (c.donor_name||'').toLowerCase().includes(q) || (c.contribution||'').toLowerCase().includes(q);
+      const matchFrom = !fromDate || (c.date && c.date >= fromDate);
+      const matchTo = !toDate || (c.date && c.date <= toDate);
+      return matchQ && matchFrom && matchTo;
     });
     document.getElementById('contribTable').innerHTML = data.map(function(c) {
       return '<tr>' +
@@ -1468,6 +1496,13 @@
   }
 
   document.getElementById('ctSearch').addEventListener('input', renderContribTable);
+  document.getElementById('ctDateFrom').addEventListener('change', renderContribTable);
+  document.getElementById('ctDateTo').addEventListener('change', renderContribTable);
+  document.getElementById('ctClearDates').addEventListener('click', function(){
+    document.getElementById('ctDateFrom').value='';
+    document.getElementById('ctDateTo').value='';
+    renderContribTable();
+  });
 
   document.getElementById('contribTable').addEventListener('click', function(e) {
     const btn = e.target.closest('[data-action]'); if (!btn) return;
