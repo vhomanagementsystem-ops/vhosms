@@ -7,8 +7,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="shared.css">
 <style>
-.sponsor-tab{flex:1;padding:8px 14px;border:none;border-radius:8px;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);transition:all .2s;white-space:nowrap}
-.sponsor-tab.on{background:#fff;color:var(--blue2);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.sponsor-tab{flex:1;padding:9px 16px;border:none;border-radius:9px;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);transition:all .2s;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px}
+.sponsor-tab.on{background:#fff;color:var(--blue2);font-weight:600;box-shadow:0 2px 8px rgba(74,90,138,.15)}
+.sponsor-tab:hover:not(.on){background:rgba(255,255,255,.6);color:var(--text)}
+.stat-card.teal{background:linear-gradient(135deg,#0d9488,#0891b2);color:#fff}
+.stat-card.teal .stat-label,.stat-card.teal .stat-sub{color:rgba(255,255,255,.8)}
+.stat-card.teal .stat-val{color:#fff}
+.sponsor-stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.sponsor-stat-card{background:#fff;border-radius:14px;padding:16px 18px;border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sponsor-stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sponsor-stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.sponsor-stat-val{font-size:22px;font-weight:700;color:var(--text)}
 .dash-two{display:grid;grid-template-columns:1fr 320px;gap:16px}
 @media(max-width:900px){.dash-two{grid-template-columns:1fr}}
 .breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f4f4f8}
@@ -132,14 +141,36 @@
     <div id="page-sponsors" class="page" style="display:none">
       <div class="page-header">
         <div class="page-header-left"><h1>Sponsor Database</h1><p>Manage VHO sponsors, partners, events and contributions</p></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-ghost" id="exportSponsorsBtn">📥 Export to Excel</button>
-          <button class="btn btn-primary" id="addSponsorBtn">+ Add Sponsor</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="sponsorPageActions">
+          <button class="btn btn-ghost" id="exportSponsorsBtn" style="display:none">📥 Export to Excel</button>
+          <button class="btn btn-primary" id="addSponsorBtn" style="display:none">+ Add Sponsor</button>
+          <button class="btn btn-primary" id="addEventBtnTop" style="display:none">+ Add Event</button>
+          <button class="btn btn-primary" id="addContribBtnTop" style="display:none">+ Add Contribution</button>
+        </div>
+      </div>
+
+      <!-- Sponsor Stats -->
+      <div class="sponsor-stat-row" id="sponsorStatsRow">
+        <div class="sponsor-stat-card">
+          <div class="sponsor-stat-icon" style="background:#ede9fe">🏢</div>
+          <div><div class="sponsor-stat-label">Total Sponsors</div><div class="sponsor-stat-val" id="statTotalSponsors">0</div></div>
+        </div>
+        <div class="sponsor-stat-card">
+          <div class="sponsor-stat-icon" style="background:#dcfce7">✅</div>
+          <div><div class="sponsor-stat-label">Active Partners</div><div class="sponsor-stat-val" id="statActiveSponsors">0</div></div>
+        </div>
+        <div class="sponsor-stat-card">
+          <div class="sponsor-stat-icon" style="background:#fef3c7">📅</div>
+          <div><div class="sponsor-stat-label">Events Tracked</div><div class="sponsor-stat-val" id="statTotalEvents">0</div></div>
+        </div>
+        <div class="sponsor-stat-card">
+          <div class="sponsor-stat-icon" style="background:#fce7f3">💰</div>
+          <div><div class="sponsor-stat-label">Contributions</div><div class="sponsor-stat-val" id="statTotalContribs">0</div></div>
         </div>
       </div>
 
       <!-- Sub tabs -->
-      <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:18px;width:fit-content">
+      <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:12px;padding:4px;margin-bottom:18px;width:fit-content">
         <button class="sponsor-tab on" id="stab-sponsors" data-stab="sponsors">🏢 Sponsors</button>
         <button class="sponsor-tab" id="stab-events" data-stab="events">📅 Event Tracker</button>
         <button class="sponsor-tab" id="stab-contributions" data-stab="contributions">💰 Contributions</button>
@@ -158,16 +189,13 @@
 
       <!-- EVENT TRACKER -->
       <div id="spanel-events" style="display:none">
-        <div class="page-header" style="padding:0 0 14px">
-          <div></div>
-          <button class="btn btn-primary" id="addEventBtn">+ Add Event</button>
-        </div>
         <div class="card">
           <div class="search-row">
             <input id="evSearch" placeholder="Search event name or sponsor…">
-            <input id="evDateFrom" type="date" title="From date">
-            <input id="evDateTo" type="date" title="To date">
-            <button class="btn btn-ghost btn-sm" id="evClearDates">Clear Dates</button>
+            <select id="evSort" style="max-width:160px">
+              <option value="desc">Date: Newest First</option>
+              <option value="asc">Date: Oldest First</option>
+            </select>
           </div>
           <div class="table-wrap"><table><thead><tr><th>Event Name</th><th>Date</th><th>Sponsors Involved</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="eventsTable"></tbody></table></div>
         </div>
@@ -175,16 +203,13 @@
 
       <!-- CONTRIBUTIONS TRACKER -->
       <div id="spanel-contributions" style="display:none">
-        <div class="page-header" style="padding:0 0 14px">
-          <div></div>
-          <button class="btn btn-primary" id="addContribBtn">+ Add Contribution</button>
-        </div>
         <div class="card">
           <div class="search-row">
             <input id="ctSearch" placeholder="Search donor or contribution…">
-            <input id="ctDateFrom" type="date" title="From date">
-            <input id="ctDateTo" type="date" title="To date">
-            <button class="btn btn-ghost btn-sm" id="ctClearDates">Clear Dates</button>
+            <select id="ctSort" style="max-width:160px">
+              <option value="desc">Date: Newest First</option>
+              <option value="asc">Date: Oldest First</option>
+            </select>
           </div>
           <div class="table-wrap"><table><thead><tr><th>Donor Name</th><th>Contribution</th><th>Date</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="contribTable"></tbody></table></div>
         </div>
@@ -449,6 +474,17 @@
   </div>
 </div></div>
 
+<!-- Delete Announcement Confirmation -->
+<div class="modal-bg" id="mDeleteAnnouncementConfirm">
+<div class="modal" style="max-width:420px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Announcement</h2>
+  <p class="modal-sub">Are you sure you want to delete <strong id="deleteAnnouncementName"></strong>? All poll responses and attendance records for this announcement will also be deleted. This <strong>cannot be undone.</strong></p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteAnnouncementBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteAnnouncementBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
 <!-- Delete Scholar Confirmation -->
 <div class="modal-bg" id="mDeleteConfirm">
 <div class="modal" style="max-width:400px">
@@ -565,7 +601,7 @@
     if (page==='scholars') renderScholarsTable();
     if (page==='announcements') renderAnnouncements();
     if (page==='admins') renderAdmins();
-    if (page==='sponsors') renderSponsors();
+    if (page==='sponsors') { renderSponsors(); updateSponsorTabButtons(); }
     closeSidebar();
   }
 
@@ -895,33 +931,46 @@
     renderAnnouncements();
   }
 
-  async function deleteAnnouncement(id){
-    const ann=announcements.find(function(a){ return a.id===id; });
-    if(!ann||!confirm('Delete "'+ann.title+'"? This cannot be undone.')) return;
+  let deletingAnnouncementId = null;
 
-    // Delete related records first
+  function deleteAnnouncement(id){
+    const ann=announcements.find(function(a){ return a.id===id; });
+    if(!ann) return;
+    deletingAnnouncementId = id;
+    document.getElementById('deleteAnnouncementName').textContent = ann.title;
+    openModal('mDeleteAnnouncementConfirm');
+  }
+
+  document.getElementById('cancelDeleteAnnouncementBtn').addEventListener('click', function(){ closeModal('mDeleteAnnouncementConfirm'); });
+  document.getElementById('mDeleteAnnouncementConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAnnouncementConfirm'); });
+  document.getElementById('confirmDeleteAnnouncementBtn').addEventListener('click', async function(){
+    if(!deletingAnnouncementId) return;
+    const id = deletingAnnouncementId;
+    this.disabled=true; this.textContent='Deleting…';
+
     await sb.from('poll_responses').delete().eq('announcement_id',id);
     await sb.from('poll_options').delete().eq('announcement_id',id);
     await sb.from('attendance').delete().eq('announcement_id',id);
     const {error}=await sb.from('announcements').delete().eq('id',id);
 
+    this.disabled=false; this.textContent='Yes, Delete';
     if(error){ toast(error.message,'❌'); return; }
 
-    // Remove from local array immediately so UI updates right away
+    closeModal('mDeleteAnnouncementConfirm');
+    deletingAnnouncementId=null;
+
+    // Remove from local array so all admins see it gone immediately
     announcements=announcements.filter(function(a){ return a.id!==id; });
     toast('Announcement deleted','🗑️');
 
-    // Re-render from updated local array
     const container=document.getElementById('announcementsList');
     if(!announcements.length){
       container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
       document.getElementById('nb-announcements').style.display='none';
       return;
     }
-
-    // Full re-render to refresh counts
     renderAnnouncements();
-  }
+  });
 
   async function renderAnnouncements(){
     const container=document.getElementById('announcementsList');
@@ -1169,6 +1218,13 @@
   let currentSponsorTab = 'sponsors';
 
   // Sub-tab switching
+  function updateSponsorTabButtons() {
+    document.getElementById('exportSponsorsBtn').style.display = currentSponsorTab === 'sponsors' ? '' : 'none';
+    document.getElementById('addSponsorBtn').style.display = currentSponsorTab === 'sponsors' ? '' : 'none';
+    document.getElementById('addEventBtnTop').style.display = currentSponsorTab === 'events' ? '' : 'none';
+    document.getElementById('addContribBtnTop').style.display = currentSponsorTab === 'contributions' ? '' : 'none';
+  }
+
   document.querySelectorAll('.sponsor-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       currentSponsorTab = this.dataset.stab;
@@ -1177,6 +1233,7 @@
       ['sponsors','events','contributions'].forEach(function(p){
         document.getElementById('spanel-'+p).style.display = p === currentSponsorTab ? 'block' : 'none';
       });
+      updateSponsorTabButtons();
     });
   });
 
@@ -1197,6 +1254,19 @@
     renderSponsorsTable();
     renderEventsTable();
     renderContribTable();
+    updateSponsorStats();
+  }
+
+  function updateSponsorStats() {
+    document.getElementById('statTotalSponsors').textContent = sponsors.length;
+    const active = sponsors.filter(function(s){
+      return (s.relationship_status||'').toLowerCase().includes('active') ||
+             (s.relationship_status||'').toLowerCase().includes('partner') ||
+             (s.relationship_status||'').toLowerCase().includes('mou');
+    }).length;
+    document.getElementById('statActiveSponsors').textContent = active;
+    document.getElementById('statTotalEvents').textContent = sponsorEvents.length;
+    document.getElementById('statTotalContribs').textContent = contributions.length;
   }
 
   // ── SPONSORS TABLE ──
@@ -1282,6 +1352,8 @@
 
   // ── ADD/EDIT SPONSOR ──
   document.getElementById('addSponsorBtn').addEventListener('click', openAddSponsor);
+  document.getElementById('addEventBtnTop').addEventListener('click', openAddEvent);
+  document.getElementById('addContribBtnTop').addEventListener('click', openAddContrib);
   document.getElementById('closeSponsorForm').addEventListener('click', function(){ closeModal('mSponsorForm'); });
   document.getElementById('cancelSponsorForm').addEventListener('click', function(){ closeModal('mSponsorForm'); });
   document.getElementById('mSponsorForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mSponsorForm'); });
@@ -1342,7 +1414,7 @@
     }
     btn.disabled=false; btn.textContent=editingSponsorId?'Save Changes':'Add Sponsor';
     closeModal('mSponsorForm');
-    renderSponsorsTable();
+    renderSponsorsTable(); updateSponsorStats();
   }
 
   // ── DELETE SPONSOR ──
@@ -1358,19 +1430,20 @@
     if (error){ toast(error.message,'❌'); return; }
     sponsors = sponsors.filter(function(x){ return x.id!==deletingSponsorId; });
     closeModal('mDeleteSponsorConfirm'); deletingSponsorId=null;
-    renderSponsorsTable(); toast('Sponsor deleted','🗑️');
+    renderSponsorsTable(); updateSponsorStats(); toast('Sponsor deleted','🗑️');
   });
 
   // ── EVENTS TABLE ──
   function renderEventsTable() {
     const q = document.getElementById('evSearch').value.toLowerCase();
-    const fromDate = document.getElementById('evDateFrom').value;
-    const toDate = document.getElementById('evDateTo').value;
-    const data = sponsorEvents.filter(function(e) {
-      const matchQ = !q || (e.event_name||'').toLowerCase().includes(q) || (e.sponsors_involved||'').toLowerCase().includes(q);
-      const matchFrom = !fromDate || (e.event_date && e.event_date >= fromDate);
-      const matchTo = !toDate || (e.event_date && e.event_date <= toDate);
-      return matchQ && matchFrom && matchTo;
+    const sort = document.getElementById('evSort').value;
+    let data = sponsorEvents.filter(function(e) {
+      return !q || (e.event_name||'').toLowerCase().includes(q) || (e.sponsors_involved||'').toLowerCase().includes(q);
+    });
+    data = data.slice().sort(function(a, b) {
+      const da = a.event_date || '';
+      const db = b.event_date || '';
+      return sort === 'asc' ? da.localeCompare(db) : db.localeCompare(da);
     });
     document.getElementById('eventsTable').innerHTML = data.map(function(e) {
       return '<tr>' +
@@ -1386,13 +1459,7 @@
   }
 
   document.getElementById('evSearch').addEventListener('input', renderEventsTable);
-  document.getElementById('evDateFrom').addEventListener('change', renderEventsTable);
-  document.getElementById('evDateTo').addEventListener('change', renderEventsTable);
-  document.getElementById('evClearDates').addEventListener('click', function(){
-    document.getElementById('evDateFrom').value='';
-    document.getElementById('evDateTo').value='';
-    renderEventsTable();
-  });
+  document.getElementById('evSort').addEventListener('change', renderEventsTable);
 
   document.getElementById('eventsTable').addEventListener('click', function(e) {
     const btn = e.target.closest('[data-action]'); if (!btn) return;
@@ -1405,7 +1472,7 @@
   });
 
   // ── ADD/EDIT EVENT ──
-  document.getElementById('addEventBtn').addEventListener('click', openAddEvent);
+  // addEventBtnTop wired above
   document.getElementById('closeEventForm').addEventListener('click', function(){ closeModal('mEventForm'); });
   document.getElementById('cancelEventForm').addEventListener('click', function(){ closeModal('mEventForm'); });
   document.getElementById('mEventForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mEventForm'); });
@@ -1455,7 +1522,7 @@
       toast('Event updated','✅');
     }
     btn.disabled=false; btn.textContent=editingEventId?'Save Changes':'Save Event';
-    closeModal('mEventForm'); renderEventsTable();
+    closeModal('mEventForm'); renderEventsTable(); updateSponsorStats();
   }
 
   document.getElementById('cancelDeleteEventBtn').addEventListener('click', function(){ closeModal('mDeleteEventConfirm'); });
@@ -1468,19 +1535,20 @@
     if (error){ toast(error.message,'❌'); return; }
     sponsorEvents = sponsorEvents.filter(function(x){ return x.id!==deletingEventId; });
     closeModal('mDeleteEventConfirm'); deletingEventId=null;
-    renderEventsTable(); toast('Event deleted','🗑️');
+    renderEventsTable(); updateSponsorStats(); toast('Event deleted','🗑️');
   });
 
   // ── CONTRIBUTIONS TABLE ──
   function renderContribTable() {
     const q = document.getElementById('ctSearch').value.toLowerCase();
-    const fromDate = document.getElementById('ctDateFrom').value;
-    const toDate = document.getElementById('ctDateTo').value;
-    const data = contributions.filter(function(c) {
-      const matchQ = !q || (c.donor_name||'').toLowerCase().includes(q) || (c.contribution||'').toLowerCase().includes(q);
-      const matchFrom = !fromDate || (c.date && c.date >= fromDate);
-      const matchTo = !toDate || (c.date && c.date <= toDate);
-      return matchQ && matchFrom && matchTo;
+    const sort = document.getElementById('ctSort').value;
+    let data = contributions.filter(function(c) {
+      return !q || (c.donor_name||'').toLowerCase().includes(q) || (c.contribution||'').toLowerCase().includes(q);
+    });
+    data = data.slice().sort(function(a, b) {
+      const da = a.date || '';
+      const db = b.date || '';
+      return sort === 'asc' ? da.localeCompare(db) : db.localeCompare(da);
     });
     document.getElementById('contribTable').innerHTML = data.map(function(c) {
       return '<tr>' +
@@ -1496,13 +1564,7 @@
   }
 
   document.getElementById('ctSearch').addEventListener('input', renderContribTable);
-  document.getElementById('ctDateFrom').addEventListener('change', renderContribTable);
-  document.getElementById('ctDateTo').addEventListener('change', renderContribTable);
-  document.getElementById('ctClearDates').addEventListener('click', function(){
-    document.getElementById('ctDateFrom').value='';
-    document.getElementById('ctDateTo').value='';
-    renderContribTable();
-  });
+  document.getElementById('ctSort').addEventListener('change', renderContribTable);
 
   document.getElementById('contribTable').addEventListener('click', function(e) {
     const btn = e.target.closest('[data-action]'); if (!btn) return;
@@ -1515,7 +1577,7 @@
   });
 
   // ── ADD/EDIT CONTRIBUTION ──
-  document.getElementById('addContribBtn').addEventListener('click', openAddContrib);
+  // addContribBtnTop wired above
   document.getElementById('closeContribForm').addEventListener('click', function(){ closeModal('mContribForm'); });
   document.getElementById('cancelContribForm').addEventListener('click', function(){ closeModal('mContribForm'); });
   document.getElementById('mContribForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mContribForm'); });
@@ -1566,7 +1628,7 @@
       toast('Contribution updated','✅');
     }
     btn.disabled=false; btn.textContent=editingContribId?'Save Changes':'Save Contribution';
-    closeModal('mContribForm'); renderContribTable();
+    closeModal('mContribForm'); renderContribTable(); updateSponsorStats();
   }
 
   document.getElementById('cancelDeleteContribBtn').addEventListener('click', function(){ closeModal('mDeleteContribConfirm'); });
@@ -1579,7 +1641,7 @@
     if (error){ toast(error.message,'❌'); return; }
     contributions = contributions.filter(function(x){ return x.id!==deletingContribId; });
     closeModal('mDeleteContribConfirm'); deletingContribId=null;
-    renderContribTable(); toast('Contribution deleted','🗑️');
+    renderContribTable(); updateSponsorStats(); toast('Contribution deleted','🗑️');
   });
 
   // ── EXPORT SPONSORS TO EXCEL ──
