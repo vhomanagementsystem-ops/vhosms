@@ -852,237 +852,242 @@
 
   // ── ANNOUNCEMENTS ──
   document.getElementById('addAnnouncementBtn').addEventListener('click', openAddAnnouncement);
-  document.getElementById('closeAnnouncementForm').addEventListener('click', function(){ closeModal('mAnnouncementForm'); });
-  document.getElementById('cancelAnnouncementForm').addEventListener('click', function(){ closeModal('mAnnouncementForm'); });
-  document.getElementById('mAnnouncementForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mAnnouncementForm'); });
+  document.getElementById('closeAnnouncementForm').addEventListener('click', function() { closeModal('mAnnouncementForm'); });
+  document.getElementById('cancelAnnouncementForm').addEventListener('click', function() { closeModal('mAnnouncementForm'); });
+  document.getElementById('mAnnouncementForm').addEventListener('click', function(e) { if(e.target===this) closeModal('mAnnouncementForm'); });
   document.getElementById('saveAnnouncementBtn').addEventListener('click', saveAnnouncement);
-  document.getElementById('closePollResults').addEventListener('click', function(){ closeModal('mPollResults'); });
-  document.getElementById('closePollResultsBtn').addEventListener('click', function(){ closeModal('mPollResults'); });
-  document.getElementById('mPollResults').addEventListener('click', function(e){ if(e.target===this) closeModal('mPollResults'); });
-  document.getElementById('closeAttendance').addEventListener('click', function(){ closeModal('mAttendance'); });
-  document.getElementById('closeAttendanceBtn').addEventListener('click', function(){ closeModal('mAttendance'); });
-  document.getElementById('mAttendance').addEventListener('click', function(e){ if(e.target===this) closeModal('mAttendance'); });
+  document.getElementById('closePollResults').addEventListener('click', function() { closeModal('mPollResults'); });
+  document.getElementById('closePollResultsBtn').addEventListener('click', function() { closeModal('mPollResults'); });
+  document.getElementById('mPollResults').addEventListener('click', function(e) { if(e.target===this) closeModal('mPollResults'); });
+  document.getElementById('closeAttendance').addEventListener('click', function() { closeModal('mAttendance'); });
+  document.getElementById('closeAttendanceBtn').addEventListener('click', function() { closeModal('mAttendance'); });
+  document.getElementById('mAttendance').addEventListener('click', function(e) { if(e.target===this) closeModal('mAttendance'); });
 
-  function openAddAnnouncement(){
-    editingAnnouncementId=null;
-    ['ann_title','ann_desc','ann_date','ann_location','ann_poll_question','ann_poll_options'].forEach(function(id){ document.getElementById(id).value=''; });
-    document.getElementById('announcementFormTitle').textContent='New Announcement';
-    document.getElementById('saveAnnouncementBtn').textContent='Post Announcement';
+  function openAddAnnouncement() {
+    editingAnnouncementId = null;
+    document.getElementById('ann_title').value = '';
+    document.getElementById('ann_desc').value = '';
+    document.getElementById('ann_date').value = '';
+    document.getElementById('ann_location').value = '';
+    document.getElementById('ann_poll_question').value = '';
+    document.getElementById('ann_poll_options').value = '';
+    document.getElementById('announcementFormTitle').textContent = 'New Announcement';
+    document.getElementById('saveAnnouncementBtn').textContent = 'Post Announcement';
     openModal('mAnnouncementForm');
   }
 
-  async function openEditAnnouncement(id){
-    const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
-    editingAnnouncementId=id;
-    document.getElementById('ann_title').value=ann.title||'';
-    document.getElementById('ann_desc').value=ann.description||'';
-    document.getElementById('ann_date').value=ann.event_date||'';
-    document.getElementById('ann_location').value=ann.event_location||'';
-    document.getElementById('ann_poll_question').value=ann.poll_question||'';
-    // Load existing options WITHOUT removing existing responses
-    const {data:opts}=await sb.from('poll_options').select('*').eq('announcement_id',id);
-    document.getElementById('ann_poll_options').value=opts?opts.map(function(o){ return o.option_text; }).join('\n'):'';
-    document.getElementById('announcementFormTitle').textContent='Edit Announcement';
-    document.getElementById('saveAnnouncementBtn').textContent='Save Changes';
+  async function openEditAnnouncement(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann) return;
+    editingAnnouncementId = id;
+    document.getElementById('ann_title').value = ann.title || '';
+    document.getElementById('ann_desc').value = ann.description || '';
+    document.getElementById('ann_date').value = ann.event_date || '';
+    document.getElementById('ann_location').value = ann.event_location || '';
+    document.getElementById('ann_poll_question').value = ann.poll_question || '';
+    const { data: opts } = await sb.from('poll_options').select('*').eq('announcement_id', id);
+    document.getElementById('ann_poll_options').value = opts ? opts.map(function(o) { return o.option_text; }).join('\n') : '';
+    document.getElementById('announcementFormTitle').textContent = 'Edit Announcement';
+    document.getElementById('saveAnnouncementBtn').textContent = 'Save Changes';
     openModal('mAnnouncementForm');
   }
 
-  async function saveAnnouncement(){
-    const title=document.getElementById('ann_title').value.trim();
-    if(!title){ toast('Title is required','⚠️'); return; }
-    const btn=document.getElementById('saveAnnouncementBtn');
-    btn.disabled=true; btn.textContent='Saving…';
-    const payload={
-      title:title,
-      description:document.getElementById('ann_desc').value.trim()||null,
-      event_date:document.getElementById('ann_date').value||null,
-      event_location:document.getElementById('ann_location').value.trim()||null,
-      poll_question:document.getElementById('ann_poll_question').value.trim()||null,
-      updated_at:new Date().toISOString()
+  async function saveAnnouncement() {
+    const title = document.getElementById('ann_title').value.trim();
+    if (!title) { toast('Title is required', '⚠️'); return; }
+    const btn = document.getElementById('saveAnnouncementBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const payload = {
+      title: title,
+      description: document.getElementById('ann_desc').value.trim() || null,
+      event_date: document.getElementById('ann_date').value || null,
+      event_location: document.getElementById('ann_location').value.trim() || null,
+      poll_question: document.getElementById('ann_poll_question').value.trim() || null,
+      updated_at: new Date().toISOString()
     };
-    const optionsText=document.getElementById('ann_poll_options').value.trim();
-    const optionLines=optionsText?optionsText.split('\n').map(function(s){ return s.trim(); }).filter(Boolean):[];
-    let annId=editingAnnouncementId;
 
-    if(!editingAnnouncementId){
-      const {data:newAnn,error}=await sb.from('announcements').insert(payload).select().single();
-      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Post Announcement'; return; }
-      annId=newAnn.id;
-      toast('Announcement posted!','📢');
+    const optionsText = document.getElementById('ann_poll_options').value.trim();
+    const optionLines = optionsText ? optionsText.split('\n').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+    let annId = editingAnnouncementId;
+
+    if (!editingAnnouncementId) {
+      const { data: newAnn, error } = await sb.from('announcements').insert(payload).select().single();
+      if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Post Announcement'; return; }
+      annId = newAnn.id;
+      toast('Announcement posted!', '📢');
     } else {
-      const {error}=await sb.from('announcements').update(payload).eq('id',annId);
-      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
-      // When editing: only add NEW options, do NOT delete old ones (preserves existing responses)
-      const {data:existingOpts}=await sb.from('poll_options').select('option_text').eq('announcement_id',annId);
-      const existingTexts=existingOpts?existingOpts.map(function(o){ return o.option_text; }):[];
-      const newOpts=optionLines.filter(function(opt){ return !existingTexts.includes(opt); });
-      if(newOpts.length>0){
-        await sb.from('poll_options').insert(newOpts.map(function(opt){ return {announcement_id:annId,option_text:opt}; }));
-      }
-      toast('Announcement updated!','✅');
+      const { error } = await sb.from('announcements').update(payload).eq('id', annId);
+      if (error) { toast(error.message, '❌'); btn.disabled = false; btn.textContent = 'Save Changes'; return; }
+      await sb.from('poll_options').delete().eq('announcement_id', annId);
+      toast('Announcement updated!', '✅');
     }
 
-    if(!editingAnnouncementId && optionLines.length>0){
-      await sb.from('poll_options').insert(optionLines.map(function(opt){ return {announcement_id:annId,option_text:opt}; }));
+    if (optionLines.length > 0) {
+      await sb.from('poll_options').insert(optionLines.map(function(opt) { return { announcement_id: annId, option_text: opt }; }));
     }
 
-    btn.disabled=false; btn.textContent=editingAnnouncementId?'Save Changes':'Post Announcement';
+    btn.disabled = false;
+    btn.textContent = editingAnnouncementId ? 'Save Changes' : 'Post Announcement';
     closeModal('mAnnouncementForm');
     renderAnnouncements();
   }
 
-  let deletingAnnouncementId = null;
-
-  function deleteAnnouncement(id){
-    const ann=announcements.find(function(a){ return a.id===id; });
-    if(!ann) return;
-    deletingAnnouncementId = id;
-    document.getElementById('deleteAnnouncementName').textContent = ann.title;
-    openModal('mDeleteAnnouncementConfirm');
+  async function deleteAnnouncement(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann || !confirm('Delete "' + ann.title + '"? This cannot be undone.')) return;
+    await sb.from('poll_responses').delete().eq('announcement_id', id);
+    await sb.from('poll_options').delete().eq('announcement_id', id);
+    await sb.from('attendance').delete().eq('announcement_id', id);
+    await sb.from('announcements').delete().eq('id', id);
+    toast('Announcement deleted', '🗑️');
+    renderAnnouncements();
   }
 
-  document.getElementById('cancelDeleteAnnouncementBtn').addEventListener('click', function(){ closeModal('mDeleteAnnouncementConfirm'); });
-  document.getElementById('mDeleteAnnouncementConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAnnouncementConfirm'); });
-  document.getElementById('confirmDeleteAnnouncementBtn').addEventListener('click', async function(){
-    if(!deletingAnnouncementId) return;
-    const id = deletingAnnouncementId;
-    this.disabled=true; this.textContent='Deleting…';
+  async function renderAnnouncements() {
+    const container = document.getElementById('announcementsList');
+    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
 
-    await sb.from('poll_responses').delete().eq('announcement_id',id);
-    await sb.from('poll_options').delete().eq('announcement_id',id);
-    await sb.from('attendance').delete().eq('announcement_id',id);
-    const {error}=await sb.from('announcements').delete().eq('id',id);
-
-    this.disabled=false; this.textContent='Yes, Delete';
-    if(error){ toast(error.message,'❌'); return; }
-
-    closeModal('mDeleteAnnouncementConfirm');
-    deletingAnnouncementId=null;
-
-    // Remove from local array so all admins see it gone immediately
-    announcements=announcements.filter(function(a){ return a.id!==id; });
-    toast('Announcement deleted','🗑️');
-
-    const container=document.getElementById('announcementsList');
-    if(!announcements.length){
-      container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
-      document.getElementById('nb-announcements').style.display='none';
+    const { data: anns, error } = await sb.from('announcements').select('*').order('created_at', { ascending: false });
+    if (error || !anns || !anns.length) {
+      container.innerHTML = '<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
+      document.getElementById('nb-announcements').style.display = 'none';
       return;
     }
-    renderAnnouncements();
-  });
+    announcements = anns;
 
-  async function renderAnnouncements(){
-    const container=document.getElementById('announcementsList');
-    container.innerHTML='<div class="empty"><p>Loading...</p></div>';
-    const {data:anns,error}=await sb.from('announcements').select('*').order('created_at',{ascending:false});
-    if(error||!anns||!anns.length){
-      container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet. Click "+ New Announcement" to post one.</p></div></div>';
-      document.getElementById('nb-announcements').style.display='none';
-      announcements=[];
-      return;
-    }
-    announcements=anns;
+    const htmlParts = [];
+    for (const ann of anns) {
+      const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', ann.id);
+      const { data: responses } = await sb.from('poll_responses').select('*').eq('announcement_id', ann.id);
+      const { data: attended } = await sb.from('attendance').select('*').eq('announcement_id', ann.id).eq('attended', true);
+      const totalResponses = responses ? responses.length : 0;
+      const attendedCount = attended ? attended.length : 0;
+      const hasOptions = options && options.length > 0;
+      const eventDate = ann.event_date ? new Date(ann.event_date + 'T00:00:00').toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}) : null;
 
-    const htmlParts=[];
-    for(const ann of anns){
-      const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',ann.id);
-      const {data:responses}=await sb.from('poll_responses').select('*').eq('announcement_id',ann.id);
-      const {data:allAtt}=await sb.from('attendance').select('*').eq('announcement_id',ann.id);
-      const totalResponses=responses?responses.length:0;
-      const attendedCount=allAtt?allAtt.filter(function(a){ return a.attended===true; }).length:0;
-      const notAttendedCount=allAtt?allAtt.filter(function(a){ return a.attended===false; }).length:0;
-      const hasOptions=options&&options.length>0;
-      const eventDate=ann.event_date?new Date(ann.event_date+'T00:00:00').toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}):null;
-      let pollBar='';
-      if(hasOptions){
-        pollBar=options.map(function(o){
-          const count=responses?responses.filter(function(r){ return r.poll_option_id===o.id; }).length:0;
-          const pct=totalResponses?Math.round(count/totalResponses*100):0;
-          return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>'+o.option_text+'</span><span style="color:var(--muted)">'+count+' ('+pct+'%)</span></div><div style="height:6px;background:#f0f0f5;border-radius:3px"><div style="height:100%;width:'+pct+'%;background:var(--blue);border-radius:3px"></div></div></div>';
+      let pollBar = '';
+      if (hasOptions) {
+        pollBar = options.map(function(o) {
+          const count = responses ? responses.filter(function(r) { return r.poll_option_id === o.id; }).length : 0;
+          const pct = totalResponses ? Math.round(count / totalResponses * 100) : 0;
+          return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>' + o.option_text + '</span><span style="color:var(--muted)">' + count + ' (' + pct + '%)</span></div><div style="height:6px;background:#f0f0f5;border-radius:3px"><div style="height:100%;width:' + pct + '%;background:var(--blue);border-radius:3px"></div></div></div>';
         }).join('');
       }
+
       htmlParts.push(
-        '<div class="card" style="margin-bottom:14px">'+
-        '<div class="card-header"><div><span class="card-title">'+ann.title+'</span>'+
-        (eventDate?'<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 '+eventDate+(ann.event_location?' · 📍 '+ann.event_location:'')+'</div>':'')+
-        '</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
-        (hasOptions?'<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="'+ann.id+'">📊 Poll Results ('+totalResponses+')</button>':'')+
-        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="'+ann.id+'">👥 Attended ('+attendedCount+') / Not ('+notAttendedCount+')</button>'+
-        '<button class="btn btn-ghost btn-sm" data-action="editAnn" data-id="'+ann.id+'">Edit</button>'+
-        '<button class="btn btn-danger btn-sm" data-action="deleteAnn" data-id="'+ann.id+'">Delete</button>'+
-        '</div></div>'+
-        (ann.description?'<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">'+ann.description+'</p></div>':'')+
-        (hasOptions?'<div class="card-body" style="border-top:1px solid var(--border)"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">'+(ann.poll_question||'POLL')+'</div>'+pollBar+'</div>':'')+
+        '<div class="card" style="margin-bottom:14px">' +
+        '<div class="card-header"><div><span class="card-title">' + ann.title + '</span>' +
+        (eventDate ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 ' + eventDate + (ann.event_location ? ' · 📍 ' + ann.event_location : '') + '</div>' : '') +
+        '</div><div style="display:flex;gap:6px;flex-wrap:wrap">' +
+        (hasOptions ? '<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="' + ann.id + '">📊 Poll Results (' + totalResponses + ')</button>' : '') +
+        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="' + ann.id + '">👥 Attendees (' + attendedCount + ')</button>' +
+        '<button class="btn btn-ghost btn-sm" data-action="editAnn" data-id="' + ann.id + '">Edit</button>' +
+        '<button class="btn btn-danger btn-sm" data-action="deleteAnn" data-id="' + ann.id + '">Delete</button>' +
+        '</div></div>' +
+        (ann.description ? '<div class="card-body" style="padding-top:0"><p style="font-size:13px;color:var(--muted);line-height:1.7">' + ann.description + '</p></div>' : '') +
+        (hasOptions ? '<div class="card-body" style="border-top:1px solid var(--border)"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">' + (ann.poll_question || 'POLL') + '</div>' + pollBar + '</div>' : '') +
         '</div>'
       );
     }
-    container.innerHTML=htmlParts.join('');
-    const badge=document.getElementById('nb-announcements');
-    badge.style.display=anns.length?'':'none';
-    if(anns.length) badge.textContent=anns.length;
+
+    container.innerHTML = htmlParts.join('');
+
+    const badge = document.getElementById('nb-announcements');
+    badge.style.display = anns.length ? '' : 'none';
+    if (anns.length) badge.textContent = anns.length;
   }
 
-  document.getElementById('announcementsList').addEventListener('click', function(e){
-    const btn=e.target.closest('[data-action]'); if(!btn) return;
-    const id=btn.dataset.id; const action=btn.dataset.action;
-    if(action==='pollResults') openPollResults(id);
-    if(action==='viewAttendance') openAttendance(id);
-    if(action==='editAnn') openEditAnnouncement(id);
-    if(action==='deleteAnn') deleteAnnouncement(id);
+  document.getElementById('announcementsList').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    if (action === 'pollResults') openPollResults(id);
+    if (action === 'viewAttendance') openAttendance(id);
+    if (action === 'editAnn') openEditAnnouncement(id);
+    if (action === 'deleteAnn') deleteAnnouncement(id);
   });
 
-  async function openPollResults(id){
-    const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
-    document.getElementById('pollResultsTitle').textContent=ann.title+' — Poll Results';
-    document.getElementById('pollResultsBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+  async function openPollResults(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann) return;
+    document.getElementById('pollResultsTitle').textContent = ann.title + ' — Poll Results';
+    document.getElementById('pollResultsBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
     openModal('mPollResults');
-    const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',id);
-    const {data:responses}=await sb.from('poll_responses').select('*, scholars(name), poll_options(option_text)').eq('announcement_id',id);
-    const total=responses?responses.length:0;
-    if(!options||!options.length){ document.getElementById('pollResultsBody').innerHTML='<p style="color:var(--muted);font-size:13px">No poll options.</p>'; return; }
-    const html=options.map(function(opt){
-      const responders=responses?responses.filter(function(r){ return r.poll_option_id===opt.id; }):[];
-      const pct=total?Math.round(responders.length/total*100):0;
-      return '<div style="margin-bottom:18px">'+
-        '<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin-bottom:4px"><span>'+opt.option_text+'</span><span style="color:var(--muted)">'+responders.length+' / '+total+' ('+pct+'%)</span></div>'+
-        '<div style="height:8px;background:#f0f0f5;border-radius:4px;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:var(--blue);border-radius:4px"></div></div>'+
-        (responders.length?'<div style="display:flex;flex-wrap:wrap;gap:6px">'+responders.map(function(r){ return '<span class="badge badge-blue">'+(r.scholars?r.scholars.name:'—')+'</span>'; }).join('')+'</div>':'<span style="font-size:12px;color:var(--muted)">No responses yet</span>')+
+
+    const { data: options } = await sb.from('poll_options').select('*').eq('announcement_id', id);
+    const { data: responses } = await sb.from('poll_responses').select('*, scholars(name), poll_options(option_text)').eq('announcement_id', id);
+    const total = responses ? responses.length : 0;
+
+    if (!options || !options.length) {
+      document.getElementById('pollResultsBody').innerHTML = '<p style="color:var(--muted);font-size:13px">No poll options for this announcement.</p>';
+      return;
+    }
+
+    const html = options.map(function(opt) {
+      const responders = responses ? responses.filter(function(r) { return r.poll_option_id === opt.id; }) : [];
+      const pct = total ? Math.round(responders.length / total * 100) : 0;
+      return '<div style="margin-bottom:18px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin-bottom:4px"><span>' + opt.option_text + '</span><span style="color:var(--muted)">' + responders.length + ' / ' + total + ' (' + pct + '%)</span></div>' +
+        '<div style="height:8px;background:#f0f0f5;border-radius:4px;margin-bottom:8px"><div style="height:100%;width:' + pct + '%;background:var(--blue);border-radius:4px"></div></div>' +
+        (responders.length ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + responders.map(function(r) { return '<span class="badge badge-blue">' + (r.scholars ? r.scholars.name : '—') + '</span>'; }).join('') + '</div>' : '<span style="font-size:12px;color:var(--muted)">No responses yet</span>') +
         '</div>';
     }).join('');
-    document.getElementById('pollResultsBody').innerHTML='<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">'+(ann.poll_question||'Poll')+' · '+total+' total response'+(total!==1?'s':'')+'</div>'+html;
+
+    document.getElementById('pollResultsBody').innerHTML =
+      '<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">' + (ann.poll_question || 'Poll') + ' · ' + total + ' total response' + (total !== 1 ? 's' : '') + '</div>' + html;
   }
 
-  async function openAttendance(id){
-    const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
-    document.getElementById('attendanceTitle').textContent=ann.title+' — Attendance';
-    document.getElementById('attendanceSub').textContent='Scholars who marked their attendance.';
-    document.getElementById('attendanceBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+  async function openAttendance(id) {
+    const ann = announcements.find(function(a) { return a.id === id; });
+    if (!ann) return;
+    document.getElementById('attendanceTitle').textContent = ann.title + ' — Attendance';
+    document.getElementById('attendanceSub').textContent = 'Scholars who marked their attendance for this event.';
+    document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
     openModal('mAttendance');
-    const {data:allRecords}=await sb.from('attendance').select('*, scholars(name,group_name,batch_no)').eq('announcement_id',id);
-    const {data:responses}=await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id',id);
-    const records=allRecords||[];
-    if(!records.length){ document.getElementById('attendanceBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked their attendance yet.</div>'; return; }
-    const attended=records.filter(function(r){ return r.attended===true; });
-    const notAttended=records.filter(function(r){ return r.attended===false; });
-    function scholarRow(a,didAttend){
-      const s=a.scholars||{};
-      const resp=responses?responses.find(function(r){ return r.scholar_id===a.scholar_id; }):null;
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
-        '<div><div style="font-size:14px;font-weight:500">'+(s.name||'—')+'</div>'+
-        '<div style="font-size:12px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div>'+
-        '<div style="font-size:12px;color:var(--muted)">Poll: '+(resp&&resp.poll_options?resp.poll_options.option_text:'No response')+'</div></div>'+
-        (didAttend?'<span class="badge badge-green">✅ Attended</span>':'<span class="badge badge-pink">❌ Did Not Attend</span>')+
+
+    const { data: allRecords } = await sb.from('attendance').select('*, scholars(name, group_name, batch_no)').eq('announcement_id', id);
+    const { data: responses } = await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id', id);
+    const records = allRecords || [];
+
+    if (!records.length) {
+      document.getElementById('attendanceBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked their attendance yet.</div>';
+      return;
+    }
+
+    const attended = records.filter(function(r) { return r.attended === true; });
+    const notAttended = records.filter(function(r) { return r.attended === false; });
+
+    function scholarRow(a, didAttend) {
+      const s = a.scholars || {};
+      const resp = responses ? responses.find(function(r) { return r.scholar_id === a.scholar_id; }) : null;
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">' +
+        '<div><div style="font-size:14px;font-weight:500">' + (s.name || '—') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">' + (s.group_name || '') + ' · Batch ' + (s.batch_no || '—') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">Poll answer: ' + (resp && resp.poll_options ? resp.poll_options.option_text : 'No response') + '</div></div>' +
+        (didAttend ? '<span class="badge badge-green">✅ Attended</span>' : '<span class="badge badge-pink">❌ Did Not Attend</span>') +
         '</div>';
     }
-    let html='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">'+
-      '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;color:#166534;font-weight:500">✅ Attended: '+attended.length+'</div>'+
-      '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 16px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: '+notAttended.length+'</div>'+
-      '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:500">Total: '+records.length+'</div>'+
+
+    let html = '<div style="margin-bottom:16px">' +
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">' +
+        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;color:#166534;font-weight:500">✅ Attended: ' + attended.length + '</div>' +
+        '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 16px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: ' + notAttended.length + '</div>' +
+        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:500">Total Responded: ' + records.length + '</div>' +
       '</div>';
-    if(attended.length) html+='<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended ('+attended.length+')</div>'+attended.map(function(a){ return scholarRow(a,true); }).join('');
-    if(notAttended.length) html+='<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px">Did Not Attend ('+notAttended.length+')</div>'+notAttended.map(function(a){ return scholarRow(a,false); }).join('');
-    document.getElementById('attendanceBody').innerHTML=html;
+
+    if (attended.length) {
+      html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended (' + attended.length + ')</div>' +
+        attended.map(function(a) { return scholarRow(a, true); }).join('');
+    }
+    if (notAttended.length) {
+      html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px">Did Not Attend (' + notAttended.length + ')</div>' +
+        notAttended.map(function(a) { return scholarRow(a, false); }).join('');
+    }
+    html += '</div>';
+
+    document.getElementById('attendanceBody').innerHTML = html;
   }
 
   // ── ADMIN ACCOUNTS ──
