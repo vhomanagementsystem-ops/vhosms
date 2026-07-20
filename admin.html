@@ -153,11 +153,7 @@
       <div class="sponsor-stat-row" id="sponsorStatsRow">
         <div class="sponsor-stat-card">
           <div class="sponsor-stat-icon" style="background:#ede9fe">🏢</div>
-          <div><div class="sponsor-stat-label">Total Sponsors</div><div class="sponsor-stat-val" id="statTotalSponsors">0</div></div>
-        </div>
-        <div class="sponsor-stat-card">
-          <div class="sponsor-stat-icon" style="background:#dcfce7">✅</div>
-          <div><div class="sponsor-stat-label">Active Partners</div><div class="sponsor-stat-val" id="statActiveSponsors">0</div></div>
+          <div><div class="sponsor-stat-label">Total Sponsors/Partners</div><div class="sponsor-stat-val" id="statTotalSponsors">0</div></div>
         </div>
         <div class="sponsor-stat-card">
           <div class="sponsor-stat-icon" style="background:#fef3c7">📅</div>
@@ -179,11 +175,11 @@
       <!-- SPONSORS LIST -->
       <div id="spanel-sponsors">
         <div class="card">
-          <div class="search-row">
-            <input id="spSearch" placeholder="Search company, contact, email…">
-            <input id="spRelStatus" placeholder="Filter by relationship status...">
+          <div class="search-row" style="flex-wrap:nowrap">
+            <input id="spSearch" placeholder="Search company, contact, email, address…" style="flex:2;min-width:200px">
+            <input id="spRelStatus" placeholder="Filter by relationship status..." style="flex:1;min-width:140px">
           </div>
-          <div class="table-wrap"><table><thead><tr><th>Company</th><th>Contact Person</th><th>Relationship</th><th>Email</th><th>Contact No.</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Company / Institution</th><th>Contacts</th><th>Relationship</th><th>Address</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
         </div>
       </div>
 
@@ -382,17 +378,20 @@
     </div>
   </div>
   <div class="form-row">
-    <div class="form-field"><label class="form-label">Contact Person</label><input class="form-input" id="sp_contact" placeholder="e.g. Juan Dela Cruz"></div>
-    <div class="form-field"><label class="form-label">Title / Position</label><input class="form-input" id="sp_title" placeholder="e.g. HR Manager"></div>
+    <div class="form-field"><label class="form-label">Company Address</label><input class="form-input" id="sp_address" placeholder="Street, City, Province"></div>
   </div>
-  <div class="form-row">
-    <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" id="sp_email" type="email" placeholder="contact@company.com"></div>
-    <div class="form-field"><label class="form-label">Contact Number</label><input class="form-input" id="sp_phone" placeholder="09XXXXXXXXX"></div>
-  </div>
-  <div class="form-field"><label class="form-label">Company Address</label><input class="form-input" id="sp_address" placeholder="Street, City, Province"></div>
   <div class="form-field">
     <label class="form-label">What does this company offer? <span style="font-size:11px;color:var(--muted)">(e.g. internships, mentoring, employment, cash donations, training)</span></label>
     <textarea class="form-textarea" id="sp_offers" placeholder="Describe what this company/institution can offer to VHO scholars..."></textarea>
+  </div>
+  <div class="form-field" style="margin-top:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <label class="form-label" style="margin-bottom:0">Contact Persons <span style="font-size:11px;color:var(--muted)">(optional)</span></label>
+      <button type="button" class="btn btn-ghost btn-sm" id="addContactRowBtn">+ Add Contact</button>
+    </div>
+    <div id="contactRowsContainer">
+      <!-- Contact rows added dynamically -->
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" id="cancelSponsorForm">Cancel</button>
@@ -1238,15 +1237,19 @@
   });
 
   // ── LOAD SPONSORS DATA ──
+  let sponsorContacts = [];
+
   async function loadSponsors() {
-    const [s, e, c] = await Promise.all([
+    const [s, e, c, sc] = await Promise.all([
       sb.from('sponsors').select('*').order('company_name', {ascending:true}),
       sb.from('sponsor_events').select('*').order('event_date', {ascending:false}),
-      sb.from('sponsor_contributions').select('*').order('date', {ascending:false})
+      sb.from('sponsor_contributions').select('*').order('date', {ascending:false}),
+      sb.from('sponsor_contacts').select('*').order('created_at', {ascending:true})
     ]);
     sponsors = s.data || [];
     sponsorEvents = e.data || [];
     contributions = c.data || [];
+    sponsorContacts = sc.data || [];
   }
 
   async function renderSponsors() {
@@ -1259,12 +1262,6 @@
 
   function updateSponsorStats() {
     document.getElementById('statTotalSponsors').textContent = sponsors.length;
-    const active = sponsors.filter(function(s){
-      return (s.relationship_status||'').toLowerCase().includes('active') ||
-             (s.relationship_status||'').toLowerCase().includes('partner') ||
-             (s.relationship_status||'').toLowerCase().includes('mou');
-    }).length;
-    document.getElementById('statActiveSponsors').textContent = active;
     document.getElementById('statTotalEvents').textContent = sponsorEvents.length;
     document.getElementById('statTotalContribs').textContent = contributions.length;
   }
@@ -1274,26 +1271,37 @@
     const q = document.getElementById('spSearch').value.toLowerCase();
     const rel = document.getElementById('spRelStatus').value.toLowerCase();
     const data = sponsors.filter(function(s) {
+      const contacts = sponsorContacts.filter(function(c){ return c.sponsor_id === s.id; });
+      const contactStr = contacts.map(function(c){ return (c.contact_person||'') + ' ' + (c.email||''); }).join(' ').toLowerCase();
       return (!q || (s.company_name||'').toLowerCase().includes(q) ||
-        (s.contact_person||'').toLowerCase().includes(q) ||
+        contactStr.includes(q) ||
+        (s.company_address||'').toLowerCase().includes(q) ||
         (s.email||'').toLowerCase().includes(q)) &&
         (!rel || (s.relationship_status||'').toLowerCase().includes(rel));
     });
     document.getElementById('sponsorsTable').innerHTML = data.map(function(s) {
+      const contacts = sponsorContacts.filter(function(c){ return c.sponsor_id === s.id; });
       const offersShort = s.offers ? (s.offers.length > 60 ? s.offers.slice(0,60)+'...' : s.offers) : '—';
+      const contactsHtml = contacts.length
+        ? contacts.map(function(c){
+            return '<div style="margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #f4f4f8">' +
+              '<div style="font-size:13px;font-weight:500">'+(c.contact_person||'—')+'</div>' +
+              '<div style="font-size:11px;color:var(--muted)">'+(c.title||'')+(c.title&&c.email?' · ':'')+''+(c.email||'')+(c.contact_number?' · '+c.contact_number:'')+'</div>' +
+            '</div>';
+          }).join('')
+        : '<span style="font-size:12px;color:var(--muted)">No contacts added</span>';
       return '<tr>' +
-        '<td><div class="s-info-row"><div class="s-avatar" style="background:var(--blue2);font-size:13px">'+ini(s.company_name)+'</div><div><div class="s-name">'+s.company_name+'</div><div class="s-sub">'+(s.company_address||'')+'</div></div></div></td>' +
-        '<td><div style="font-size:13px">'+(s.contact_person||'—')+'</div><div style="font-size:11px;color:var(--muted)">'+(s.title||'')+'</div></td>' +
+        '<td><div style="font-weight:500;font-size:14px">'+s.company_name+'</div><div style="font-size:11px;color:var(--muted)">'+(s.company_address||'')+'</div></td>' +
+        '<td style="min-width:180px">'+contactsHtml+'</td>' +
         '<td>'+(s.relationship_status?'<span class="badge badge-blue">'+s.relationship_status+'</span>':'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+(s.email||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+(s.contact_number||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);max-width:140px">'+(s.company_address||'—')+'</td>' +
         '<td style="font-size:12px;color:var(--muted);max-width:160px">'+offersShort+'</td>' +
         '<td style="display:flex;gap:4px;flex-wrap:wrap">' +
           '<button class="btn btn-ghost btn-sm" data-action="viewSponsor" data-id="'+s.id+'">View</button>' +
           '<button class="btn btn-ghost btn-sm" data-action="editSponsor" data-id="'+s.id+'">Edit</button>' +
           '<button class="btn btn-danger btn-sm" data-action="deleteSponsor" data-id="'+s.id+'">Delete</button>' +
         '</td></tr>';
-    }).join('') || '<tr><td colspan="7"><div class="empty"><p>No sponsors found. Click "+ Add Sponsor" to add one.</p></div></td></tr>';
+    }).join('') || '<tr><td colspan="6"><div class="empty"><p>No sponsors found. Click "+ Add Sponsor" to add one.</p></div></td></tr>';
   }
 
   ['spSearch','spRelStatus'].forEach(function(id) {
@@ -1316,25 +1324,31 @@
   // ── VIEW SPONSOR DETAIL ──
   function viewSponsor(id) {
     const s = sponsors.find(function(x){ return x.id===id; }); if (!s) return;
-    const fields = [
-      ['Company / Institution', s.company_name],
-      ['Contact Person', s.contact_person],
-      ['Title / Position', s.title],
-      ['Relationship Status', s.relationship_status],
-      ['Email Address', s.email],
-      ['Contact Number', s.contact_number],
-      ['Company Address', s.company_address]
-    ];
+    const contacts = sponsorContacts.filter(function(c){ return c.sponsor_id === id; });
+    const contactsHtml = contacts.length
+      ? contacts.map(function(c, i){
+          return '<div style="background:#f9f9fb;border-radius:10px;padding:12px;margin-bottom:8px">' +
+            '<div style="font-size:14px;font-weight:600;margin-bottom:4px">'+(c.contact_person||'—')+'</div>' +
+            (c.title?'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">'+c.title+'</div>':'') +
+            (c.email?'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">📧 '+c.email+'</div>':'') +
+            (c.contact_number?'<div style="font-size:12px;color:var(--muted)">📞 '+c.contact_number+'</div>':'') +
+          '</div>';
+        }).join('')
+      : '<div style="font-size:13px;color:var(--muted)">No contacts added yet.</div>';
+
     document.getElementById('sponsorDetailBody').innerHTML =
-      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">' +
-        '<div style="width:52px;height:52px;border-radius:50%;background:var(--blue2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#fff">'+ini(s.company_name)+'</div>' +
-        '<div><h2 class="modal-title" style="margin-bottom:2px">'+s.company_name+'</h2>' +
+      '<div style="margin-bottom:18px">' +
+        '<h2 class="modal-title" style="margin-bottom:4px">'+s.company_name+'</h2>' +
         (s.relationship_status?'<span class="badge badge-blue">'+s.relationship_status+'</span>':'') +
-        '</div></div>' +
+      '</div>' +
       '<div class="info-grid" style="margin-bottom:16px">' +
-        fields.map(function(f){ return '<div class="info-item"><div class="info-label">'+f[0]+'</div><div class="info-value">'+(f[1]||'—')+'</div></div>'; }).join('') +
+        '<div class="info-item"><div class="info-label">Company Address</div><div class="info-value">'+(s.company_address||'—')+'</div></div>' +
       '</div>' +
       (s.offers ? '<div style="margin-bottom:16px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">What they offer</div><div style="font-size:13px;background:#f9f9fb;border-radius:8px;padding:12px;line-height:1.7">'+s.offers+'</div></div>' : '') +
+      '<div style="margin-bottom:16px">' +
+        '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px">Contact Persons ('+contacts.length+')</div>' +
+        contactsHtml +
+      '</div>' +
       '<div class="modal-footer">' +
         '<button class="btn btn-ghost" id="closeSponsorDetailBtn">Close</button>' +
         '<button class="btn btn-primary" data-action="editSponsorDetail" data-id="'+s.id+'">Edit</button>' +
@@ -1359,28 +1373,74 @@
   document.getElementById('mSponsorForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mSponsorForm'); });
   document.getElementById('sponsorFormSaveBtn').addEventListener('click', saveSponsor);
 
+  // ── CONTACT ROWS ──
+  let contactRowCount = 0;
+
+  function addContactRow(data) {
+    data = data || {};
+    contactRowCount++;
+    const rowId = 'crow_' + contactRowCount;
+    const div = document.createElement('div');
+    div.id = rowId;
+    div.style.cssText = 'background:#f9f9fb;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;position:relative';
+    div.innerHTML =
+      '<button type="button" onclick="document.getElementById(\'' + rowId + '\').remove()" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:2px 6px">✕</button>' +
+      '<div class="form-row" style="margin-bottom:8px">' +
+        '<div class="form-field"><label class="form-label" style="font-size:10px">Contact Person</label><input class="form-input" name="cp_name" value="' + (data.contact_person||'') + '" placeholder="e.g. Juan Dela Cruz"></div>' +
+        '<div class="form-field"><label class="form-label" style="font-size:10px">Title / Position</label><input class="form-input" name="cp_title" value="' + (data.title||'') + '" placeholder="e.g. HR Manager"></div>' +
+      '</div>' +
+      '<div class="form-row" style="margin-bottom:0">' +
+        '<div class="form-field"><label class="form-label" style="font-size:10px">Email</label><input class="form-input" name="cp_email" type="email" value="' + (data.email||'') + '" placeholder="contact@company.com"></div>' +
+        '<div class="form-field"><label class="form-label" style="font-size:10px">Contact Number</label><input class="form-input" name="cp_phone" value="' + (data.contact_number||'') + '" placeholder="09XXXXXXXXX"></div>' +
+      '</div>';
+    document.getElementById('contactRowsContainer').appendChild(div);
+  }
+
+  function getContactRows() {
+    const rows = [];
+    document.querySelectorAll('#contactRowsContainer > div').forEach(function(row) {
+      const name = row.querySelector('[name="cp_name"]').value.trim();
+      const title = row.querySelector('[name="cp_title"]').value.trim();
+      const email = row.querySelector('[name="cp_email"]').value.trim();
+      const phone = row.querySelector('[name="cp_phone"]').value.trim();
+      if (name || email || phone) {
+        rows.push({ contact_person: name||null, title: title||null, email: email||null, contact_number: phone||null });
+      }
+    });
+    return rows;
+  }
+
+  document.getElementById('addContactRowBtn').addEventListener('click', function(){ addContactRow(); });
+
   function openAddSponsor() {
     editingSponsorId = null;
-    ['sp_company','sp_contact','sp_title','sp_email','sp_phone','sp_address','sp_offers'].forEach(function(id){ document.getElementById(id).value=''; });
-    document.getElementById('sp_relstatus').value = '';
+    ['sp_company','sp_relstatus','sp_address','sp_offers'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('contactRowsContainer').innerHTML = '';
+    contactRowCount = 0;
+    addContactRow();
     document.getElementById('sponsorFormTitle').textContent = 'Add Sponsor';
     document.getElementById('sponsorFormSaveBtn').textContent = 'Add Sponsor';
     openModal('mSponsorForm');
   }
 
-  function openEditSponsor(id) {
+  async function openEditSponsor(id) {
     const s = sponsors.find(function(x){ return x.id===id; }); if (!s) return;
     editingSponsorId = id;
     document.getElementById('sp_company').value = s.company_name||'';
-    document.getElementById('sp_contact').value = s.contact_person||'';
-    document.getElementById('sp_title').value = s.title||'';
     document.getElementById('sp_relstatus').value = s.relationship_status||'';
-    document.getElementById('sp_email').value = s.email||'';
-    document.getElementById('sp_phone').value = s.contact_number||'';
     document.getElementById('sp_address').value = s.company_address||'';
     document.getElementById('sp_offers').value = s.offers||'';
+    document.getElementById('contactRowsContainer').innerHTML = '';
+    contactRowCount = 0;
+    const existing = sponsorContacts.filter(function(c){ return c.sponsor_id === id; });
+    if (existing.length) {
+      existing.forEach(function(c){ addContactRow(c); });
+    } else {
+      addContactRow();
+    }
     document.getElementById('sponsorFormTitle').textContent = 'Edit Sponsor';
     document.getElementById('sponsorFormSaveBtn').textContent = 'Save Changes';
+    closeModal('mSponsorDetail');
     openModal('mSponsorForm');
   }
 
@@ -1391,30 +1451,41 @@
     btn.disabled = true; btn.textContent = 'Saving…';
     const payload = {
       company_name: company,
-      contact_person: document.getElementById('sp_contact').value.trim()||null,
-      title: document.getElementById('sp_title').value.trim()||null,
-      relationship_status: document.getElementById('sp_relstatus').value||null,
-      email: document.getElementById('sp_email').value.trim()||null,
-      contact_number: document.getElementById('sp_phone').value.trim()||null,
+      relationship_status: document.getElementById('sp_relstatus').value.trim()||null,
       company_address: document.getElementById('sp_address').value.trim()||null,
       offers: document.getElementById('sp_offers').value.trim()||null,
       updated_at: new Date().toISOString()
     };
+    const contactRows = getContactRows();
+    let sponsorId = editingSponsorId;
+
     if (!editingSponsorId) {
       const {data:newS, error} = await sb.from('sponsors').insert(payload).select().single();
       if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Add Sponsor'; return; }
       sponsors.unshift(newS);
-      toast(company+' added!','✅');
+      sponsorId = newS.id;
     } else {
       const {data:upd, error} = await sb.from('sponsors').update(payload).eq('id',editingSponsorId).select().single();
       if (error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
       const idx = sponsors.findIndex(function(x){ return x.id===editingSponsorId; });
       if (idx!==-1) sponsors[idx]=upd;
-      toast('Sponsor updated','✅');
+      await sb.from('sponsor_contacts').delete().eq('sponsor_id', editingSponsorId);
+      sponsorContacts = sponsorContacts.filter(function(c){ return c.sponsor_id !== editingSponsorId; });
     }
+
+    if (contactRows.length > 0) {
+      const insertPayload = contactRows.map(function(c){
+        return { sponsor_id: sponsorId, contact_person: c.contact_person, title: c.title, email: c.email, contact_number: c.contact_number };
+      });
+      const {data:newContacts, error:cErr} = await sb.from('sponsor_contacts').insert(insertPayload).select();
+      if (!cErr && newContacts) sponsorContacts = sponsorContacts.concat(newContacts);
+    }
+
     btn.disabled=false; btn.textContent=editingSponsorId?'Save Changes':'Add Sponsor';
+    toast(company + (editingSponsorId?' updated!':' added!'),'✅');
     closeModal('mSponsorForm');
-    renderSponsorsTable(); updateSponsorStats();
+    renderSponsorsTable();
+    updateSponsorStats();
   }
 
   // ── DELETE SPONSOR ──
