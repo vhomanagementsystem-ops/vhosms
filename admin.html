@@ -9,6 +9,10 @@
 <style>
 .sponsor-tab{flex:1;padding:9px 16px;border:none;border-radius:9px;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);transition:all .2s;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px}
 .sponsor-tab.on{background:#fff;color:var(--blue2);font-weight:600;box-shadow:0 2px 8px rgba(74,90,138,.15)}
+.btn-amber{background:#f59e0b;color:#fff;border:none}
+.btn-amber:hover{background:#d97706}
+.btn-success{background:#22c55e;color:#fff;border:none}
+.btn-success:hover{background:#16a34a}
 .sponsor-tab:hover:not(.on){background:rgba(255,255,255,.6);color:var(--text)}
 .stat-card.teal{background:linear-gradient(135deg,#0d9488,#0891b2);color:#fff}
 .stat-card.teal .stat-label,.stat-card.teal .stat-sub{color:rgba(255,255,255,.8)}
@@ -142,7 +146,9 @@
       <div class="page-header">
         <div class="page-header-left"><h1>Sponsor Database</h1><p>Manage VHO sponsors, partners, events and contributions</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap" id="sponsorPageActions">
-          <button class="btn btn-ghost" id="exportSponsorsBtn" style="display:none">📥 Export to Excel</button>
+          <button class="btn btn-ghost" id="exportSponsorsBtn" style="display:none">
+  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export to Excel
+</button>
           <button class="btn btn-primary" id="addSponsorBtn" style="display:none">+ Add Sponsor</button>
           <button class="btn btn-primary" id="addEventBtnTop" style="display:none">+ Add Event</button>
           <button class="btn btn-primary" id="addContribBtnTop" style="display:none">+ Add Contribution</button>
@@ -150,45 +156,57 @@
       </div>
 
       <!-- Sponsor Stats -->
-      <div class="sponsor-stat-row" id="sponsorStatsRow">
+      <div class="sponsor-stat-row" id="sponsorStatsRow" style="grid-template-columns:repeat(3,1fr)">
         <div class="sponsor-stat-card">
-          <div class="sponsor-stat-icon" style="background:#ede9fe">🏢</div>
+          <div class="sponsor-stat-icon" style="background:#ede9fe">
+            <svg width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
+          </div>
           <div><div class="sponsor-stat-label">Total Sponsors/Partners</div><div class="sponsor-stat-val" id="statTotalSponsors">0</div></div>
         </div>
         <div class="sponsor-stat-card">
-          <div class="sponsor-stat-icon" style="background:#fef3c7">📅</div>
+          <div class="sponsor-stat-icon" style="background:#fef3c7">
+            <svg width="20" height="20" fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
           <div><div class="sponsor-stat-label">Events Tracked</div><div class="sponsor-stat-val" id="statTotalEvents">0</div></div>
         </div>
         <div class="sponsor-stat-card">
-          <div class="sponsor-stat-icon" style="background:#fce7f3">💰</div>
+          <div class="sponsor-stat-icon" style="background:#dcfce7">
+            <svg width="20" height="20" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M8 14s1 2 4 2 4-2 4-2M12 8v1M12 15v1"/></svg>
+          </div>
           <div><div class="sponsor-stat-label">Contributions</div><div class="sponsor-stat-val" id="statTotalContribs">0</div></div>
         </div>
       </div>
 
       <!-- Sub tabs -->
       <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:12px;padding:4px;margin-bottom:18px;width:fit-content">
-        <button class="sponsor-tab on" id="stab-sponsors" data-stab="sponsors">🏢 Sponsors</button>
-        <button class="sponsor-tab" id="stab-events" data-stab="events">📅 Event Tracker</button>
-        <button class="sponsor-tab" id="stab-contributions" data-stab="contributions">💰 Contributions</button>
+        <button class="sponsor-tab on" id="stab-sponsors" data-stab="sponsors">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>Sponsors
+        </button>
+        <button class="sponsor-tab" id="stab-events" data-stab="events">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Event Tracker
+        </button>
+        <button class="sponsor-tab" id="stab-contributions" data-stab="contributions">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Contributions
+        </button>
       </div>
 
       <!-- SPONSORS LIST -->
       <div id="spanel-sponsors">
         <div class="card">
-          <div class="search-row" style="flex-wrap:nowrap">
-            <input id="spSearch" placeholder="Search company, contact, email, address…" style="flex:2;min-width:200px">
-            <input id="spRelStatus" placeholder="Filter by relationship status..." style="flex:1;min-width:140px">
+          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+            <input class="form-input" id="spSearch" placeholder="🔍 Search company, contact, email…" style="flex:2;min-width:220px;height:40px">
+            <input class="form-input" id="spRelStatus" placeholder="Filter by relationship status..." style="flex:1;min-width:160px;height:40px">
           </div>
-          <div class="table-wrap"><table><thead><tr><th>Company / Institution</th><th>Contacts</th><th>Relationship</th><th>Address</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Company / Institution</th><th>Contact Persons</th><th>Relationship</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
         </div>
       </div>
 
       <!-- EVENT TRACKER -->
       <div id="spanel-events" style="display:none">
         <div class="card">
-          <div class="search-row">
-            <input id="evSearch" placeholder="Search event name or sponsor…">
-            <select id="evSort" style="max-width:160px">
+          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+            <input class="form-input" id="evSearch" placeholder="🔍 Search event name or sponsor…" style="flex:2;min-width:220px;height:40px">
+            <select class="form-select" id="evSort" style="flex:0 0 180px;height:40px">
               <option value="desc">Date: Newest First</option>
               <option value="asc">Date: Oldest First</option>
             </select>
@@ -200,9 +218,9 @@
       <!-- CONTRIBUTIONS TRACKER -->
       <div id="spanel-contributions" style="display:none">
         <div class="card">
-          <div class="search-row">
-            <input id="ctSearch" placeholder="Search donor or contribution…">
-            <select id="ctSort" style="max-width:160px">
+          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+            <input class="form-input" id="ctSearch" placeholder="🔍 Search donor or contribution…" style="flex:2;min-width:220px;height:40px">
+            <select class="form-select" id="ctSort" style="flex:0 0 180px;height:40px">
               <option value="desc">Date: Newest First</option>
               <option value="asc">Date: Oldest First</option>
             </select>
@@ -470,6 +488,28 @@
   <div class="modal-footer">
     <button class="btn btn-ghost" id="cancelDeleteContribBtn">Cancel</button>
     <button class="btn btn-danger" id="confirmDeleteContribBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
+<!-- Deactivate Admin Confirmation -->
+<div class="modal-bg" id="mDeactivateAdminConfirm">
+<div class="modal" style="max-width:420px">
+  <h2 class="modal-title" style="color:#f59e0b">⚠️ Deactivate Admin</h2>
+  <p class="modal-sub">Are you sure you want to deactivate <strong id="deactivateAdminName"></strong>? They will no longer be able to log in until reactivated.</p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeactivateAdminBtn">Cancel</button>
+    <button class="btn btn-amber" id="confirmDeactivateAdminBtn">Yes, Deactivate</button>
+  </div>
+</div></div>
+
+<!-- Activate Admin Confirmation -->
+<div class="modal-bg" id="mActivateAdminConfirm">
+<div class="modal" style="max-width:420px">
+  <h2 class="modal-title" style="color:#22c55e">✅ Activate Admin</h2>
+  <p class="modal-sub">Are you sure you want to activate <strong id="activateAdminName"></strong>? They will be able to log in again.</p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelActivateAdminBtn">Cancel</button>
+    <button class="btn btn-success" id="confirmActivateAdminBtn">Yes, Activate</button>
   </div>
 </div></div>
 
@@ -1085,12 +1125,43 @@
   }
 
   // ── ADMIN ACCOUNTS ──
+  let pendingAdminAction = null;
   document.getElementById('addAdminBtn').addEventListener('click', openAddAdmin);
   document.getElementById('closeAdminForm').addEventListener('click', function(){ closeModal('mAdminForm'); });
   document.getElementById('cancelAdminForm').addEventListener('click', function(){ closeModal('mAdminForm'); });
   document.getElementById('mAdminForm').addEventListener('click', function(e){ if(e.target===this) closeModal('mAdminForm'); });
   document.getElementById('adminFormSaveBtn').addEventListener('click', saveAdmin);
   document.getElementById('cancelDeleteAdminBtn').addEventListener('click', function(){ closeModal('mDeleteAdminConfirm'); });
+  document.getElementById('cancelDeactivateAdminBtn').addEventListener('click', function(){ closeModal('mDeactivateAdminConfirm'); pendingAdminAction=null; });
+  document.getElementById('mDeactivateAdminConfirm').addEventListener('click', function(e){ if(e.target===this){ closeModal('mDeactivateAdminConfirm'); pendingAdminAction=null; } });
+  document.getElementById('confirmDeactivateAdminBtn').addEventListener('click', async function(){
+    if(!pendingAdminAction) return;
+    const {id,name} = pendingAdminAction;
+    this.disabled=true; this.textContent='Saving...';
+    const {error}=await sb.from('admins').update({is_active:false}).eq('id',id).select();
+    this.disabled=false; this.textContent='Yes, Deactivate';
+    if(error){ toast(error.message,'❌'); return; }
+    const idx=adminsList.findIndex(function(x){ return String(x.id)===String(id); });
+    if(idx!==-1) adminsList[idx].is_active=false;
+    closeModal('mDeactivateAdminConfirm'); pendingAdminAction=null;
+    toast(name+' has been deactivated.','🔒');
+    renderAdmins();
+  });
+  document.getElementById('cancelActivateAdminBtn').addEventListener('click', function(){ closeModal('mActivateAdminConfirm'); pendingAdminAction=null; });
+  document.getElementById('mActivateAdminConfirm').addEventListener('click', function(e){ if(e.target===this){ closeModal('mActivateAdminConfirm'); pendingAdminAction=null; } });
+  document.getElementById('confirmActivateAdminBtn').addEventListener('click', async function(){
+    if(!pendingAdminAction) return;
+    const {id,name} = pendingAdminAction;
+    this.disabled=true; this.textContent='Saving...';
+    const {error}=await sb.from('admins').update({is_active:true}).eq('id',id).select();
+    this.disabled=false; this.textContent='Yes, Activate';
+    if(error){ toast(error.message,'❌'); return; }
+    const idx=adminsList.findIndex(function(x){ return String(x.id)===String(id); });
+    if(idx!==-1) adminsList[idx].is_active=true;
+    closeModal('mActivateAdminConfirm'); pendingAdminAction=null;
+    toast(name+' has been activated.','✅');
+    renderAdmins();
+  });
   document.getElementById('mDeleteAdminConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAdminConfirm'); });
   document.getElementById('confirmDeleteAdminBtn').addEventListener('click', async function(){
     if(!deletingAdminId) return;
@@ -1195,25 +1266,14 @@
           openModal('mDeleteAdminConfirm');
         }
         if(action==='deactivate'){
-          if(!confirm('Deactivate '+a.name+"? They won't be able to log in until reactivated.")) return;
-          this.disabled=true; this.textContent='Saving...';
-          const {data:dData, error}=await sb.from('admins').update({is_active:false}).eq('id',id).select();
-          console.log('deactivate result:', dData, error);
-          if(error){ toast(error.message,'❌'); this.disabled=false; this.textContent='Deactivate'; return; }
-          const idx=adminsList.findIndex(function(x){ return String(x.id)===id; });
-          if(idx!==-1) adminsList[idx].is_active=false;
-          toast(a.name+' has been deactivated.','🔒');
-          renderAdmins();
+          pendingAdminAction = {id:id, name:a.name, type:'deactivate'};
+          document.getElementById('deactivateAdminName').textContent = a.name;
+          openModal('mDeactivateAdminConfirm');
         }
         if(action==='activate'){
-          this.disabled=true; this.textContent='Saving...';
-          const {data:aData, error}=await sb.from('admins').update({is_active:true}).eq('id',id).select();
-          console.log('activate result:', aData, error);
-          if(error){ toast(error.message,'❌'); this.disabled=false; this.textContent='Activate'; return; }
-          const idx=adminsList.findIndex(function(x){ return String(x.id)===id; });
-          if(idx!==-1) adminsList[idx].is_active=true;
-          toast(a.name+' has been activated.','✅');
-          renderAdmins();
+          pendingAdminAction = {id:id, name:a.name, type:'activate'};
+          document.getElementById('activateAdminName').textContent = a.name;
+          openModal('mActivateAdminConfirm');
         }
       });
     });
@@ -1299,27 +1359,35 @@
     });
     document.getElementById('sponsorsTable').innerHTML = data.map(function(s) {
       const contacts = sponsorContacts.filter(function(c){ return c.sponsor_id === s.id; });
-      const offersShort = s.offers ? (s.offers.length > 60 ? s.offers.slice(0,60)+'...' : s.offers) : '—';
+      const offersShort = s.offers ? (s.offers.length > 80 ? s.offers.slice(0,80)+'...' : s.offers) : '—';
       const contactsHtml = contacts.length
-        ? contacts.map(function(c){
-            return '<div style="margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #f4f4f8">' +
-              '<div style="font-size:13px;font-weight:500">'+(c.contact_person||'—')+'</div>' +
-              '<div style="font-size:11px;color:var(--muted)">'+(c.title||'')+(c.title&&c.email?' · ':'')+''+(c.email||'')+(c.contact_number?' · '+c.contact_number:'')+'</div>' +
+        ? contacts.map(function(c, i){
+            const parts = [];
+            if(c.title) parts.push('<span style="color:var(--muted)">'+c.title+'</span>');
+            if(c.email) parts.push('<a href="mailto:'+c.email+'" style="color:var(--blue);text-decoration:none">'+c.email+'</a>');
+            if(c.contact_number) parts.push('<span style="color:var(--muted)">'+c.contact_number+'</span>');
+            return '<div style="'+(i>0?'margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f5':'')+'">' +
+              '<div style="font-size:13px;font-weight:600;color:var(--text)">'+( c.contact_person||'—')+'</div>' +
+              (parts.length?'<div style="font-size:11px;margin-top:2px;line-height:1.6">'+parts.join(' &middot; ')+'</div>':'') +
             '</div>';
           }).join('')
-        : '<span style="font-size:12px;color:var(--muted)">No contacts added</span>';
+        : '<span style="font-size:12px;color:var(--muted);font-style:italic">No contacts yet</span>';
       return '<tr>' +
-        '<td><div style="font-weight:500;font-size:14px">'+s.company_name+'</div><div style="font-size:11px;color:var(--muted)">'+(s.company_address||'')+'</div></td>' +
-        '<td style="min-width:180px">'+contactsHtml+'</td>' +
-        '<td>'+(s.relationship_status?'<span class="badge badge-blue">'+s.relationship_status+'</span>':'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted);max-width:140px">'+(s.company_address||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted);max-width:160px">'+offersShort+'</td>' +
-        '<td style="display:flex;gap:4px;flex-wrap:wrap">' +
-          '<button class="btn btn-ghost btn-sm" data-action="viewSponsor" data-id="'+s.id+'">View</button>' +
-          '<button class="btn btn-ghost btn-sm" data-action="editSponsor" data-id="'+s.id+'">Edit</button>' +
-          '<button class="btn btn-danger btn-sm" data-action="deleteSponsor" data-id="'+s.id+'">Delete</button>' +
+        '<td style="min-width:180px">' +
+          '<div style="font-weight:600;font-size:14px;color:var(--text)">'+s.company_name+'</div>' +
+          (s.company_address?'<div style="font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4">'+s.company_address+'</div>':'') +
+        '</td>' +
+        '<td style="min-width:220px;max-width:300px">'+contactsHtml+'</td>' +
+        '<td>'+(s.relationship_status?'<span class="badge badge-blue" style="white-space:normal;text-align:center">'+s.relationship_status+'</span>':'<span style="color:var(--muted);font-size:12px">—</span>')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);max-width:180px;line-height:1.5">'+offersShort+'</td>' +
+        '<td>' +
+          '<div style="display:flex;gap:4px;flex-wrap:wrap">' +
+            '<button class="btn btn-ghost btn-sm" data-action="viewSponsor" data-id="'+s.id+'">View</button>' +
+            '<button class="btn btn-ghost btn-sm" data-action="editSponsor" data-id="'+s.id+'">Edit</button>' +
+            '<button class="btn btn-danger btn-sm" data-action="deleteSponsor" data-id="'+s.id+'">Delete</button>' +
+          '</div>' +
         '</td></tr>';
-    }).join('') || '<tr><td colspan="6"><div class="empty"><p>No sponsors found. Click "+ Add Sponsor" to add one.</p></div></td></tr>';
+    }).join('') || '<tr><td colspan="5"><div class="empty"><p>No sponsors found.</p></div></td></tr>';
   }
 
   ['spSearch','spRelStatus'].forEach(function(id) {
