@@ -1149,69 +1149,70 @@
   }
 
   function renderAdmins(){
-    const currentEmail=sessionStorage.getItem('admin_email');
-    document.getElementById('adminsTable').innerHTML=adminsList.map(function(a){
-      const isMe=a.email===currentEmail;
-      const isActive=a.is_active!==false;
-      return '<tr style="opacity:'+(isActive?'1':'0.6')+'">'+
-        '<td><div class="s-info-row"><div class="s-avatar" style="background:'+(isActive?'var(--blue)':'var(--muted)')+'">'+ini(a.name)+'</div>'+
-        '<div><div class="s-name">'+a.name+(isMe?' <span class="badge badge-blue" style="font-size:10px">You</span>':'')+'</div>'+
-        '<div class="s-sub">'+(isActive?'<span style="color:#22c55e;font-size:11px">● Active</span>':'<span style="color:#ef4444;font-size:11px">● Deactivated</span>')+'</div>'+
-        '</div></div></td>'+
-        '<td style="font-size:13px">'+a.email+'</td>'+
-        '<td>'+(isActive?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Deactivated</span>')+'</td>'+
-        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(a.created_at)+'</td>'+
-        '<td style="display:flex;gap:4px;flex-wrap:wrap">'+
-          '<button class="btn btn-ghost btn-sm" data-action="editAdmin" data-id="'+a.id+'">Edit</button>'+
-          (!isMe&&isActive?'<button class="btn btn-amber btn-sm" data-action="deactivateAdmin" data-id="'+a.id+'">Deactivate</button>':'')+
-          (!isMe&&!isActive?'<button class="btn btn-success btn-sm" data-action="activateAdmin" data-id="'+a.id+'">Activate</button>':'')+
-          (!isMe?'<button class="btn btn-danger btn-sm" data-action="deleteAdmin" data-id="'+a.id+'">Delete</button>':'')+
+    const currentEmail = sessionStorage.getItem('admin_email');
+    const tbody = document.getElementById('adminsTable');
+    if(!tbody) return;
+    tbody.innerHTML = adminsList.length ? adminsList.map(function(a){
+      const isMe = a.email === currentEmail;
+      const isActive = a.is_active !== false;
+      const aid = String(a.id);
+      return '<tr style="opacity:'+(isActive?'1':'0.6')+'">' +
+        '<td><div class="s-info-row"><div class="s-avatar" style="background:'+(isActive?'var(--blue)':'var(--muted)')+'">'+ini(a.name)+'</div>' +
+        '<div><div class="s-name">'+a.name+(isMe?' <span class="badge badge-blue" style="font-size:10px">You</span>':'')+'</div>' +
+        '<div class="s-sub">'+(isActive?'<span style="color:#22c55e;font-size:11px">&#9679; Active</span>':'<span style="color:#ef4444;font-size:11px">&#9679; Deactivated</span>')+'</div>' +
+        '</div></div></td>' +
+        '<td style="font-size:13px">'+a.email+'</td>' +
+        '<td>'+(isActive?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Deactivated</span>')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(a.created_at)+'</td>' +
+        '<td style="display:flex;gap:4px;flex-wrap:wrap">' +
+          '<button class="btn btn-ghost btn-sm" data-admin-action="edit" data-admin-id="'+aid+'">Edit</button>' +
+          (!isMe&&isActive?'<button class="btn btn-amber btn-sm" data-admin-action="deactivate" data-admin-id="'+aid+'">Deactivate</button>':'') +
+          (!isMe&&!isActive?'<button class="btn btn-success btn-sm" data-admin-action="activate" data-admin-id="'+aid+'">Activate</button>':'') +
+          (!isMe?'<button class="btn btn-danger btn-sm" data-admin-action="delete" data-admin-id="'+aid+'">Delete</button>':'') +
         '</td></tr>';
-    }).join('')||'<tr><td colspan="4"><div class="empty"><p>No admins found.</p></div></td></tr>';
+    }).join('') : '<tr><td colspan="5"><div class="empty"><p>No admins found.</p></div></td></tr>';
+
+    // Wire buttons directly after render
+    tbody.querySelectorAll('[data-admin-action]').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        const action = this.dataset.adminAction;
+        const id = this.dataset.adminId;
+        const a = adminsList.find(function(x){ return String(x.id)===id; });
+        if(!a) return;
+
+        if(action==='edit'){
+          openEditAdmin(id);
+        }
+        if(action==='delete'){
+          deletingAdminId=id;
+          document.getElementById('deleteAdminName').textContent=a.name;
+          openModal('mDeleteAdminConfirm');
+        }
+        if(action==='deactivate'){
+          if(!confirm('Deactivate '+a.name+"? They won't be able to log in until reactivated.")) return;
+          this.disabled=true; this.textContent='Saving...';
+          const {error}=await sb.from('admins').update({is_active:false}).eq('id',Number(id));
+          if(error){ toast(error.message,'❌'); this.disabled=false; this.textContent='Deactivate'; return; }
+          const idx=adminsList.findIndex(function(x){ return String(x.id)===id; });
+          if(idx!==-1) adminsList[idx].is_active=false;
+          toast(a.name+' has been deactivated.','🔒');
+          renderAdmins();
+        }
+        if(action==='activate'){
+          this.disabled=true; this.textContent='Saving...';
+          const {error}=await sb.from('admins').update({is_active:true}).eq('id',Number(id));
+          if(error){ toast(error.message,'❌'); this.disabled=false; this.textContent='Activate'; return; }
+          const idx=adminsList.findIndex(function(x){ return String(x.id)===id; });
+          if(idx!==-1) adminsList[idx].is_active=true;
+          toast(a.name+' has been activated.','✅');
+          renderAdmins();
+        }
+      });
+    });
   }
 
   // Use document-level delegation for adminsTable since it is dynamically rendered
-  document.addEventListener('click', async function(e){
-    // closest() traverses UP — must find [data-action] first, then check if inside adminsTable
-    const btn=e.target.closest('[data-action]');
-    if(!btn) return;
-    if(!btn.closest('#adminsTable')) return; // only handle admin table buttons here
-    const id=btn.dataset.id;
-    const action=btn.dataset.action;
-    function matchId(x){ return String(x.id)===String(id); }
-
-    if(action==='editAdmin') openEditAdmin(id);
-
-    if(action==='deleteAdmin'){
-      const a=adminsList.find(matchId); if(!a) return;
-      deletingAdminId=id;
-      document.getElementById('deleteAdminName').textContent=a.name;
-      openModal('mDeleteAdminConfirm');
-    }
-
-    if(action==='deactivateAdmin'){
-      const a=adminsList.find(matchId); if(!a) return;
-      if(!confirm('Deactivate '+a.name+"? They won't be able to log in until reactivated.")) return;
-      btn.disabled=true; btn.textContent='Saving...';
-      const {error}=await sb.from('admins').update({is_active:false}).eq('id',Number(id));
-      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Deactivate'; return; }
-      const idx=adminsList.findIndex(matchId);
-      if(idx!==-1) adminsList[idx].is_active=false;
-      toast(a.name+' has been deactivated.','🔒');
-      renderAdmins();
-    }
-
-    if(action==='activateAdmin'){
-      const a=adminsList.find(matchId); if(!a) return;
-      btn.disabled=true; btn.textContent='Saving...';
-      const {error}=await sb.from('admins').update({is_active:true}).eq('id',Number(id));
-      if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Activate'; return; }
-      const idx=adminsList.findIndex(matchId);
-      if(idx!==-1) adminsList[idx].is_active=true;
-      toast(a.name+' has been activated.','✅');
-      renderAdmins();
-    }
-  });
+  // Admin table actions are wired directly in renderAdmins() after each render
 
   // ── SPONSORS DATABASE ──
   let sponsors = [];
