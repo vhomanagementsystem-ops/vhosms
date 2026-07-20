@@ -1094,9 +1094,9 @@
   document.getElementById('mDeleteAdminConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAdminConfirm'); });
   document.getElementById('confirmDeleteAdminBtn').addEventListener('click', async function(){
     if(!deletingAdminId) return;
-    const {error}=await sb.from('admins').delete().eq('id',deletingAdminId);
+    const {error}=await sb.from('admins').delete().eq('id',Number(deletingAdminId));
     if(error){ toast(error.message,'❌'); return; }
-    adminsList=adminsList.filter(function(a){ return a.id!==deletingAdminId; });
+    adminsList=adminsList.filter(function(a){ return String(a.id)!==String(deletingAdminId); });
     closeModal('mDeleteAdminConfirm'); deletingAdminId=null;
     renderAdmins(); toast('Admin deleted','🗑️');
   });
@@ -1111,7 +1111,7 @@
   }
 
   function openEditAdmin(id){
-    const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+    const a=adminsList.find(function(x){ return String(x.id)===String(id); }); if(!a) return;
     editingAdminId=id;
     const nameParts=(a.name||'').split(' ');
     document.getElementById('adm_fn').value=nameParts[0]||'';
@@ -1138,9 +1138,9 @@
       adminsList.unshift(newA);
       toast(fullName+' added! Default password: '+defaultPw,'✅');
     } else {
-      const {data:upd,error}=await sb.from('admins').update({name:fullName,email:email}).eq('id',editingAdminId).select().single();
+      const {data:upd,error}=await sb.from('admins').update({name:fullName,email:email}).eq('id',Number(editingAdminId)).select().single();
       if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
-      const idx=adminsList.findIndex(function(x){ return x.id===editingAdminId; });
+      const idx=adminsList.findIndex(function(x){ return String(x.id)===String(editingAdminId); });
       if(idx!==-1) adminsList[idx]=upd;
       toast('Admin updated','✅');
     }
@@ -1173,31 +1173,38 @@
   // Use document-level delegation for adminsTable since it is dynamically rendered
   document.addEventListener('click', async function(e){
     const btn=e.target.closest('#adminsTable [data-action]'); if(!btn) return;
-    const id=btn.dataset.id; const action=btn.dataset.action;
+    // id from dataset is always string; admins.id is int8 — compare as string
+    const id=btn.dataset.id;
+    const action=btn.dataset.action;
+    function matchId(x){ return String(x.id)===String(id); }
+
     if(action==='editAdmin') openEditAdmin(id);
+
     if(action==='deleteAdmin'){
-      const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+      const a=adminsList.find(matchId); if(!a) return;
       deletingAdminId=id;
       document.getElementById('deleteAdminName').textContent=a.name;
       openModal('mDeleteAdminConfirm');
     }
+
     if(action==='deactivateAdmin'){
-      const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+      const a=adminsList.find(matchId); if(!a) return;
       if(!confirm('Deactivate '+a.name+"? They won't be able to log in until reactivated.")) return;
       btn.disabled=true; btn.textContent='Saving...';
-      const {error}=await sb.from('admins').update({is_active:false}).eq('id',id);
+      const {error}=await sb.from('admins').update({is_active:false}).eq('id',Number(id));
       if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Deactivate'; return; }
-      const idx=adminsList.findIndex(function(x){ return x.id===id; });
+      const idx=adminsList.findIndex(matchId);
       if(idx!==-1) adminsList[idx].is_active=false;
       toast(a.name+' has been deactivated.','🔒');
       renderAdmins();
     }
+
     if(action==='activateAdmin'){
-      const a=adminsList.find(function(x){ return x.id===id; }); if(!a) return;
+      const a=adminsList.find(matchId); if(!a) return;
       btn.disabled=true; btn.textContent='Saving...';
-      const {error}=await sb.from('admins').update({is_active:true}).eq('id',id);
+      const {error}=await sb.from('admins').update({is_active:true}).eq('id',Number(id));
       if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Activate'; return; }
-      const idx=adminsList.findIndex(function(x){ return x.id===id; });
+      const idx=adminsList.findIndex(matchId);
       if(idx!==-1) adminsList[idx].is_active=true;
       toast(a.name+' has been activated.','✅');
       renderAdmins();
