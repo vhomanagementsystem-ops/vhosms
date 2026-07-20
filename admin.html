@@ -1172,8 +1172,10 @@
 
   // Use document-level delegation for adminsTable since it is dynamically rendered
   document.addEventListener('click', async function(e){
-    const btn=e.target.closest('#adminsTable [data-action]'); if(!btn) return;
-    // id from dataset is always string; admins.id is int8 — compare as string
+    // closest() traverses UP — must find [data-action] first, then check if inside adminsTable
+    const btn=e.target.closest('[data-action]');
+    if(!btn) return;
+    if(!btn.closest('#adminsTable')) return; // only handle admin table buttons here
     const id=btn.dataset.id;
     const action=btn.dataset.action;
     function matchId(x){ return String(x.id)===String(id); }
