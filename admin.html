@@ -1094,7 +1094,8 @@
   document.getElementById('mDeleteAdminConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAdminConfirm'); });
   document.getElementById('confirmDeleteAdminBtn').addEventListener('click', async function(){
     if(!deletingAdminId) return;
-    const {error}=await sb.from('admins').delete().eq('id',Number(deletingAdminId));
+    const {data:delData, error}=await sb.from('admins').delete().eq('id',deletingAdminId).select();
+    console.log('delete result:', delData, error);
     if(error){ toast(error.message,'❌'); return; }
     adminsList=adminsList.filter(function(a){ return String(a.id)!==String(deletingAdminId); });
     closeModal('mDeleteAdminConfirm'); deletingAdminId=null;
@@ -1111,7 +1112,9 @@
   }
 
   function openEditAdmin(id){
-    const a=adminsList.find(function(x){ return String(x.id)===String(id); }); if(!a) return;
+    console.log('openEditAdmin called with id:', id, 'adminsList:', adminsList.map(function(x){return String(x.id);}));
+    const a=adminsList.find(function(x){ return String(x.id)===String(id); }); 
+    if(!a){ console.log('admin not found!'); return; }
     editingAdminId=id;
     const nameParts=(a.name||'').split(' ');
     document.getElementById('adm_fn').value=nameParts[0]||'';
@@ -1138,7 +1141,8 @@
       adminsList.unshift(newA);
       toast(fullName+' added! Default password: '+defaultPw,'✅');
     } else {
-      const {data:upd,error}=await sb.from('admins').update({name:fullName,email:email}).eq('id',Number(editingAdminId)).select().single();
+      const {data:upd,error}=await sb.from('admins').update({name:fullName,email:email}).eq('id',editingAdminId).select().single();
+      console.log('saveAdmin update result:', upd, error);
       if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
       const idx=adminsList.findIndex(function(x){ return String(x.id)===String(editingAdminId); });
       if(idx!==-1) adminsList[idx]=upd;
@@ -1181,9 +1185,11 @@
         if(!a) return;
 
         if(action==='edit'){
+          console.log('edit admin id:', id, 'found:', a);
           openEditAdmin(id);
         }
         if(action==='delete'){
+          console.log('delete admin id:', id, 'found:', a);
           deletingAdminId=id;
           document.getElementById('deleteAdminName').textContent=a.name;
           openModal('mDeleteAdminConfirm');
@@ -1191,7 +1197,8 @@
         if(action==='deactivate'){
           if(!confirm('Deactivate '+a.name+"? They won't be able to log in until reactivated.")) return;
           this.disabled=true; this.textContent='Saving...';
-          const {error}=await sb.from('admins').update({is_active:false}).eq('id',Number(id));
+          const {data:dData, error}=await sb.from('admins').update({is_active:false}).eq('id',id).select();
+          console.log('deactivate result:', dData, error);
           if(error){ toast(error.message,'❌'); this.disabled=false; this.textContent='Deactivate'; return; }
           const idx=adminsList.findIndex(function(x){ return String(x.id)===id; });
           if(idx!==-1) adminsList[idx].is_active=false;
@@ -1200,7 +1207,8 @@
         }
         if(action==='activate'){
           this.disabled=true; this.textContent='Saving...';
-          const {error}=await sb.from('admins').update({is_active:true}).eq('id',Number(id));
+          const {data:aData, error}=await sb.from('admins').update({is_active:true}).eq('id',id).select();
+          console.log('activate result:', aData, error);
           if(error){ toast(error.message,'❌'); this.disabled=false; this.textContent='Activate'; return; }
           const idx=adminsList.findIndex(function(x){ return String(x.id)===id; });
           if(idx!==-1) adminsList[idx].is_active=true;
