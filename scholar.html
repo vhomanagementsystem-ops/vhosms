@@ -7,6 +7,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="shared.css">
 <style>
+.doc-upload-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px}
+.doc-upload-card h3{font-size:15px;font-weight:500;margin-bottom:4px}
+.doc-upload-card p{font-size:12px;color:var(--muted);margin-bottom:14px}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-pale)}
+.verif-box{border-radius:var(--radius);border:2px solid var(--border);padding:18px;text-align:center}
+.verif-box.pending{border-color:#f59e0b;background:#fffbeb}
+.verif-box.verified{border-color:#22c55e;background:#f0fdf4}
+.verif-box.rejected{border-color:#ef4444;background:#fef2f2}
+.verif-box.not_submitted{border-color:var(--border);background:#f9f9fb}
+.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #f4f4f8}
+.checklist-item:last-child{border-bottom:none}
 .quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
 .quick-btn{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text)}
 .quick-btn:hover{border-color:var(--blue);transform:translateY(-2px)}
@@ -36,6 +48,10 @@
       <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7A1 1 0 0 0 3 11h1v6a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3h2v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-6h1a1 1 0 0 0 .707-1.707l-7-7z"/></svg>Home</a>
     <a class="nav-item" id="nav-profile">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7 9a7 7 0 1 1 14 0H3z"/></svg>My Profile</a>
+    <a class="nav-item" id="nav-documents">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h4.586A2 2 0 0 1 12 2.586L15.414 6A2 2 0 0 1 16 7.414V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 6a1 1 0 0 1 1-1h6a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm1 3a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H7z"/></svg>Documents</a>
+    <a class="nav-item" id="nav-verification">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 0 0 1.745-.723 3.066 3.066 0 0 1 3.976 0 3.066 3.066 0 0 0 1.745.723 3.066 3.066 0 0 1 2.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 0 1 0 3.976 3.066 3.066 0 0 0-.723 1.745 3.066 3.066 0 0 1-2.812 2.812 3.066 3.066 0 0 0-1.745.723 3.066 3.066 0 0 1-3.976 0 3.066 3.066 0 0 0-1.745-.723 3.066 3.066 0 0 1-2.812-2.812 3.066 3.066 0 0 0-.723-1.745 3.066 3.066 0 0 1 0-3.976 3.066 3.066 0 0 0 .723-1.745 3.066 3.066 0 0 1 2.812-2.812zm7.44 5.252a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4z"/></svg>Verification</a>
     <div class="nav-group-label">Updates</div>
     <a class="nav-item" id="nav-announcements">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l6.553 3.276A1 1 0 0 0 18 15V3z"/></svg>Announcements<span class="nav-badge" id="nb-announcements" style="display:none">!</span></a>
@@ -72,6 +88,8 @@
       <div class="stat-grid" id="homeStats"></div>
       <div class="quick-grid">
         <div class="quick-btn" id="qbtn-profile"><div class="qicon">👤</div><div class="qlabel">Edit Profile</div></div>
+        <div class="quick-btn" id="qbtn-documents"><div class="qicon">📄</div><div class="qlabel">Upload Docs</div></div>
+        <div class="quick-btn" id="qbtn-verification"><div class="qicon">✅</div><div class="qlabel">Verification</div></div>
         <div class="quick-btn" id="qbtn-announcements"><div class="qicon">📢</div><div class="qlabel">Announcements</div></div>
         <div class="quick-btn" id="qbtn-notifications"><div class="qicon">🔔</div><div class="qlabel">Notifications</div></div>
         <div class="quick-btn" id="qbtn-changepassword"><div class="qicon">🔒</div><div class="qlabel">Change Password</div></div>
@@ -149,6 +167,53 @@
         <div class="edit-actions">
           <button class="btn btn-ghost" id="cancelEditBtn">Cancel</button>
           <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div id="page-documents" class="page" style="display:none">
+      <div class="page-header"><div class="page-header-left"><h1>Documents</h1><p>Upload your required scholarship documents (PDF only, max 10MB)</p></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="doc-upload-card">
+          <h3>📋 Certificate of Registration (COR)</h3>
+          <p>Upload your Certificate of Registration / Enrollment from your school.</p>
+          <div id="certBadge" style="margin-bottom:12px"></div>
+          <div class="upload-zone" id="uploadZoneCert">
+            <svg width="28" height="28" fill="none" stroke="var(--muted)" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <p style="font-size:13px;color:var(--muted)"><strong>Click to upload</strong> PDF</p>
+          </div>
+          <input type="file" id="up_cert" accept=".pdf" style="display:none">
+        </div>
+        <div class="doc-upload-card">
+          <h3>📊 Grade Report</h3>
+          <p>Upload your latest report card, grade sheet, or transcript of records.</p>
+          <div id="rcBadge" style="margin-bottom:12px"></div>
+          <div class="upload-zone" id="uploadZoneGrade">
+            <svg width="28" height="28" fill="none" stroke="var(--muted)" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <p style="font-size:13px;color:var(--muted)"><strong>Click to upload</strong> PDF</p>
+          </div>
+          <input type="file" id="up_rc" accept=".pdf" style="display:none">
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="card-header"><span class="card-title">Upload History</span></div>
+        <div class="table-wrap"><table><thead><tr><th>File Name</th><th>Type</th><th>Date</th><th>Status</th><th>Remarks</th></tr></thead><tbody id="docHistory"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- VERIFICATION -->
+    <div id="page-verification" class="page" style="display:none">
+      <div class="page-header"><div class="page-header-left"><h1>Verification Status</h1><p>Track the review status of your submitted documents</p></div></div>
+      <div style="max-width:520px">
+        <div class="verif-box not_submitted" id="verifBox" style="margin-bottom:16px;border-radius:var(--radius);border:2px solid var(--border);padding:18px;text-align:center">
+          <div style="font-size:36px;margin-bottom:8px" id="verifIcon">📭</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:4px" id="verifTitle">No Documents Submitted</div>
+          <div style="font-size:12px;color:var(--muted)" id="verifDesc">Upload your documents to begin the verification process.</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Document Checklist</span></div>
+          <div class="card-body" id="verifChecklist"><div class="empty"><p>Loading…</p></div></div>
         </div>
       </div>
     </div>
@@ -268,8 +333,8 @@
   }
 
   // ── NAV ──
-  const navPages = ['home','profile','announcements','notifications','changepassword'];
-  const pageTitles = {home:'Home',profile:'My Profile',announcements:'Announcements',notifications:'Notifications',changepassword:'Change Password'};
+  const navPages = ['home','profile','documents','verification','announcements','notifications','changepassword'];
+  const pageTitles = {home:'Home',profile:'My Profile',documents:'Documents',verification:'Verification Status',announcements:'Announcements',notifications:'Notifications',changepassword:'Change Password'};
 
   function gotoPage(page){
     navPages.forEach(function(p){
@@ -279,6 +344,8 @@
     document.getElementById('pageTitle').textContent = pageTitles[page]||page;
     if (page==='home') renderHome();
     if (page==='profile') renderProfile();
+    if (page==='documents') loadDocs().then(renderDocs);
+    if (page==='verification') loadDocs().then(renderVerification);
     if (page==='announcements') renderAnnouncements();
     if (page==='notifications') renderNotifications();
     closeSidebar();
@@ -401,6 +468,102 @@
     if(error){ toast(error.message,'❌'); return; }
     currentUser=updated; setupSidebar(); cancelEdit(); renderProfile();
     toast('Profile updated successfully','✅');
+  }
+
+  // ── DOCUMENTS ──
+  let myDocs = [];
+
+  async function loadDocs() {
+    const {data, error} = await sb.from('documents').select('*').eq('scholar_id', currentUser.id).order('uploaded_at', {ascending:false});
+    if (!error) myDocs = data || [];
+  }
+
+  document.getElementById('uploadZoneCert').addEventListener('click', function(){ document.getElementById('up_cert').click(); });
+  document.getElementById('uploadZoneGrade').addEventListener('click', function(){ document.getElementById('up_rc').click(); });
+  document.getElementById('up_cert').addEventListener('change', function(){ handleUpload('Certificate of Registration', this); });
+  document.getElementById('up_rc').addEventListener('change', function(){ handleUpload('Grade Report', this); });
+
+  function renderDocs() {
+    const cor = myDocs.find(function(d){ return d.document_type === 'Certificate of Registration'; });
+    const grade = myDocs.find(function(d){ return d.document_type === 'Grade Report'; });
+    function badge(doc, label) {
+      if (!doc) return '<span class="badge badge-gray">'+label+' — Not uploaded</span>';
+      const m = {Pending:'badge-amber',Verified:'badge-green',Rejected:'badge-pink'};
+      return '<span class="badge '+(m[doc.verification_status]||'badge-gray')+'">✓ '+label+' — '+doc.verification_status+'</span>';
+    }
+    document.getElementById('certBadge').innerHTML = badge(cor, 'COR');
+    document.getElementById('rcBadge').innerHTML = badge(grade, 'Grade Report');
+    if (!myDocs.length) {
+      document.getElementById('docHistory').innerHTML = '<tr><td colspan="5"><div class="empty"><p>No uploads yet.</p></div></td></tr>';
+      return;
+    }
+    const m = {Pending:'badge-amber',Verified:'badge-green',Rejected:'badge-pink'};
+    document.getElementById('docHistory').innerHTML = myDocs.map(function(doc){
+      return '<tr><td>'+doc.file_name+'</td><td>'+doc.document_type+'</td><td>'+fmtDate(doc.uploaded_at)+'</td><td><span class="badge '+(m[doc.verification_status]||'badge-gray')+'">'+(doc.verification_status||'Pending')+'</span></td><td style="font-size:12px;color:var(--muted);max-width:200px">'+(doc.remarks||'—')+'</td></tr>';
+    }).join('');
+  }
+
+  async function handleUpload(documentType, input) {
+    if (!input.files.length) return;
+    const file = input.files[0];
+    if (!file.name.toLowerCase().endsWith('.pdf')) { toast('Only PDF files are accepted','⚠️'); input.value=''; return; }
+    if (file.size > 10*1024*1024) { toast('File must be under 10MB','⚠️'); input.value=''; return; }
+    document.getElementById('uploadZoneCert').style.pointerEvents = 'none';
+    document.getElementById('uploadZoneGrade').style.pointerEvents = 'none';
+    toast('Uploading…','⏳');
+    try {
+      const filePath = currentUser.id+'/'+documentType.replace(/ /g,'_')+'/'+Date.now()+'_'+file.name;
+      const {error:upErr} = await sb.storage.from('scholar-documents').upload(filePath, file);
+      if (upErr) { toast(upErr.message,'❌'); input.value=''; return; }
+      const {data:urlData} = sb.storage.from('scholar-documents').getPublicUrl(filePath);
+      const {error:dbErr} = await sb.from('documents').insert({
+        scholar_id: currentUser.id, document_type: documentType,
+        file_name: file.name, file_url: urlData.publicUrl,
+        verification_status: 'Pending', uploaded_at: new Date().toISOString()
+      });
+      if (dbErr) { toast(dbErr.message,'❌'); input.value=''; return; }
+      toast('Document uploaded!','✅');
+      input.value='';
+      await loadDocs();
+      renderDocs();
+      renderVerification();
+    } catch(err) {
+      console.error(err); toast('Upload failed. Please try again.','❌'); input.value='';
+    } finally {
+      document.getElementById('uploadZoneCert').style.pointerEvents = '';
+      document.getElementById('uploadZoneGrade').style.pointerEvents = '';
+    }
+  }
+
+  function renderVerification() {
+    const cor = myDocs.find(function(d){ return d.document_type === 'Certificate of Registration'; });
+    const grade = myDocs.find(function(d){ return d.document_type === 'Grade Report'; });
+    let status = 'not_submitted';
+    if (myDocs.length > 0) {
+      if (myDocs.every(function(d){ return d.verification_status === 'Verified'; })) status = 'verified';
+      else if (myDocs.some(function(d){ return d.verification_status === 'Rejected'; })) status = 'rejected';
+      else status = 'pending';
+    }
+    const box = document.getElementById('verifBox');
+    box.className = 'verif-box '+status;
+    const icons = {pending:'⏳',verified:'✅',rejected:'❌',not_submitted:'📭'};
+    const titles = {pending:'Under Review',verified:'All Verified',rejected:'Action Required',not_submitted:'No Documents Submitted'};
+    const descs = {
+      pending:'Your documents are under review by the admin. Please wait.',
+      verified:'All your documents have been verified. Great job!',
+      rejected:'One or more documents were rejected. Check the remarks below and re-upload.',
+      not_submitted:'Upload your COR and Grade Report to begin verification.'
+    };
+    document.getElementById('verifIcon').textContent = icons[status];
+    document.getElementById('verifTitle').textContent = titles[status];
+    document.getElementById('verifDesc').textContent = descs[status];
+    function checkItem(label, doc) {
+      if (!doc) return '<div class="checklist-item"><span style="font-size:22px">⬜</span><div><div style="font-weight:500">'+label+'</div><div style="font-size:12px;color:var(--muted)">Not uploaded</div></div></div>';
+      const icns = {Pending:'⏳',Verified:'✅',Rejected:'❌'};
+      const remarksHtml = doc.remarks ? '<div style="font-size:12px;color:var(--red);margin-top:4px">Admin remark: '+doc.remarks+'</div>' : '';
+      return '<div class="checklist-item"><span style="font-size:22px">'+(icns[doc.verification_status]||'⏳')+'</span><div><div style="font-weight:500">'+label+'</div><div style="font-size:12px;color:var(--muted)">'+doc.file_name+' · '+fmtDate(doc.uploaded_at)+'</div>'+remarksHtml+'</div></div>';
+    }
+    document.getElementById('verifChecklist').innerHTML = checkItem('Certificate of Registration (COR)', cor) + checkItem('Grade Report', grade);
   }
 
   // ── ANNOUNCEMENTS ──
