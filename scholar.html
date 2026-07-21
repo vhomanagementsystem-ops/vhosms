@@ -198,7 +198,7 @@
       </div>
       <div class="card" style="margin-top:14px">
         <div class="card-header"><span class="card-title">Upload History</span></div>
-        <div class="table-wrap"><table><thead><tr><th>File Name</th><th>Type</th><th>Date</th><th>Status</th><th>Remarks</th></tr></thead><tbody id="docHistory"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>File Name</th><th>Type</th><th>Date</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="docHistory"></tbody></table></div>
       </div>
     </div>
 
@@ -264,6 +264,25 @@
 
   </div>
 </main>
+
+<!-- Document View Modal -->
+<div class="modal-bg" id="mDocViewScholar">
+<div class="modal" style="max-width:780px">
+  <button class="modal-close" id="closeDocViewScholar">✕</button>
+  <h2 class="modal-title" id="docViewScholarTitle">Document Preview</h2>
+  <iframe id="docViewScholarFrame" src="about:blank" style="width:100%;height:500px;border:none;border-radius:8px;background:#f9f9fb"></iframe>
+</div></div>
+
+<!-- Delete Document Confirmation -->
+<div class="modal-bg" id="mDeleteDocConfirm">
+<div class="modal" style="max-width:420px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Document</h2>
+  <p class="modal-sub">Are you sure you want to delete <strong id="deleteDocName"></strong>? This will permanently remove the file and <strong>cannot be undone.</strong></p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteDocBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteDocBtn">Yes, Delete</button>
+  </div>
+</div></div>
 
 <!-- Logout Confirmation Modal -->
 <div class="modal-bg" id="mLogoutConfirm">
@@ -494,12 +513,24 @@
     document.getElementById('certBadge').innerHTML = badge(cor, 'COR');
     document.getElementById('rcBadge').innerHTML = badge(grade, 'Grade Report');
     if (!myDocs.length) {
-      document.getElementById('docHistory').innerHTML = '<tr><td colspan="5"><div class="empty"><p>No uploads yet.</p></div></td></tr>';
+      document.getElementById('docHistory').innerHTML = '<tr><td colspan="6"><div class="empty"><p>No uploads yet.</p></div></td></tr>';
       return;
     }
     const m = {Pending:'badge-amber',Verified:'badge-green',Rejected:'badge-pink'};
     document.getElementById('docHistory').innerHTML = myDocs.map(function(doc){
-      return '<tr><td>'+doc.file_name+'</td><td>'+doc.document_type+'</td><td>'+fmtDate(doc.uploaded_at)+'</td><td><span class="badge '+(m[doc.verification_status]||'badge-gray')+'">'+(doc.verification_status||'Pending')+'</span></td><td style="font-size:12px;color:var(--muted);max-width:200px">'+(doc.remarks||'—')+'</td></tr>';
+      const isVerified = doc.verification_status === 'Verified';
+      return '<tr>' +
+        '<td style="font-size:13px">'+doc.file_name+'</td>' +
+        '<td style="font-size:13px">'+doc.document_type+'</td>' +
+        '<td style="font-size:12px;color:var(--muted);white-space:nowrap">'+fmtDate(doc.uploaded_at)+'</td>' +
+        '<td><span class="badge '+(m[doc.verification_status]||'badge-gray')+'">'+(doc.verification_status||'Pending')+'</span></td>' +
+        '<td style="font-size:12px;color:var(--muted);max-width:160px">'+(doc.remarks||'—')+'</td>' +
+        '<td style="display:flex;gap:4px;flex-wrap:wrap">' +
+          (doc.file_url ? '<button class="btn btn-ghost btn-sm" data-action="viewDoc" data-url="'+doc.file_url+'" data-name="'+doc.file_name+'">View</button>' : '') +
+          (!isVerified ? '<button class="btn btn-danger btn-sm" data-action="deleteDoc" data-id="'+doc.id+'" data-path="'+doc.file_url+'">Delete</button>' : '') +
+          (isVerified ? '<span style="font-size:11px;color:#22c55e;padding:4px 6px">✓ Verified</span>' : '') +
+        '</td>' +
+        '</tr>';
     }).join('');
   }
 
@@ -565,6 +596,91 @@
     }
     document.getElementById('verifChecklist').innerHTML = checkItem('Certificate of Registration (COR)', cor) + checkItem('Grade Report', grade);
   }
+
+  // ── DOCUMENT ACTIONS ──
+  let deletingDocId = null;
+  let deletingDocPath = null;
+
+  // View and Delete button delegation on docHistory table
+  document.getElementById('docHistory').addEventListener('click', async function(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+
+    if (btn.dataset.action === 'viewDoc') {
+      const url = btn.dataset.url;
+      const name = btn.dataset.name;
+      document.getElementById('docViewScholarTitle').textContent = name || 'Document Preview';
+      document.getElementById('docViewScholarFrame').src = url || 'about:blank';
+      openModal('mDocViewScholar');
+    }
+
+    if (btn.dataset.action === 'deleteDoc') {
+      deletingDocId = btn.dataset.id;
+      deletingDocPath = btn.dataset.path;
+      const doc = myDocs.find(function(d){ return d.id === deletingDocId; });
+      document.getElementById('deleteDocName').textContent = doc ? doc.file_name : 'this document';
+      openModal('mDeleteDocConfirm');
+    }
+  });
+
+  // Close document view modal
+  document.getElementById('closeDocViewScholar').addEventListener('click', function(){
+    document.getElementById('docViewScholarFrame').src = 'about:blank';
+    closeModal('mDocViewScholar');
+  });
+  document.getElementById('mDocViewScholar').addEventListener('click', function(e){
+    if (e.target === this) {
+      document.getElementById('docViewScholarFrame').src = 'about:blank';
+      closeModal('mDocViewScholar');
+    }
+  });
+
+  // Cancel delete doc
+  document.getElementById('cancelDeleteDocBtn').addEventListener('click', function(){
+    closeModal('mDeleteDocConfirm');
+    deletingDocId = null;
+    deletingDocPath = null;
+  });
+  document.getElementById('mDeleteDocConfirm').addEventListener('click', function(e){
+    if (e.target === this) { closeModal('mDeleteDocConfirm'); deletingDocId = null; deletingDocPath = null; }
+  });
+
+  // Confirm delete doc
+  document.getElementById('confirmDeleteDocBtn').addEventListener('click', async function(){
+    if (!deletingDocId) return;
+    this.disabled = true; this.textContent = 'Deleting…';
+
+    // Try to delete from storage using file path extracted from URL
+    try {
+      if (deletingDocPath) {
+        // Extract path after /storage/v1/object/public/scholar-documents/
+        const marker = '/scholar-documents/';
+        const pathIdx = deletingDocPath.indexOf(marker);
+        if (pathIdx !== -1) {
+          const storagePath = deletingDocPath.slice(pathIdx + marker.length);
+          await sb.storage.from('scholar-documents').remove([storagePath]);
+        }
+      }
+    } catch(err) {
+      console.warn('Storage delete failed:', err);
+      // Continue with DB delete even if storage delete fails
+    }
+
+    // Delete from documents table
+    const { error } = await sb.from('documents').delete().eq('id', deletingDocId);
+    this.disabled = false; this.textContent = 'Yes, Delete';
+
+    if (error) { toast(error.message, '❌'); return; }
+
+    // Remove from local array
+    myDocs = myDocs.filter(function(d){ return d.id !== deletingDocId; });
+    closeModal('mDeleteDocConfirm');
+    deletingDocId = null;
+    deletingDocPath = null;
+    toast('Document deleted successfully', '🗑️');
+    renderDocs();
+    renderVerification();
+  });
 
   // ── ANNOUNCEMENTS ──
   async function renderAnnouncements(){
