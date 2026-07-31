@@ -734,7 +734,7 @@
     document.getElementById('pageTitle').textContent = titles[page]||page;
     if (page==='dashboard') renderDash();
     if (page==='scholars') renderScholarsTable();
-    if (page==='documents') renderDocsTable();
+    if (page==='documents') { renderDocsTable(); initDocTabs(); }
     if (page==='announcements') renderAnnouncements();
     if (page==='admins') renderAdmins();
     if (page==='sponsors') { renderSponsors(); updateSponsorTabButtons(); }
@@ -990,18 +990,33 @@
 
   // ── DOCUMENT VERIFICATION ──
   let currentDocTab = 'submitted';
+  let docTabsInited = false;
 
-  // Doc sub-tab switching
-  document.querySelectorAll('[data-dtab]').forEach(function(tab){
-    tab.addEventListener('click', function(){
-      currentDocTab = this.dataset.dtab;
-      document.querySelectorAll('[data-dtab]').forEach(function(t){ t.classList.remove('on'); });
-      this.classList.add('on');
-      document.getElementById('dpanel-submitted').style.display = currentDocTab === 'submitted' ? 'block' : 'none';
-      document.getElementById('dpanel-notsubmitted').style.display = currentDocTab === 'notsubmitted' ? 'block' : 'none';
-      if (currentDocTab === 'notsubmitted') renderMissingDocs();
+  function initDocTabs() {
+    // Reset to submitted tab each time page is opened
+    currentDocTab = 'submitted';
+    document.querySelectorAll('[data-dtab]').forEach(function(t){ t.classList.remove('on'); });
+    document.getElementById('dtab-submitted').classList.add('on');
+    document.getElementById('dpanel-submitted').style.display = 'block';
+    document.getElementById('dpanel-notsubmitted').style.display = 'none';
+
+    if (docTabsInited) return;
+    docTabsInited = true;
+
+    document.querySelectorAll('[data-dtab]').forEach(function(tab){
+      tab.addEventListener('click', function(){
+        currentDocTab = this.dataset.dtab;
+        document.querySelectorAll('[data-dtab]').forEach(function(t){ t.classList.remove('on'); });
+        this.classList.add('on');
+        document.getElementById('dpanel-submitted').style.display = currentDocTab === 'submitted' ? 'block' : 'none';
+        document.getElementById('dpanel-notsubmitted').style.display = currentDocTab === 'notsubmitted' ? 'block' : 'none';
+        if (currentDocTab === 'notsubmitted') renderMissingDocs();
+      });
     });
-  });
+
+    document.getElementById('dSearchMissingCor').addEventListener('input', renderMissingDocs);
+    document.getElementById('dSearchMissingGrade').addEventListener('input', renderMissingDocs);
+  }
 
   function renderMissingDocs() {
     const qCor = (document.getElementById('dSearchMissingCor').value||'').toLowerCase();
@@ -1039,8 +1054,7 @@
       : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have submitted their Grade Report ✅</div>';
   }
 
-  document.getElementById('dSearchMissingCor').addEventListener('input', renderMissingDocs);
-  document.getElementById('dSearchMissingGrade').addEventListener('input', renderMissingDocs);
+  // dSearchMissingCor and dSearchMissingGrade listeners are in initDocTabs()
   function getDoc(scholarId, type) { return docs.find(function(d){ return d.scholar_id===scholarId && d.document_type===type; }); }
   function docBadge(status) {
     if (!status) return '<span class="badge badge-gray">Not Submitted</span>';
@@ -1303,7 +1317,7 @@
         (eventDate?'<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 '+eventDate+(ann.event_location?' · 📍 '+ann.event_location:'')+'</div>':'')+
         '</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
         (hasOptions?'<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="'+ann.id+'">📊 Poll Results ('+totalResponses+')</button>':'')+
-        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="'+ann.id+'">👥 Attended ('+attendedCount+') / Not ('+notAttendedCount+')</button>'+
+        '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="'+ann.id+'">👥 Attendance (✅'+attendedCount+' / ❌'+notAttendedCount+')</button>'+
         '<button class="btn btn-ghost btn-sm" data-action="editAnn" data-id="'+ann.id+'">Edit</button>'+
         '<button class="btn btn-danger btn-sm" data-action="deleteAnn" data-id="'+ann.id+'">Delete</button>'+
         '</div></div>'+
@@ -1397,15 +1411,17 @@
       : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have voted! 🎉</div>';
   }
 
-  // Poll tabs
+  // Poll tabs - delegated from modal container
   document.getElementById('mPollResults').addEventListener('click', function(e){
-    const tab = e.target.closest('[data-ptab]'); if(!tab) return;
+    const tab = e.target.closest('[data-ptab]');
+    if (!tab) return;
     document.querySelectorAll('[data-ptab]').forEach(function(t){ t.classList.remove('on'); });
     tab.classList.add('on');
     const ptab = tab.dataset.ptab;
     document.getElementById('pollResultsBody').style.display = ptab==='results' ? 'block' : 'none';
     document.getElementById('pollVotedBody').style.display = ptab==='voted' ? 'block' : 'none';
     document.getElementById('pollNotVotedBody').style.display = ptab==='notvoted' ? 'block' : 'none';
+    e.stopPropagation();
   });
 
   async function openAttendance(id){
