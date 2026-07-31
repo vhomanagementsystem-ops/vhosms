@@ -42,7 +42,7 @@
     <div class="nav-group-label">Scholars</div>
     <a class="nav-item" id="nav-scholars">
       <svg fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 1 1 6 0 3 3 0 0 1-6 0zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm14-1a5 5 0 0 1 4 5H13a5 5 0 0 1 4-5z"/></svg>All Scholars</a>
-    <div class="nav-group-label">Scholars Documents</div>
+    <div class="nav-group-label">Scholars</div>
     <a class="nav-item" id="nav-documents">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h4.586A2 2 0 0 1 12 2.586L15.414 6A2 2 0 0 1 16 7.414V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 6a1 1 0 0 1 1-1h6a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm1 3a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H7z"/></svg>Document Verification<span class="nav-badge" id="nb-documents" style="display:none">0</span></a>
     <div class="nav-group-label">Engagement</div>
@@ -127,13 +127,55 @@
     <!-- DOCUMENT VERIFICATION -->
     <div id="page-documents" class="page" style="display:none">
       <div class="page-header"><div class="page-header-left"><h1>Document Verification</h1><p>Review submitted COR and Grades for each scholar</p></div></div>
-      <div class="card">
-        <div class="search-row">
-          <input id="dSearch" placeholder="Search scholar name…">
-          <select id="dType"><option value="">All Document Types</option><option value="Certificate of Registration">COR / Registration</option><option value="Grade Report">Grades / Report Card</option></select>
-          <select id="dStatus"><option value="">All Statuses</option><option value="Pending">Pending</option><option value="Verified">Verified</option><option value="Rejected">Rejected</option></select>
+
+      <!-- Doc sub tabs -->
+      <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:12px;padding:4px;margin-bottom:18px;width:fit-content">
+        <button class="sponsor-tab on" id="dtab-submitted" data-dtab="submitted">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Submitted
+        </button>
+        <button class="sponsor-tab" id="dtab-notsubmitted" data-dtab="notsubmitted">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Not Yet Submitted
+        </button>
+      </div>
+
+      <!-- Submitted panel -->
+      <div id="dpanel-submitted">
+        <div class="card">
+          <div class="search-row">
+            <input id="dSearch" placeholder="Search scholar name…">
+            <select id="dType"><option value="">All Document Types</option><option value="Certificate of Registration">COR / Registration</option><option value="Grade Report">Grades / Report Card</option></select>
+            <select id="dStatus"><option value="">All Statuses</option><option value="Pending">Pending</option><option value="Verified">Verified</option><option value="Rejected">Rejected</option></select>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Document</th><th>File</th><th>Uploaded</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="docsTable"></tbody></table></div>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Document</th><th>File</th><th>Uploaded</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="docsTable"></tbody></table></div>
+      </div>
+
+      <!-- Not submitted panel -->
+      <div id="dpanel-notsubmitted" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Missing COR</span>
+              <span class="badge badge-amber" id="missingCorCount">0</span>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="search-row" style="padding:12px 16px 0"><input id="dSearchMissingCor" placeholder="Search scholar…"></div>
+              <div id="missingCorList" style="max-height:400px;overflow-y:auto"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Missing Grade Report</span>
+              <span class="badge badge-amber" id="missingGradeCount">0</span>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="search-row" style="padding:12px 16px 0"><input id="dSearchMissingGrade" placeholder="Search scholar…"></div>
+              <div id="missingGradeList" style="max-height:400px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -212,7 +254,7 @@
         <div class="card">
           <div style="display:flex;gap:10px;padding:16px 16px 4px;flex-wrap:wrap">
             <input class="form-input" id="spSearch" placeholder="Search company, contact, email..." style="flex:2;min-width:220px">
-            <input class="form-input" id="spRelStatus" placeholder="Search by relationship status..." style="flex:1;min-width:160px">
+            <input class="form-input" id="spRelStatus" placeholder="Filter by relationship status..." style="flex:1;min-width:160px">
           </div>
           <div class="table-wrap"><table><thead><tr><th>Company / Institution</th><th>Contact Persons</th><th>Relationship</th><th>Offers</th><th>Actions</th></tr></thead><tbody id="sponsorsTable"></tbody></table></div>
         </div>
@@ -366,20 +408,32 @@
 
 <!-- Poll Results Modal -->
 <div class="modal-bg" id="mPollResults">
-<div class="modal" style="max-width:600px">
+<div class="modal" style="max-width:640px">
   <button class="modal-close" id="closePollResults">✕</button>
   <h2 class="modal-title" id="pollResultsTitle">Poll Results</h2>
-  <div id="pollResultsBody" style="max-height:400px;overflow-y:auto"></div>
+  <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:14px;width:fit-content">
+    <button class="sponsor-tab on" id="ptab-results" data-ptab="results">📊 Results</button>
+    <button class="sponsor-tab" id="ptab-voted" data-ptab="voted">✅ Voted</button>
+    <button class="sponsor-tab" id="ptab-notvoted" data-ptab="notvoted">⏳ Not Yet Voted</button>
+  </div>
+  <div id="pollResultsBody" style="max-height:420px;overflow-y:auto"></div>
+  <div id="pollVotedBody" style="max-height:420px;overflow-y:auto;display:none"></div>
+  <div id="pollNotVotedBody" style="max-height:420px;overflow-y:auto;display:none"></div>
   <div class="modal-footer"><button class="btn btn-ghost" id="closePollResultsBtn">Close</button></div>
 </div></div>
 
 <!-- Attendance View Modal -->
 <div class="modal-bg" id="mAttendance">
-<div class="modal" style="max-width:600px">
+<div class="modal" style="max-width:640px">
   <button class="modal-close" id="closeAttendance">✕</button>
   <h2 class="modal-title" id="attendanceTitle">Attendance</h2>
-  <p class="modal-sub" id="attendanceSub">Scholars who marked their attendance.</p>
-  <div id="attendanceBody" style="max-height:400px;overflow-y:auto"></div>
+  <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:14px;width:fit-content">
+    <button class="sponsor-tab on" id="atab-all" data-atab="all">👥 All Scholars</button>
+    <button class="sponsor-tab" id="atab-attended" data-atab="attended">✅ Attended</button>
+    <button class="sponsor-tab" id="atab-notattended" data-atab="notattended">❌ Did Not Attend</button>
+    <button class="sponsor-tab" id="atab-notmarked" data-atab="notmarked">⏳ Not Yet Marked</button>
+  </div>
+  <div id="attendanceBody" style="max-height:420px;overflow-y:auto"></div>
   <div class="modal-footer"><button class="btn btn-ghost" id="closeAttendanceBtn">Close</button></div>
 </div></div>
 
@@ -935,6 +989,58 @@
   });
 
   // ── DOCUMENT VERIFICATION ──
+  let currentDocTab = 'submitted';
+
+  // Doc sub-tab switching
+  document.querySelectorAll('[data-dtab]').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      currentDocTab = this.dataset.dtab;
+      document.querySelectorAll('[data-dtab]').forEach(function(t){ t.classList.remove('on'); });
+      this.classList.add('on');
+      document.getElementById('dpanel-submitted').style.display = currentDocTab === 'submitted' ? 'block' : 'none';
+      document.getElementById('dpanel-notsubmitted').style.display = currentDocTab === 'notsubmitted' ? 'block' : 'none';
+      if (currentDocTab === 'notsubmitted') renderMissingDocs();
+    });
+  });
+
+  function renderMissingDocs() {
+    const qCor = (document.getElementById('dSearchMissingCor').value||'').toLowerCase();
+    const qGrade = (document.getElementById('dSearchMissingGrade').value||'').toLowerCase();
+
+    // Find scholars missing COR
+    const missingCor = scholars.filter(function(s){
+      const hasCor = docs.some(function(d){ return d.scholar_id === s.id && d.document_type === 'Certificate of Registration'; });
+      return !hasCor && (!qCor || (s.name||'').toLowerCase().includes(qCor));
+    });
+
+    // Find scholars missing Grade Report
+    const missingGrade = scholars.filter(function(s){
+      const hasGrade = docs.some(function(d){ return d.scholar_id === s.id && d.document_type === 'Grade Report'; });
+      return !hasGrade && (!qGrade || (s.name||'').toLowerCase().includes(qGrade));
+    });
+
+    document.getElementById('missingCorCount').textContent = missingCor.length;
+    document.getElementById('missingGradeCount').textContent = missingGrade.length;
+
+    function scholarRow(s) {
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f4f4f8">' +
+        '<div class="s-avatar" style="flex-shrink:0">'+ini(s.name)+'</div>' +
+        '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>' +
+        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+' · '+(s.grade_level||'—')+'</div></div>' +
+        '</div>';
+    }
+
+    document.getElementById('missingCorList').innerHTML = missingCor.length
+      ? missingCor.map(scholarRow).join('')
+      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have submitted their COR ✅</div>';
+
+    document.getElementById('missingGradeList').innerHTML = missingGrade.length
+      ? missingGrade.map(scholarRow).join('')
+      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have submitted their Grade Report ✅</div>';
+  }
+
+  document.getElementById('dSearchMissingCor').addEventListener('input', renderMissingDocs);
+  document.getElementById('dSearchMissingGrade').addEventListener('input', renderMissingDocs);
   function getDoc(scholarId, type) { return docs.find(function(d){ return d.scholar_id===scholarId && d.document_type===type; }); }
   function docBadge(status) {
     if (!status) return '<span class="badge badge-gray">Not Submitted</span>';
@@ -1225,11 +1331,33 @@
     const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
     document.getElementById('pollResultsTitle').textContent=ann.title+' — Poll Results';
     document.getElementById('pollResultsBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+    document.getElementById('pollVotedBody').innerHTML='';
+    document.getElementById('pollNotVotedBody').innerHTML='';
+
+    // Reset tabs
+    document.querySelectorAll('[data-ptab]').forEach(function(t){ t.classList.remove('on'); });
+    document.getElementById('ptab-results').classList.add('on');
+    document.getElementById('pollResultsBody').style.display='block';
+    document.getElementById('pollVotedBody').style.display='none';
+    document.getElementById('pollNotVotedBody').style.display='none';
+
     openModal('mPollResults');
+
     const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',id);
-    const {data:responses}=await sb.from('poll_responses').select('*, scholars(name), poll_options(option_text)').eq('announcement_id',id);
+    const {data:responses}=await sb.from('poll_responses').select('*, scholars(name,group_name,batch_no), poll_options(option_text)').eq('announcement_id',id);
     const total=responses?responses.length:0;
-    if(!options||!options.length){ document.getElementById('pollResultsBody').innerHTML='<p style="color:var(--muted);font-size:13px">No poll options.</p>'; return; }
+
+    // Scholars who responded
+    const respondedIds = responses ? responses.map(function(r){ return r.scholar_id; }) : [];
+    // Scholars who have NOT responded
+    const notVoted = scholars.filter(function(s){ return !respondedIds.includes(s.id); });
+
+    if(!options||!options.length){
+      document.getElementById('pollResultsBody').innerHTML='<p style="color:var(--muted);font-size:13px">No poll options for this announcement.</p>';
+      return;
+    }
+
+    // Results tab
     const html=options.map(function(opt){
       const responders=responses?responses.filter(function(r){ return r.poll_option_id===opt.id; }):[];
       const pct=total?Math.round(responders.length/total*100):0;
@@ -1239,39 +1367,123 @@
         (responders.length?'<div style="display:flex;flex-wrap:wrap;gap:6px">'+responders.map(function(r){ return '<span class="badge badge-blue">'+(r.scholars?r.scholars.name:'—')+'</span>'; }).join('')+'</div>':'<span style="font-size:12px;color:var(--muted)">No responses yet</span>')+
         '</div>';
     }).join('');
-    document.getElementById('pollResultsBody').innerHTML='<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">'+(ann.poll_question||'Poll')+' · '+total+' total response'+(total!==1?'s':'')+'</div>'+html;
+    document.getElementById('pollResultsBody').innerHTML=
+      '<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">'+(ann.poll_question||'Poll')+' · '+total+' total response'+(total!==1?'s':'')+' · '+notVoted.length+' not yet voted</div>'+html;
+
+    // Voted tab
+    document.getElementById('pollVotedBody').innerHTML = total
+      ? '<div style="margin-bottom:10px;font-size:13px;color:var(--muted);font-weight:500">'+total+' scholar'+(total!==1?'s':'')+' responded</div>' +
+        responses.map(function(r){
+          const s = r.scholars || {};
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
+            '<div><div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
+            '<span class="badge badge-green">'+(r.poll_options?r.poll_options.option_text:'—')+'</span>'+
+            '</div>';
+        }).join('')
+      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have voted yet.</div>';
+
+    // Not voted tab
+    document.getElementById('pollNotVotedBody').innerHTML = notVoted.length
+      ? '<div style="margin-bottom:10px;font-size:13px;color:var(--muted);font-weight:500">'+notVoted.length+' scholar'+(notVoted.length!==1?'s':'')+' have not voted yet</div>' +
+        notVoted.map(function(s){
+          return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
+            '<div class="s-avatar">'+ini(s.name)+'</div>'+
+            '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
+            '<span class="badge badge-gray" style="margin-left:auto">Not Voted</span>'+
+            '</div>';
+        }).join('')
+      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have voted! 🎉</div>';
   }
+
+  // Poll tabs
+  document.getElementById('mPollResults').addEventListener('click', function(e){
+    const tab = e.target.closest('[data-ptab]'); if(!tab) return;
+    document.querySelectorAll('[data-ptab]').forEach(function(t){ t.classList.remove('on'); });
+    tab.classList.add('on');
+    const ptab = tab.dataset.ptab;
+    document.getElementById('pollResultsBody').style.display = ptab==='results' ? 'block' : 'none';
+    document.getElementById('pollVotedBody').style.display = ptab==='voted' ? 'block' : 'none';
+    document.getElementById('pollNotVotedBody').style.display = ptab==='notvoted' ? 'block' : 'none';
+  });
 
   async function openAttendance(id){
     const ann=announcements.find(function(a){ return a.id===id; }); if(!ann) return;
     document.getElementById('attendanceTitle').textContent=ann.title+' — Attendance';
-    document.getElementById('attendanceSub').textContent='Scholars who marked their attendance.';
     document.getElementById('attendanceBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+
+    // Reset tabs
+    document.querySelectorAll('[data-atab]').forEach(function(t){ t.classList.remove('on'); });
+    document.getElementById('atab-all').classList.add('on');
     openModal('mAttendance');
+
     const {data:allRecords}=await sb.from('attendance').select('*, scholars(name,group_name,batch_no)').eq('announcement_id',id);
     const {data:responses}=await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id',id);
     const records=allRecords||[];
-    if(!records.length){ document.getElementById('attendanceBody').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have marked their attendance yet.</div>'; return; }
+
     const attended=records.filter(function(r){ return r.attended===true; });
     const notAttended=records.filter(function(r){ return r.attended===false; });
-    function scholarRow(a,didAttend){
+    const markedIds=records.map(function(r){ return r.scholar_id; });
+    const notMarked=scholars.filter(function(s){ return !markedIds.includes(s.id); });
+
+    function scholarRow(a, didAttend){
       const s=a.scholars||{};
       const resp=responses?responses.find(function(r){ return r.scholar_id===a.scholar_id; }):null;
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
-        '<div><div style="font-size:14px;font-weight:500">'+(s.name||'—')+'</div>'+
-        '<div style="font-size:12px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div>'+
-        '<div style="font-size:12px;color:var(--muted)">Poll: '+(resp&&resp.poll_options?resp.poll_options.option_text:'No response')+'</div></div>'+
+        '<div><div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)">Poll: '+(resp&&resp.poll_options?resp.poll_options.option_text:'No response')+'</div></div>'+
         (didAttend?'<span class="badge badge-green">✅ Attended</span>':'<span class="badge badge-pink">❌ Did Not Attend</span>')+
         '</div>';
     }
-    let html='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">'+
-      '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;color:#166534;font-weight:500">✅ Attended: '+attended.length+'</div>'+
-      '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 16px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: '+notAttended.length+'</div>'+
-      '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:500">Total: '+records.length+'</div>'+
-      '</div>';
-    if(attended.length) html+='<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended ('+attended.length+')</div>'+attended.map(function(a){ return scholarRow(a,true); }).join('');
-    if(notAttended.length) html+='<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px">Did Not Attend ('+notAttended.length+')</div>'+notAttended.map(function(a){ return scholarRow(a,false); }).join('');
-    document.getElementById('attendanceBody').innerHTML=html;
+
+    function notMarkedRow(s){
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
+        '<div class="s-avatar">'+ini(s.name)+'</div>'+
+        '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
+        '<span class="badge badge-gray" style="margin-left:auto">Not Yet Marked</span>'+
+        '</div>';
+    }
+
+    // Store data for tab switching
+    window._attData = { attended, notAttended, notMarked, records, responses };
+
+    function renderAttTab(tab){
+      const d = window._attData;
+      let html = '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'+
+        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:8px 14px;font-size:13px;color:#166534;font-weight:500">✅ Attended: '+d.attended.length+'</div>'+
+        '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:8px 14px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: '+d.notAttended.length+'</div>'+
+        '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:8px 14px;font-size:13px;color:#92400e;font-weight:500">⏳ Not Yet Marked: '+d.notMarked.length+'</div>'+
+        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;color:var(--muted);font-weight:500">Total Scholars: '+scholars.length+'</div>'+
+        '</div>';
+
+      if(tab==='all'){
+        if(d.attended.length) html+='<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Attended ('+d.attended.length+')</div>'+d.attended.map(function(a){return scholarRow(a,true);}).join('');
+        if(d.notAttended.length) html+='<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:12px;margin-bottom:6px">Did Not Attend ('+d.notAttended.length+')</div>'+d.notAttended.map(function(a){return scholarRow(a,false);}).join('');
+        if(d.notMarked.length) html+='<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:12px;margin-bottom:6px">Not Yet Marked ('+d.notMarked.length+')</div>'+d.notMarked.map(notMarkedRow).join('');
+        if(!d.records.length && !d.notMarked.length) html+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No attendance data yet.</div>';
+      } else if(tab==='attended'){
+        html += d.attended.length ? d.attended.map(function(a){return scholarRow(a,true);}).join('') : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars marked as attended yet.</div>';
+      } else if(tab==='notattended'){
+        html += d.notAttended.length ? d.notAttended.map(function(a){return scholarRow(a,false);}).join('') : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars marked as did not attend.</div>';
+      } else if(tab==='notmarked'){
+        html += d.notMarked.length ? d.notMarked.map(notMarkedRow).join('') : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have marked their attendance! 🎉</div>';
+      }
+      document.getElementById('attendanceBody').innerHTML = html;
+    }
+
+    renderAttTab('all');
+
+    // Tab click handling inside modal
+    document.querySelectorAll('[data-atab]').forEach(function(tab){
+      tab.onclick = function(){
+        document.querySelectorAll('[data-atab]').forEach(function(t){ t.classList.remove('on'); });
+        this.classList.add('on');
+        renderAttTab(this.dataset.atab);
+      };
+    });
   }
 
   // ── ADMIN ACCOUNTS ──
