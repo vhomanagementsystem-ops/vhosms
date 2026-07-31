@@ -131,11 +131,11 @@
       <!-- Doc sub tabs -->
       <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:12px;padding:4px;margin-bottom:18px;width:fit-content">
         <button class="sponsor-tab on" id="dtab-submitted" data-dtab="submitted">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
           Submitted
         </button>
         <button class="sponsor-tab" id="dtab-notsubmitted" data-dtab="notsubmitted">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="12" y1="11" x2="12.01" y2="11"/></svg>
           Not Yet Submitted
         </button>
       </div>
@@ -160,20 +160,20 @@
               <span class="card-title">Missing COR</span>
               <span class="badge badge-amber" id="missingCorCount">0</span>
             </div>
-            <div class="card-body" style="padding:0">
-              <div class="search-row" style="padding:12px 16px 0"><input id="dSearchMissingCor" placeholder="Search scholar…"></div>
-              <div id="missingCorList" style="max-height:400px;overflow-y:auto"></div>
+            <div style="padding:12px 16px 8px">
+              <input class="form-input" id="dSearchMissingCor" placeholder="Search scholar..." style="width:100%">
             </div>
+            <div id="missingCorList" style="max-height:420px;overflow-y:auto;border-top:1px solid var(--border)"></div>
           </div>
           <div class="card">
             <div class="card-header">
               <span class="card-title">Missing Grade Report</span>
               <span class="badge badge-amber" id="missingGradeCount">0</span>
             </div>
-            <div class="card-body" style="padding:0">
-              <div class="search-row" style="padding:12px 16px 0"><input id="dSearchMissingGrade" placeholder="Search scholar…"></div>
-              <div id="missingGradeList" style="max-height:400px;overflow-y:auto"></div>
+            <div style="padding:12px 16px 8px">
+              <input class="form-input" id="dSearchMissingGrade" placeholder="Search scholar..." style="width:100%">
             </div>
+            <div id="missingGradeList" style="max-height:420px;overflow-y:auto;border-top:1px solid var(--border)"></div>
           </div>
         </div>
       </div>
@@ -411,10 +411,19 @@
 <div class="modal" style="max-width:640px">
   <button class="modal-close" id="closePollResults">✕</button>
   <h2 class="modal-title" id="pollResultsTitle">Poll Results</h2>
-  <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:14px;width:fit-content">
-    <button class="sponsor-tab on" id="ptab-results" data-ptab="results">📊 Results</button>
-    <button class="sponsor-tab" id="ptab-voted" data-ptab="voted">✅ Voted</button>
-    <button class="sponsor-tab" id="ptab-notvoted" data-ptab="notvoted">⏳ Not Yet Voted</button>
+  <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:14px">
+    <button class="sponsor-tab on" id="ptab-results" data-ptab="results">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
+      Results
+    </button>
+    <button class="sponsor-tab" id="ptab-voted" data-ptab="voted">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Voted
+    </button>
+    <button class="sponsor-tab" id="ptab-notvoted" data-ptab="notvoted">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Not Yet Voted
+    </button>
   </div>
   <div id="pollResultsBody" style="max-height:420px;overflow-y:auto"></div>
   <div id="pollVotedBody" style="max-height:420px;overflow-y:auto;display:none"></div>
@@ -427,11 +436,23 @@
 <div class="modal" style="max-width:640px">
   <button class="modal-close" id="closeAttendance">✕</button>
   <h2 class="modal-title" id="attendanceTitle">Attendance</h2>
-  <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:14px;width:fit-content">
-    <button class="sponsor-tab on" id="atab-all" data-atab="all">👥 All Scholars</button>
-    <button class="sponsor-tab" id="atab-attended" data-atab="attended">✅ Attended</button>
-    <button class="sponsor-tab" id="atab-notattended" data-atab="notattended">❌ Did Not Attend</button>
-    <button class="sponsor-tab" id="atab-notmarked" data-atab="notmarked">⏳ Not Yet Marked</button>
+  <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:10px;padding:4px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="sponsor-tab on" id="atab-all" data-atab="all">
+      <svg width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 1 1 6 0 3 3 0 0 1-6 0zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm14-1a5 5 0 0 1 4 5H13a5 5 0 0 1 4-5z"/></svg>
+      All
+    </button>
+    <button class="sponsor-tab" id="atab-attended" data-atab="attended">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Attended
+    </button>
+    <button class="sponsor-tab" id="atab-notattended" data-atab="notattended">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Did Not Attend
+    </button>
+    <button class="sponsor-tab" id="atab-notmarked" data-atab="notmarked">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Not Yet Marked
+    </button>
   </div>
   <div id="attendanceBody" style="max-height:420px;overflow-y:auto"></div>
   <div class="modal-footer"><button class="btn btn-ghost" id="closeAttendanceBtn">Close</button></div>
@@ -1384,31 +1405,45 @@
     document.getElementById('pollResultsBody').innerHTML=
       '<div style="margin-bottom:14px;font-size:13px;color:var(--muted)">'+(ann.poll_question||'Poll')+' · '+total+' total response'+(total!==1?'s':'')+' · '+notVoted.length+' not yet voted</div>'+html;
 
+    // Summary counts for poll
+    const pollSummaryHtml =
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">'+
+        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:#166534">'+total+'</div>'+
+          '<div style="font-size:11px;color:#166534;margin-top:2px">Voted</div></div>'+
+        '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:10px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:#92400e">'+notVoted.length+'</div>'+
+          '<div style="font-size:11px;color:#92400e;margin-top:2px">Not Yet Voted</div></div>'+
+        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:var(--text)">'+scholars.length+'</div>'+
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px">Total Scholars</div></div>'+
+      '</div>';
+
     // Voted tab
-    document.getElementById('pollVotedBody').innerHTML = total
-      ? '<div style="margin-bottom:10px;font-size:13px;color:var(--muted);font-weight:500">'+total+' scholar'+(total!==1?'s':'')+' responded</div>' +
-        responses.map(function(r){
+    document.getElementById('pollVotedBody').innerHTML = pollSummaryHtml + (total
+      ? responses.map(function(r){
           const s = r.scholars || {};
           return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
+            '<div style="display:flex;align-items:center;gap:10px">'+
+            '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
             '<div><div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
-            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
-            '<span class="badge badge-green">'+(r.poll_options?r.poll_options.option_text:'—')+'</span>'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div></div></div>'+
+            '<span class="badge badge-green" style="white-space:normal;text-align:right;max-width:160px">'+(r.poll_options?r.poll_options.option_text:'—')+'</span>'+
             '</div>';
         }).join('')
-      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have voted yet.</div>';
+      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have voted yet.</div>');
 
     // Not voted tab
-    document.getElementById('pollNotVotedBody').innerHTML = notVoted.length
-      ? '<div style="margin-bottom:10px;font-size:13px;color:var(--muted);font-weight:500">'+notVoted.length+' scholar'+(notVoted.length!==1?'s':'')+' have not voted yet</div>' +
-        notVoted.map(function(s){
+    document.getElementById('pollNotVotedBody').innerHTML = pollSummaryHtml + (notVoted.length
+      ? notVoted.map(function(s){
           return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
             '<div class="s-avatar">'+ini(s.name)+'</div>'+
             '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>'+
             '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
-            '<span class="badge badge-gray" style="margin-left:auto">Not Voted</span>'+
+            '<span class="badge badge-amber" style="margin-left:auto">Not Yet Voted</span>'+
             '</div>';
         }).join('')
-      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have voted! 🎉</div>';
+      : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">All scholars have voted!</div>');
   }
 
   // Poll tabs - delegated from modal container
@@ -1468,11 +1503,23 @@
 
     function renderAttTab(tab){
       const d = window._attData;
-      let html = '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'+
-        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:8px 14px;font-size:13px;color:#166534;font-weight:500">✅ Attended: '+d.attended.length+'</div>'+
-        '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:8px 14px;font-size:13px;color:#e05065;font-weight:500">❌ Did Not Attend: '+d.notAttended.length+'</div>'+
-        '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:8px 14px;font-size:13px;color:#92400e;font-weight:500">⏳ Not Yet Marked: '+d.notMarked.length+'</div>'+
-        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;color:var(--muted);font-weight:500">Total Scholars: '+scholars.length+'</div>'+
+      let html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">'+
+        '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 12px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:#166534">'+d.attended.length+'</div>'+
+          '<div style="font-size:11px;color:#166534;margin-top:2px">Attended</div>'+
+        '</div>'+
+        '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:10px 12px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:#e05065">'+d.notAttended.length+'</div>'+
+          '<div style="font-size:11px;color:#e05065;margin-top:2px">Did Not Attend</div>'+
+        '</div>'+
+        '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:10px 12px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:#92400e">'+d.notMarked.length+'</div>'+
+          '<div style="font-size:11px;color:#92400e;margin-top:2px">Not Yet Marked</div>'+
+        '</div>'+
+        '<div style="background:#f4f4f8;border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center">'+
+          '<div style="font-size:20px;font-weight:700;color:var(--text)">'+scholars.length+'</div>'+
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px">Total Scholars</div>'+
+        '</div>'+
         '</div>';
 
       if(tab==='all'){
