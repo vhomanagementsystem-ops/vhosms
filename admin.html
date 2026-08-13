@@ -1380,10 +1380,10 @@
 
     const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',id);
     const {data:responses}=await sb.from('poll_responses').select('*, scholars(name,group_name,batch_no), poll_options(option_text)').eq('announcement_id',id);
-    const total=responses?responses.length:0;
+    const total=responses?new Set(responses.map(function(r){return r.scholar_id;})).size:0;
 
     // Scholars who responded
-    const respondedIds = responses ? responses.map(function(r){ return r.scholar_id; }) : [];
+    const respondedIds = responses ? [...new Set(responses.map(function(r){ return r.scholar_id; }))] : [];
     // Scholars who have NOT responded
     const notVoted = scholars.filter(function(s){ return !respondedIds.includes(s.id); });
 
@@ -1419,16 +1419,25 @@
           '<div style="font-size:11px;color:var(--muted);margin-top:2px">Total Scholars</div></div>'+
       '</div>';
 
-    // Voted tab
-    document.getElementById('pollVotedBody').innerHTML = pollSummaryHtml + (total
-      ? responses.map(function(r){
-          const s = r.scholars || {};
-          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
+    // Voted tab - group by scholar, show all selected options
+    const scholarResponseMap = {};
+    if(responses){ responses.forEach(function(r){
+      const sid = r.scholar_id;
+      if(!scholarResponseMap[sid]) scholarResponseMap[sid] = {scholar: r.scholars, options:[]};
+      if(r.poll_options) scholarResponseMap[sid].options.push(r.poll_options.option_text);
+    }); }
+    const votedScholars = Object.values(scholarResponseMap);
+    document.getElementById('pollVotedBody').innerHTML = pollSummaryHtml + (votedScholars.length
+      ? votedScholars.map(function(item){
+          const s = item.scholar || {};
+          return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8;gap:10px">'+
             '<div style="display:flex;align-items:center;gap:10px">'+
             '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
             '<div><div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
             '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div></div></div>'+
-            '<span class="badge badge-green" style="white-space:normal;text-align:right;max-width:160px">'+(r.poll_options?r.poll_options.option_text:'—')+'</span>'+
+            '<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:200px">'+
+              item.options.map(function(opt){ return '<span class="badge badge-green" style="white-space:normal;text-align:center">'+opt+'</span>'; }).join('')+
+            '</div>'+
             '</div>';
         }).join('')
       : '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No scholars have voted yet.</div>');
