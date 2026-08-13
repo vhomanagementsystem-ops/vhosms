@@ -770,7 +770,7 @@
       container.innerHTML='<div class="card"><div class="empty"><p>No announcements yet.</p></div></div>';
       updateAnnouncementBadge(0); return;
     }
-    const {data:myResponses}=await sb.from('poll_responses').select('*, poll_options(option_text)').eq('scholar_id',currentUser.id);
+    const {data:myResponses}=await sb.from('poll_responses').select('*, poll_options(option_text)').eq('scholar_id',currentUser.id).order('responded_at',{ascending:true});
     const {data:myAttendance}=await sb.from('attendance').select('*').eq('scholar_id',currentUser.id);
     const today=new Date(); today.setHours(0,0,0,0);
     const htmlParts=[];
@@ -784,29 +784,53 @@
       const isPast=eventDate&&eventDate<today;
       const isToday=eventDate&&eventDate.toDateString()===today.toDateString();
 
-      // Poll section
+      // Poll section - multiple selection allowed
       let pollHtml='';
       if(hasOptions){
+        // Get ALL responses for this announcement by this scholar
+        const myAnnResponses = myResponses ? myResponses.filter(function(r){ return r.announcement_id===ann.id; }) : [];
+        const mySelectedIds = myAnnResponses.map(function(r){ return r.poll_option_id; });
+        const hasAnswered = myAnnResponses.length > 0;
+
         let pollContent='';
-        if(myResponse){
+        if(hasAnswered){
+          // Show selected answers with edit option
+          const selectedLabels = myAnnResponses.map(function(r){
+            return r.poll_options ? r.poll_options.option_text : '—';
+          });
           pollContent=
-            '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
-              '<span>You answered: <strong>'+(myResponse.poll_options?myResponse.poll_options.option_text:'—')+'</strong></span>'+
-              '<button class="btn btn-ghost btn-sm" data-action="editPoll" data-ann="'+ann.id+'" data-resp="'+myResponse.id+'" style="font-size:12px">✏️ Edit Answer</button>'+
+            '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;margin-bottom:8px">'+
+              '<div style="font-weight:500;margin-bottom:4px">Your answer'+(selectedLabels.length>1?'s':'')+':</div>'+
+              selectedLabels.map(function(l){ return '<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="color:#22c55e">✓</span> '+l+'</div>'; }).join('')+
             '</div>'+
-            '<div id="editPollForm_'+ann.id+'" style="display:none;margin-top:10px">'+
+            '<button class="btn btn-ghost btn-sm" data-action="editPollMulti" data-ann="'+ann.id+'" style="font-size:12px;margin-bottom:8px">✏️ Edit Answer</button>'+
+            '<div id="editPollForm_'+ann.id+'" style="display:none;margin-top:4px">'+
+              '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Select all that apply:</div>'+
               options.map(function(opt){
-                const isSel=myResponse.poll_option_id===opt.id;
-                return '<button class="btn '+(isSel?'btn-primary':'btn-ghost')+'" style="text-align:left;justify-content:flex-start;margin-bottom:6px;width:100%" data-action="updatePoll" data-ann="'+ann.id+'" data-opt="'+opt.id+'" data-resp="'+myResponse.id+'">'+(isSel?'✓ ':'')+opt.option_text+'</button>';
+                const isSel = mySelectedIds.includes(opt.id);
+                return '<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:1.5px solid '+(isSel?'var(--blue)':'var(--border)')+';margin-bottom:6px;cursor:pointer;background:'+(isSel?'var(--blue-pale)':'#fff')+'" class="poll-opt-label">'+
+                  '<input type="checkbox" name="poll_multi_'+ann.id+'" value="'+opt.id+'" '+(isSel?'checked':'')+' style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">'+
+                  '<span style="font-size:13px">'+opt.option_text+'</span>'+
+                '</label>';
               }).join('')+
-              '<button class="btn btn-ghost btn-sm" data-action="cancelEditPoll" data-ann="'+ann.id+'" style="margin-top:4px;font-size:12px">Cancel</button>'+
+              '<div style="display:flex;gap:8px;margin-top:8px">'+
+                '<button class="btn btn-primary btn-sm" data-action="submitPollMulti" data-ann="'+ann.id+'">Save Changes</button>'+
+                '<button class="btn btn-ghost btn-sm" data-action="cancelEditPoll" data-ann="'+ann.id+'">Cancel</button>'+
+              '</div>'+
             '</div>';
         } else {
-          pollContent=options.map(function(opt){
-            return '<button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;margin-bottom:6px;width:100%" data-action="answerPoll" data-ann="'+ann.id+'" data-opt="'+opt.id+'">'+opt.option_text+'</button>';
-          }).join('');
+          // Not answered yet - show checkboxes
+          pollContent=
+            '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Select all that apply:</div>'+
+            options.map(function(opt){
+              return '<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);margin-bottom:6px;cursor:pointer;background:#fff" class="poll-opt-label" id="pollLabel_'+ann.id+'_'+opt.id+'">'+
+                '<input type="checkbox" name="poll_multi_'+ann.id+'" value="'+opt.id+'" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">'+
+                '<span style="font-size:13px">'+opt.option_text+'</span>'+
+              '</label>';
+            }).join('')+
+            '<button class="btn btn-primary" style="width:100%;margin-top:8px" data-action="submitPollMulti" data-ann="'+ann.id+'">Submit Answer</button>';
         }
-        pollHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+(ann.poll_question||'POLL')+'</div><div style="display:flex;flex-direction:column">'+pollContent+'</div></div>';
+        pollHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+(ann.poll_question||'POLL')+'</div>'+pollContent+'</div>';
       }
 
       // Attendance section
@@ -863,8 +887,8 @@
       htmlParts.push(card);
     }
     container.innerHTML=htmlParts.join('');
-    const myResponseIds=myResponses?myResponses.map(function(r){return r.announcement_id;}):[];
-    const unanswered=anns.filter(function(a){return a.poll_question&&!myResponseIds.includes(a.id);}).length;
+    const myResponseAnnIds=myResponses?[...new Set(myResponses.map(function(r){return r.announcement_id;}))]:[];
+    const unanswered=anns.filter(function(a){return a.poll_question&&!myResponseAnnIds.includes(a.id);}).length;
     updateAnnouncementBadge(unanswered);
   }
 
@@ -875,27 +899,50 @@
   }
 
   document.getElementById('scholarAnnouncementsList').addEventListener('click', async function(e){
-    // Answer poll
-    const pollBtn=e.target.closest('[data-action="answerPoll"]');
-    if(pollBtn&&!pollBtn.disabled){
-      pollBtn.disabled=true;
-      const {error}=await sb.from('poll_responses').insert({announcement_id:pollBtn.dataset.ann,poll_option_id:pollBtn.dataset.opt,scholar_id:currentUser.id,responded_at:new Date().toISOString()});
-      if(error){ toast(error.message,'❌'); pollBtn.disabled=false; return; }
-      toast('Response recorded!','✅'); renderAnnouncements(); return;
+    // Edit poll toggle (show edit form)
+    const editBtn=e.target.closest('[data-action="editPollMulti"]');
+    if(editBtn){
+      const f=document.getElementById('editPollForm_'+editBtn.dataset.ann);
+      if(f) f.style.display=f.style.display==='none'?'block':'none';
+      return;
     }
-    // Edit poll toggle
-    const editBtn=e.target.closest('[data-action="editPoll"]');
-    if(editBtn){ const f=document.getElementById('editPollForm_'+editBtn.dataset.ann); if(f) f.style.display=f.style.display==='none'?'block':'none'; return; }
     // Cancel edit poll
     const cancelEditPollBtn=e.target.closest('[data-action="cancelEditPoll"]');
-    if(cancelEditPollBtn){ const f=document.getElementById('editPollForm_'+cancelEditPollBtn.dataset.ann); if(f) f.style.display='none'; return; }
-    // Update poll
-    const updateBtn=e.target.closest('[data-action="updatePoll"]');
-    if(updateBtn&&!updateBtn.disabled){
-      updateBtn.disabled=true; updateBtn.textContent='Saving...';
-      const {error}=await sb.from('poll_responses').update({poll_option_id:updateBtn.dataset.opt,responded_at:new Date().toISOString()}).eq('id',updateBtn.dataset.resp);
-      if(error){ toast(error.message,'❌'); updateBtn.disabled=false; return; }
-      toast('Answer updated!','✅'); renderAnnouncements(); return;
+    if(cancelEditPollBtn){
+      const f=document.getElementById('editPollForm_'+cancelEditPollBtn.dataset.ann);
+      if(f) f.style.display='none';
+      return;
+    }
+    // Submit multi-select poll (new answer or update)
+    const submitBtn=e.target.closest('[data-action="submitPollMulti"]');
+    if(submitBtn&&!submitBtn.disabled){
+      const annId=submitBtn.dataset.ann;
+      const checkboxes=document.querySelectorAll('input[name="poll_multi_'+annId+'"]:checked');
+      const selectedIds=Array.from(checkboxes).map(function(cb){ return cb.value; });
+      if(!selectedIds.length){ toast('Please select at least one option.','⚠️'); return; }
+      submitBtn.disabled=true; submitBtn.textContent='Saving...';
+      // Delete all existing responses for this announcement by this scholar
+      const {error:delErr}=await sb.from('poll_responses').delete()
+        .eq('announcement_id',annId).eq('scholar_id',currentUser.id);
+      if(delErr){ toast(delErr.message,'❌'); submitBtn.disabled=false; submitBtn.textContent='Submit Answer'; return; }
+      // Insert new responses (one per selected option)
+      const inserts=selectedIds.map(function(optId){
+        return {announcement_id:annId,poll_option_id:optId,scholar_id:currentUser.id,responded_at:new Date().toISOString()};
+      });
+      const {error:insErr}=await sb.from('poll_responses').insert(inserts);
+      if(insErr){ toast(insErr.message,'❌'); submitBtn.disabled=false; submitBtn.textContent='Submit Answer'; return; }
+      toast('Response saved!','✅');
+      renderAnnouncements();
+      return;
+    }
+    // Checkbox visual feedback - highlight selected label
+    const checkbox=e.target.closest('input[type="checkbox"]');
+    if(checkbox){
+      const label=checkbox.closest('.poll-opt-label');
+      if(label){
+        label.style.borderColor=checkbox.checked?'var(--blue)':'var(--border)';
+        label.style.background=checkbox.checked?'var(--blue-pale)':'#fff';
+      }
     }
     // Change attendance toggle
     const changeAttBtn=e.target.closest('[data-action="changeAttendance"]');
