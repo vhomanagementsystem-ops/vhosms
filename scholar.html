@@ -267,6 +267,17 @@
   </div>
 </main>
 
+<!-- Delete Poll Response Confirmation -->
+<div class="modal-bg" id="mDeletePollConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Response</h2>
+  <p class="modal-sub">Are you sure you want to delete your poll response? You can re-answer the poll anytime.</p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeletePollBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeletePollBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
 <!-- Document View Modal -->
 <div class="modal-bg" id="mDocViewScholar">
 <div class="modal" style="max-width:780px">
@@ -715,6 +726,23 @@
   });
 
   // Cancel delete doc
+  document.getElementById('cancelDeletePollBtn').addEventListener('click', function(){ closeModal('mDeletePollConfirm'); });
+  document.getElementById('mDeletePollConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeletePollConfirm'); });
+  document.getElementById('confirmDeletePollBtn').addEventListener('click', async function(){
+    const annId = this.dataset.ann;
+    if(!annId) return;
+    this.disabled=true; this.textContent='Deleting...';
+    const {error} = await sb.from('poll_responses')
+      .delete()
+      .eq('announcement_id', annId)
+      .eq('scholar_id', currentUser.id);
+    this.disabled=false; this.textContent='Yes, Delete';
+    if(error){ toast(error.message,'❌'); return; }
+    closeModal('mDeletePollConfirm');
+    toast('Poll response deleted.','🗑️');
+    renderAnnouncements();
+  });
+
   document.getElementById('cancelDeleteDocBtn').addEventListener('click', function(){
     closeModal('mDeleteDocConfirm');
     deletingDocId = null;
@@ -803,7 +831,10 @@
               '<div style="font-weight:500;margin-bottom:4px">Your answer'+(selectedLabels.length>1?'s':'')+':</div>'+
               selectedLabels.map(function(l){ return '<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="color:#22c55e">✓</span> '+l+'</div>'; }).join('')+
             '</div>'+
-            '<button class="btn btn-ghost btn-sm" data-action="editPollMulti" data-ann="'+ann.id+'" style="font-size:12px;margin-bottom:8px">✏️ Edit Answer</button>'+
+            '<div style="display:flex;gap:6px;margin-bottom:8px">'+
+              '<button class="btn btn-ghost btn-sm" data-action="editPollMulti" data-ann="'+ann.id+'" style="font-size:12px">✏️ Edit Answer</button>'+
+              '<button class="btn btn-danger btn-sm" data-action="deletePollResponse" data-ann="'+ann.id+'" style="font-size:12px">🗑️ Delete Response</button>'+
+            '</div>'+
             '<div id="editPollForm_'+ann.id+'" style="display:none;margin-top:4px">'+
               '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Select all that apply:</div>'+
               options.map(function(opt){
@@ -899,6 +930,15 @@
   }
 
   document.getElementById('scholarAnnouncementsList').addEventListener('click', async function(e){
+    // Delete poll response
+    const deletePollBtn=e.target.closest('[data-action="deletePollResponse"]');
+    if(deletePollBtn){
+      deletePollBtn.dataset.pendingAnn = deletePollBtn.dataset.ann;
+      document.getElementById('confirmDeletePollBtn').dataset.ann = deletePollBtn.dataset.ann;
+      openModal('mDeletePollConfirm');
+      return;
+    }
+
     // Edit poll toggle (show edit form)
     const editBtn=e.target.closest('[data-action="editPollMulti"]');
     if(editBtn){
