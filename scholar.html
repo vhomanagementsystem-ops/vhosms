@@ -267,6 +267,17 @@
   </div>
 </main>
 
+<!-- Delete Attendance Confirmation -->
+<div class="modal-bg" id="mDeleteAttConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Delete Attendance</h2>
+  <p class="modal-sub">Are you sure you want to remove your attendance response? You can mark it again anytime on or after the event day.</p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteAttBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteAttBtn">Yes, Delete</button>
+  </div>
+</div></div>
+
 <!-- Delete Poll Response Confirmation -->
 <div class="modal-bg" id="mDeletePollConfirm">
 <div class="modal" style="max-width:400px">
@@ -743,6 +754,23 @@
     renderAnnouncements();
   });
 
+  document.getElementById('cancelDeleteAttBtn').addEventListener('click', function(){ closeModal('mDeleteAttConfirm'); });
+  document.getElementById('mDeleteAttConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAttConfirm'); });
+  document.getElementById('confirmDeleteAttBtn').addEventListener('click', async function(){
+    const annId = this.dataset.ann;
+    if(!annId) return;
+    this.disabled=true; this.textContent='Deleting...';
+    const {error} = await sb.from('attendance')
+      .delete()
+      .eq('announcement_id', annId)
+      .eq('scholar_id', currentUser.id);
+    this.disabled=false; this.textContent='Yes, Delete';
+    if(error){ toast(error.message,'❌'); return; }
+    closeModal('mDeleteAttConfirm');
+    toast('Attendance response removed.','🗑️');
+    renderAnnouncements();
+  });
+
   document.getElementById('cancelDeleteDocBtn').addEventListener('click', function(){
     closeModal('mDeleteDocConfirm');
     deletingDocId = null;
@@ -874,7 +902,10 @@
               '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
               '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
                 '<span>✅ You marked: <strong>Attended</strong></span>'+
-                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
+                '<div style="display:flex;gap:6px">'+
+                  '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
+                  '<button class="btn btn-danger btn-sm" data-action="deleteAttendance" data-ann="'+ann.id+'" style="font-size:12px">Delete</button>'+
+                '</div>'+
               '</div>'+
               '<div id="attForm_'+ann.id+'" style="display:none;margin-top:10px">'+
                 '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ Attended</button>'+
@@ -885,7 +916,10 @@
               '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
               '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:12px;font-size:13px;color:#e05065;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
                 '<span>❌ You marked: <strong>Did Not Attend</strong></span>'+
-                '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
+                '<div style="display:flex;gap:6px">'+
+                  '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
+                  '<button class="btn btn-danger btn-sm" data-action="deleteAttendance" data-ann="'+ann.id+'" style="font-size:12px">Delete</button>'+
+                '</div>'+
               '</div>'+
               '<div id="attForm_'+ann.id+'" style="display:none;margin-top:10px">'+
                 '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ Attended</button>'+
@@ -984,6 +1018,14 @@
         label.style.background=checkbox.checked?'var(--blue-pale)':'#fff';
       }
     }
+    // Delete attendance response
+    const deleteAttBtn=e.target.closest('[data-action="deleteAttendance"]');
+    if(deleteAttBtn){
+      document.getElementById('confirmDeleteAttBtn').dataset.ann = deleteAttBtn.dataset.ann;
+      openModal('mDeleteAttConfirm');
+      return;
+    }
+
     // Change attendance toggle
     const changeAttBtn=e.target.closest('[data-action="changeAttendance"]');
     if(changeAttBtn){ const f=document.getElementById('attForm_'+changeAttBtn.dataset.ann); if(f) f.style.display=f.style.display==='none'?'block':'none'; return; }
