@@ -87,7 +87,7 @@
       <div class="dash-two">
         <div class="card">
           <div class="card-header"><span class="card-title">Recent Scholars</span><button class="btn btn-ghost btn-sm" id="dashViewAll">View all</button></div>
-          <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Grade Level</th><th>Year Level</th><th>Status</th></tr></thead><tbody id="dashTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Grade Level</th><th>Year Level</th><th>Course/Major</th><th>Status</th></tr></thead><tbody id="dashTable"></tbody></table></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="card">
@@ -120,7 +120,7 @@
           <select id="sGradeLevel"><option value="">All Grade Levels</option><option>Junior High School</option><option>Senior High School</option><option>College</option></select>
           <select id="sStatus"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="graduated">Graduated</option></select>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Batch</th><th>Grade Level</th><th>Year Level</th><th>Status</th><th>Actions</th></tr></thead><tbody id="scholarsTable"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Scholar</th><th>Group</th><th>Batch</th><th>Grade Level</th><th>Year Level</th><th>Course/Major</th><th>Status</th><th>Actions</th></tr></thead><tbody id="scholarsTable"></tbody></table></div>
       </div>
     </div>
 
@@ -357,6 +357,7 @@
   </div>
   <div class="form-row">
     <div class="form-field"><label class="form-label">Year of Graduation</label><input class="form-input" id="f_yog" type="number" placeholder="2027" min="2023" max="2040"></div>
+    <div class="form-field"><label class="form-label">Course / Major</label><input class="form-input" id="f_course" placeholder="e.g. BS Computer Science"></div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" id="cancelScholarForm">Cancel</button>
@@ -803,7 +804,7 @@
       '<div class="stat-card pink"><div class="stat-label">Pending Reviews</div><div class="stat-val">'+docs.filter(function(d){return d.verification_status==="Pending";}).length+'</div><div class="stat-sub">Awaiting review</div></div>';
 
     document.getElementById('dashTable').innerHTML = scholars.slice(0,6).map(function(s){
-      return '<tr><td><div class="s-info-row"><div class="s-avatar">'+ini(s.name)+'</div><div><div class="s-name">'+s.name+'</div><div class="s-sub">'+s.email+'</div></div></div></td><td><span class="badge badge-blue">'+(s.group_name||'—')+'</span></td><td>'+(s.grade_level||'—')+'</td><td>'+(s.year_level||'—')+'</td><td>'+statusBadge(s.scholar_status)+'</td></tr>';
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">'+ini(s.name)+'</div><div><div class="s-name">'+s.name+'</div><div class="s-sub">'+s.email+'</div></div></div></td><td><span class="badge badge-blue">'+(s.group_name||'—')+'</span></td><td>'+(s.grade_level||'—')+'</td><td>'+(s.year_level||'—')+'</td><td style="font-size:12px;color:var(--muted)">'+(s.course||'—')+'</td><td>'+statusBadge(s.scholar_status)+'</td></tr>';
     }).join('') || '<tr><td colspan="5"><div class="empty"><p>No scholars yet.</p></div></td></tr>';
 
     const gc={}; GROUPS.forEach(function(g){gc[g]=0;}); scholars.forEach(function(s){gc[s.group_name]=(gc[s.group_name]||0)+1;});
@@ -826,7 +827,7 @@
         (!yj||String(s.year_joined)===yj)&&(!gl||s.grade_level===gl)&&(!st||s.scholar_status===st);
     });
     document.getElementById('scholarsTable').innerHTML = data.map(function(s){
-      return '<tr><td><div class="s-info-row"><div class="s-avatar">'+ini(s.name)+'</div><div><div class="s-name">'+s.name+'</div><div class="s-sub">'+s.email+'</div></div></div></td><td><span class="badge badge-blue">'+(s.group_name||'—')+'</span></td><td>Batch '+(s.batch_no||'—')+'</td><td>'+(s.grade_level||'—')+'</td><td>'+(s.year_level||'—')+'</td><td>'+statusBadge(s.scholar_status)+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="view" data-id="'+s.id+'">View</button><button class="btn btn-ghost btn-sm" data-action="edit" data-id="'+s.id+'">Edit</button><button class="btn btn-amber btn-sm" data-action="status" data-id="'+s.id+'">Status</button><button class="btn btn-danger btn-sm" data-action="delete" data-id="'+s.id+'">Delete</button></td></tr>';
+      return '<tr><td><div class="s-info-row"><div class="s-avatar">'+ini(s.name)+'</div><div><div class="s-name">'+s.name+'</div><div class="s-sub">'+s.email+'</div></div></div></td><td><span class="badge badge-blue">'+(s.group_name||'—')+'</span></td><td>Batch '+(s.batch_no||'—')+'</td><td>'+(s.grade_level||'—')+'</td><td>'+(s.year_level||'—')+'</td><td style="font-size:12px;color:var(--muted)">'+(s.course||'—')+'</td><td>'+statusBadge(s.scholar_status)+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" data-action="view" data-id="'+s.id+'">View</button><button class="btn btn-ghost btn-sm" data-action="edit" data-id="'+s.id+'">Edit</button><button class="btn btn-amber btn-sm" data-action="status" data-id="'+s.id+'">Status</button><button class="btn btn-danger btn-sm" data-action="delete" data-id="'+s.id+'">Delete</button></td></tr>';
     }).join('') || '<tr><td colspan="7"><div class="empty"><p>No scholars found.</p></div></td></tr>';
   }
 
@@ -854,7 +855,7 @@
 
   function openAddScholar(){
     editingScholarId=null;
-    ['f_name','f_em','f_phone','f_bd','f_school','f_yog'].forEach(function(id){ document.getElementById(id).value=''; });
+    ['f_name','f_em','f_phone','f_bd','f_school','f_yog','f_course'].forEach(function(id){ document.getElementById(id).value=''; });
     document.getElementById('f_group').value='CKC'; document.getElementById('f_batch').value='1';
     document.getElementById('f_yj').value='2026'; document.getElementById('f_gradelevel').value='College';
     populateYearLevel('f_yearlevel','College','');
@@ -872,7 +873,7 @@
     document.getElementById('f_group').value=s.group_name||'CKC'; document.getElementById('f_batch').value=String(s.batch_no||'1');
     document.getElementById('f_yj').value=String(s.year_joined||'2026'); document.getElementById('f_gradelevel').value=s.grade_level||'College';
     populateYearLevel('f_yearlevel',s.grade_level||'College',s.year_level||'');
-    document.getElementById('f_school').value=s.school||''; document.getElementById('f_yog').value=s.graduation_year||'';
+    document.getElementById('f_school').value=s.school||''; document.getElementById('f_yog').value=s.graduation_year||''; document.getElementById('f_course').value=s.course||'';
     document.getElementById('scholarFormTitle').textContent='Edit Scholar';
     document.getElementById('scholarFormSub').textContent='Update '+s.name+"'s information.";
     document.getElementById('scholarFormSaveBtn').textContent='Save Changes';
@@ -888,6 +889,7 @@
     const yj=parseInt(document.getElementById('f_yj').value);
     const bd=document.getElementById('f_bd').value;
     const school=document.getElementById('f_school').value.trim();
+    const course=document.getElementById('f_course').value.trim()||null;
     const gl=document.getElementById('f_gradelevel').value;
     const year_level=document.getElementById('f_yearlevel').value;
     const yog=document.getElementById('f_yog').value?parseInt(document.getElementById('f_yog').value):null;
@@ -899,7 +901,7 @@
       if(editingScholarId===null){
         const {data:newS,error:dbErr}=await sb.from('scholars').insert({
           name,group_name:group,batch_no:batch,year_joined:yj,birthdate:bd,
-          age:typeof age==='number'?age:null,school,grade_level:gl,year_level,
+          age:typeof age==='number'?age:null,school,grade_level:gl,year_level,course,
           graduation_year:yog,email,phone_number:phone,scholar_status:'active'
         }).select().single();
         if(dbErr){ toast(dbErr.message,'❌'); btn.disabled=false; btn.textContent='Add Scholar'; return; }
@@ -908,7 +910,7 @@
       } else {
         const {data:upd,error}=await sb.from('scholars').update({
           name,group_name:group,batch_no:batch,year_joined:yj,birthdate:bd,
-          age:typeof age==='number'?age:null,school,grade_level:gl,year_level,
+          age:typeof age==='number'?age:null,school,grade_level:gl,year_level,course,
           graduation_year:yog,email,phone_number:phone
         }).eq('id',editingScholarId).select().single();
         if(error){ toast(error.message,'❌'); btn.disabled=false; btn.textContent='Save Changes'; return; }
@@ -981,7 +983,7 @@
     const s=scholars.find(function(x){ return x.id===id; }); if(!s) return;
     const fields=[['Group',s.group_name],['Batch No.','Batch '+(s.batch_no||'—')],['Year Joined',s.year_joined],
       ['Birthdate',s.birthdate||'—'],['Age',calcAge(s.birthdate)],['School',s.school||'—'],
-      ['Grade Level',s.grade_level||'—'],['Year Level',s.year_level||'—'],
+      ['Grade Level',s.grade_level||'—'],['Year Level',s.year_level||'—'],['Course/Major',s.course||'—'],
       ['Year of Graduation',s.graduation_year||'—'],['Phone',s.phone_number||'—'],
       ['Status',statusBadge(s.scholar_status)]];
     document.getElementById('mScholarDetailBody').innerHTML=
@@ -998,9 +1000,9 @@
 
   // ── EXPORT ──
   document.getElementById('exportBtn').addEventListener('click', function(){
-    const headers=['Name','Group','Batch No.','Year Joined','Birthdate','Age','School','Grade Level','Year Level','Year of Graduation','Email','Phone Number','Scholarship Status'];
+    const headers=['Name','Group','Batch No.','Year Joined','Birthdate','Age','School','Grade Level','Year Level','Course/Major','Year of Graduation','Email','Phone Number','Scholarship Status'];
     const rows=scholars.map(function(s){
-      return [s.name,s.group_name,s.batch_no,s.year_joined,s.birthdate||'',calcAge(s.birthdate),s.school,s.grade_level,s.year_level||'',s.graduation_year||'',s.email,s.phone_number||'',s.scholar_status];
+      return [s.name,s.group_name,s.batch_no,s.year_joined,s.birthdate||'',calcAge(s.birthdate),s.school,s.grade_level,s.year_level||'',s.course||'',s.graduation_year||'',s.email,s.phone_number||'',s.scholar_status];
     });
     const csv=[headers].concat(rows).map(function(r){ return r.map(function(v){ return '"'+String(v!=null?v:'').replace(/"/g,'""')+'"'; }).join(','); }).join('\r\n');
     const a=document.createElement('a');
@@ -1062,8 +1064,9 @@
       return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f4f4f8">' +
         '<div class="s-avatar" style="flex-shrink:0">'+ini(s.name)+'</div>' +
         '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>' +
-        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+' · '+(s.grade_level||'—')+'</div></div>' +
-        '</div>';
+        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div>' +
+        '<div style="font-size:11px;color:var(--muted)">'+(s.grade_level||'—')+' · '+(s.year_level||'—')+(s.course?' · '+s.course:'')+'</div>' +
+        '</div></div>';
     }
 
     document.getElementById('missingCorList').innerHTML = missingCor.length
@@ -1379,7 +1382,7 @@
     openModal('mPollResults');
 
     const {data:options}=await sb.from('poll_options').select('*').eq('announcement_id',id);
-    const {data:responses}=await sb.from('poll_responses').select('*, scholars(name,group_name,batch_no), poll_options(option_text)').eq('announcement_id',id);
+    const {data:responses}=await sb.from('poll_responses').select('*, scholars(name,group_name,batch_no,grade_level,year_level,course), poll_options(option_text)').eq('announcement_id',id);
     const total=responses?new Set(responses.map(function(r){return r.scholar_id;})).size:0;
 
     // Scholars who responded
@@ -1434,8 +1437,10 @@
             '<div style="display:flex;align-items:center;gap:10px">'+
             '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
             '<div><div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
-            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div></div></div>'+
-            '<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:200px">'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div>'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.grade_level||'—')+' · '+(s.year_level||'—')+(s.course?' · '+s.course:'')+'</div>'+
+            '</div></div>'+
+            '<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:180px">'+
               item.options.map(function(opt){ return '<span class="badge badge-green" style="white-space:normal;text-align:center">'+opt+'</span>'; }).join('')+
             '</div>'+
             '</div>';
@@ -1448,7 +1453,8 @@
           return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
             '<div class="s-avatar">'+ini(s.name)+'</div>'+
             '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>'+
-            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div>'+
+            '<div style="font-size:11px;color:var(--muted)">'+(s.grade_level||'—')+' · '+(s.year_level||'—')+(s.course?' · '+s.course:'')+'</div></div>'+
             '<span class="badge badge-amber" style="margin-left:auto">Not Yet Voted</span>'+
             '</div>';
         }).join('')
@@ -1478,7 +1484,7 @@
     document.getElementById('atab-all').classList.add('on');
     openModal('mAttendance');
 
-    const {data:allRecords}=await sb.from('attendance').select('*, scholars(name,group_name,batch_no)').eq('announcement_id',id);
+    const {data:allRecords}=await sb.from('attendance').select('*, scholars(name,group_name,batch_no,grade_level,year_level,course)').eq('announcement_id',id);
     const {data:responses}=await sb.from('poll_responses').select('scholar_id, poll_options(option_text)').eq('announcement_id',id);
     const records=allRecords||[];
 
@@ -1493,6 +1499,7 @@
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
         '<div><div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
         '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'')+' · Batch '+(s.batch_no||'—')+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)">'+(s.grade_level||'—')+' · '+(s.year_level||'—')+(s.course?' · '+s.course:'')+'</div>'+
         '<div style="font-size:11px;color:var(--muted)">Poll: '+(resp&&resp.poll_options?resp.poll_options.option_text:'No response')+'</div></div>'+
         (didAttend?'<span class="badge badge-green">✅ Attended</span>':'<span class="badge badge-pink">❌ Did Not Attend</span>')+
         '</div>';
@@ -1502,7 +1509,8 @@
       return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f4f4f8">'+
         '<div class="s-avatar">'+ini(s.name)+'</div>'+
         '<div><div style="font-size:13px;font-weight:500">'+s.name+'</div>'+
-        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div></div>'+
+        '<div style="font-size:11px;color:var(--muted)">'+(s.group_name||'—')+' · Batch '+(s.batch_no||'—')+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)">'+(s.grade_level||'—')+' · '+(s.year_level||'—')+(s.course?' · '+s.course:'')+'</div></div>'+
         '<span class="badge badge-gray" style="margin-left:auto">Not Yet Marked</span>'+
         '</div>';
     }
