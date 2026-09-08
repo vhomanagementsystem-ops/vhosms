@@ -158,6 +158,9 @@
               </div>
               <div class="form-field"><label class="form-label">Year of Graduation</label><input class="form-input" id="ef_gradYear" type="number" min="2020" max="2035" placeholder="e.g. 2027"></div>
             </div>
+            <div class="form-row">
+              <div class="form-field"><label class="form-label">Course / Major <span style="font-size:11px;color:var(--muted)">(optional)</span></label><input class="form-input" id="ef_course" placeholder="e.g. BS Computer Science"></div>
+            </div>
           </div>
         </div>
         <div class="card" style="margin-bottom:14px">
@@ -429,7 +432,7 @@
     if (!currentUser) return;
     const s = currentUser;
     document.getElementById('homeGreet').textContent = 'Welcome back, '+s.name+' ♥';
-    document.getElementById('homeSubtitle').textContent = [s.grade_level,s.year_level,s.school].filter(Boolean).join(' · ')||'VHO Scholar';
+    document.getElementById('homeSubtitle').textContent = [s.grade_level,s.year_level,s.course,s.school].filter(Boolean).join(' · ')||'VHO Scholar';
     document.getElementById('homeStats').innerHTML =
       '<div class="stat-card blue"><div class="stat-label">Scholar Status</div><div class="stat-val" style="font-size:18px">'+cap(s.scholar_status)+'</div><div class="stat-sub">Current standing</div></div>'+
       '<div class="stat-card green"><div class="stat-label">Grade Level</div><div class="stat-val" style="font-size:16px">'+(s.grade_level||'—')+'</div><div class="stat-sub">'+(s.year_level||'—')+'</div></div>'+
@@ -460,7 +463,7 @@
       infoItem('Age',typeof age==='number'?age+' years old':'—')+infoItem('Phone Number',s.phone_number);
     document.getElementById('profileAcadGrid').innerHTML=
       infoItem('School',s.school)+infoItem('Grade Level',s.grade_level)+infoItem('Year Level',s.year_level)+
-      infoItem('Year of Graduation',s.graduation_year)+infoItem('Group',s.group_name)+
+      infoItem('Course/Major',s.course)+infoItem('Year of Graduation',s.graduation_year)+infoItem('Group',s.group_name)+
       infoItem('Year Joined',s.year_joined)+infoItem('Scholarship Status',cap(status));
   }
 
@@ -480,6 +483,7 @@
     document.getElementById('ef_gradeLevel').value=s.grade_level||'';
     populateYearLevel('ef_yearLevel',s.grade_level||'',s.year_level||'');
     document.getElementById('ef_gradYear').value=s.graduation_year||'';
+    document.getElementById('ef_course').value=s.course||'';
     document.getElementById('scholarshipReadOnly').innerHTML=
       infoItem('Group',s.group_name)+infoItem('Batch No.',s.batch_no)+
       infoItem('Year Joined',s.year_joined)+infoItem('Scholar Status',cap(s.scholar_status));
@@ -505,6 +509,7 @@
       grade_level:document.getElementById('ef_gradeLevel').value||null,
       year_level:document.getElementById('ef_yearLevel').value||null,
       graduation_year:document.getElementById('ef_gradYear').value?parseInt(document.getElementById('ef_gradYear').value):null,
+      course:document.getElementById('ef_course').value.trim()||null,
       age:typeof calcAge(bd)==='number'?calcAge(bd):null
     };
     const {data:updated,error}=await sb.from('scholars').update(updates).eq('id',currentUser.id).select().single();
