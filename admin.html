@@ -48,6 +48,8 @@
     <div class="nav-group-label">Engagement</div>
     <a class="nav-item" id="nav-announcements">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l6.553 3.276A1 1 0 0 0 18 15V3z"/></svg>Announcements<span class="nav-badge" id="nb-announcements" style="display:none">0</span></a>
+    <a class="nav-item" id="nav-attendancetracker">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2H6z"/></svg>Attendance Tracker</a>
     <div class="nav-group-label">Partners</div>
     <a class="nav-item" id="nav-sponsors">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a1 1 0 0 1-1.581.814L10 14.396l-4.419 2.418A1 1 0 0 1 4 16V4zm6 3a1 1 0 0 1 1 1v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1H8a1 1 0 1 1 0-2h1V8a1 1 0 0 1 1-1z"/></svg>Sponsor Database</a>
@@ -179,11 +181,34 @@
       </div>
     </div>
 
+    <!-- ATTENDANCE TRACKER -->
+    <div id="page-attendancetracker" class="page" style="display:none">
+      <div class="page-header">
+        <div class="page-header-left"><h1>Attendance Tracker</h1><p>Track scholar attendance certificates for mandatory and elective events</p></div>
+      </div>
+      <!-- Event filter tabs -->
+      <div style="display:flex;gap:4px;background:#f4f4f8;border-radius:12px;padding:4px;margin-bottom:18px;width:fit-content">
+        <button class="sponsor-tab on" id="attrtab-all" data-attrtab="all">All Events</button>
+        <button class="sponsor-tab" id="attrtab-mandatory" data-attrtab="mandatory">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1-8a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V6a1 1 0 0 0-1-1z"/></svg>
+          Mandatory
+        </button>
+        <button class="sponsor-tab" id="attrtab-elective" data-attrtab="elective">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Elective
+        </button>
+      </div>
+      <div id="attendanceTrackerList"><div class="empty"><p>Loading...</p></div></div>
+    </div>
+
     <!-- ANNOUNCEMENTS -->
     <div id="page-announcements" class="page" style="display:none">
       <div class="page-header">
         <div class="page-header-left"><h1>Announcements</h1><p>Post events and polls for scholars</p></div>
-        <button class="btn btn-primary" id="addAnnouncementBtn">+ New Announcement</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="updateSchoolYearBtn">🎓 Update School Year</button>
+          <button class="btn btn-primary" id="addAnnouncementBtn">+ New Announcement</button>
+        </div>
       </div>
       <div id="announcementsList"><div class="empty"><p>Loading...</p></div></div>
     </div>
@@ -384,6 +409,27 @@
 <div class="modal-bg" id="mScholarDetail">
 <div class="modal" id="mScholarDetailBody"></div></div>
 
+<!-- Update School Year Modal -->
+<div class="modal-bg" id="mUpdateSchoolYear">
+<div class="modal" style="max-width:500px">
+  <button class="modal-close" id="closeUpdateSchoolYear">✕</button>
+  <h2 class="modal-title">🎓 Update School Year</h2>
+  <p class="modal-sub">This will automatically advance all scholars to the next grade/year level. Review before confirming.</p>
+  <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.7">
+    ⚠️ <strong>What this does:</strong><br>
+    • Junior High: Grade 7→8, 8→9, 9→10, 10→Senior High School Grade 11<br>
+    • Senior High: Grade 11→12, Grade 12→College 1st Year<br>
+    • College: 1st→2nd→3rd→4th→5th Year<br>
+    • Ages will be recalculated from birthdate automatically<br>
+    • 5th Year College scholars will be marked as <strong>Graduated</strong>
+  </div>
+  <div id="schoolYearPreview" style="max-height:200px;overflow-y:auto;margin-bottom:14px;font-size:13px;color:var(--muted)">Loading preview...</div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelUpdateSchoolYear">Cancel</button>
+    <button class="btn btn-primary" id="confirmUpdateSchoolYear">Confirm Update</button>
+  </div>
+</div></div>
+
 <!-- Add/Edit Announcement -->
 <div class="modal-bg" id="mAnnouncementForm">
 <div class="modal" style="max-width:560px">
@@ -395,6 +441,19 @@
   <div class="form-row">
     <div class="form-field"><label class="form-label">Event Date</label><input class="form-input" id="ann_date" type="date"></div>
     <div class="form-field"><label class="form-label">Location</label><input class="form-input" id="ann_location" placeholder="e.g. VHO Office, Zoom"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-field">
+      <label class="form-label">Event Type *</label>
+      <select class="form-select" id="ann_event_type">
+        <option value="elective">Elective</option>
+        <option value="mandatory">Mandatory</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Max Votes / Attendees <span style="font-size:11px;color:var(--muted)">(optional)</span></label>
+      <input class="form-input" id="ann_max_votes" type="number" min="1" placeholder="e.g. 20 (leave blank for unlimited)">
+    </div>
   </div>
   <div class="form-field"><label class="form-label">Poll Question</label><input class="form-input" id="ann_poll_question" placeholder="e.g. Will you attend this event?"></div>
   <div class="form-field">
@@ -627,6 +686,18 @@
   </div>
 </div></div>
 
+<!-- Certificate View Modal -->
+<div class="modal-bg" id="mCertView">
+<div class="modal" style="max-width:760px">
+  <button class="modal-close" id="closeCertView">✕</button>
+  <h2 class="modal-title" id="certViewTitle">Certificate of Attendance</h2>
+  <p class="modal-sub" id="certViewSub"></p>
+  <div id="certViewBody" style="text-align:center;min-height:300px;display:flex;align-items:center;justify-content:center">
+    <img id="certViewImg" src="" alt="Certificate" style="max-width:100%;max-height:500px;border-radius:8px;display:none">
+    <iframe id="certViewFrame" src="about:blank" style="width:100%;height:500px;border:none;border-radius:8px;display:none"></iframe>
+  </div>
+</div></div>
+
 <!-- Delete Announcement Confirmation -->
 <div class="modal-bg" id="mDeleteAnnouncementConfirm">
 <div class="modal" style="max-width:420px">
@@ -745,8 +816,8 @@
   }
 
   // ── NAV ──
-  const pages = ['dashboard','scholars','documents','announcements','admins','sponsors','changepassword'];
-  const titles = {dashboard:'Dashboard',scholars:'All Scholars',documents:'Document Verification',announcements:'Announcements',admins:'Admin Accounts',sponsors:'Sponsor Database',changepassword:'Change Password'};
+  const pages = ['dashboard','scholars','documents','announcements','attendancetracker','admins','sponsors','changepassword'];
+  const titles = {dashboard:'Dashboard',scholars:'All Scholars',documents:'Document Verification',announcements:'Announcements',attendancetracker:'Attendance Tracker',admins:'Admin Accounts',sponsors:'Sponsor Database',changepassword:'Change Password'};
 
   function gotoPage(page) {
     pages.forEach(function(p) {
@@ -758,6 +829,7 @@
     if (page==='scholars') renderScholarsTable();
     if (page==='documents') { renderDocsTable(); initDocTabs(); }
     if (page==='announcements') renderAnnouncements();
+    if (page==='attendancetracker') renderAttendanceTracker();
     if (page==='admins') renderAdmins();
     if (page==='sponsors') { renderSponsors(); updateSponsorTabButtons(); }
     closeSidebar();
@@ -1198,7 +1270,8 @@
 
   function openAddAnnouncement(){
     editingAnnouncementId=null;
-    ['ann_title','ann_desc','ann_date','ann_location','ann_poll_question','ann_poll_options'].forEach(function(id){ document.getElementById(id).value=''; });
+    ['ann_title','ann_desc','ann_date','ann_location','ann_poll_question','ann_poll_options','ann_max_votes'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('ann_event_type').value='elective';
     document.getElementById('announcementFormTitle').textContent='New Announcement';
     document.getElementById('saveAnnouncementBtn').textContent='Post Announcement';
     openModal('mAnnouncementForm');
@@ -1212,6 +1285,8 @@
     document.getElementById('ann_date').value=ann.event_date||'';
     document.getElementById('ann_location').value=ann.event_location||'';
     document.getElementById('ann_poll_question').value=ann.poll_question||'';
+    document.getElementById('ann_event_type').value=ann.event_type||'elective';
+    document.getElementById('ann_max_votes').value=ann.max_votes||'';
     // Load existing options WITHOUT removing existing responses
     const {data:opts}=await sb.from('poll_options').select('*').eq('announcement_id',id);
     document.getElementById('ann_poll_options').value=opts?opts.map(function(o){ return o.option_text; }).join('\n'):'';
@@ -1225,12 +1300,15 @@
     if(!title){ toast('Title is required','⚠️'); return; }
     const btn=document.getElementById('saveAnnouncementBtn');
     btn.disabled=true; btn.textContent='Saving…';
+    const maxVotesVal=document.getElementById('ann_max_votes').value;
     const payload={
       title:title,
       description:document.getElementById('ann_desc').value.trim()||null,
       event_date:document.getElementById('ann_date').value||null,
       event_location:document.getElementById('ann_location').value.trim()||null,
       poll_question:document.getElementById('ann_poll_question').value.trim()||null,
+      event_type:document.getElementById('ann_event_type').value||'elective',
+      max_votes:maxVotesVal?parseInt(maxVotesVal):null,
       updated_at:new Date().toISOString()
     };
     const optionsText=document.getElementById('ann_poll_options').value.trim();
@@ -1337,7 +1415,7 @@
       }
       htmlParts.push(
         '<div class="card" style="margin-bottom:14px">'+
-        '<div class="card-header"><div><span class="card-title">'+ann.title+'</span>'+
+        '<div class="card-header"><div><div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><span class="card-title">'+ann.title+'</span>'+(ann.event_type==='mandatory'?'<span class="badge badge-pink">Mandatory</span>':'<span class="badge badge-blue">Elective</span>')+(ann.max_votes?'<span class="badge badge-amber">Max: '+ann.max_votes+' votes</span>':'')+'</div>'+
         (eventDate?'<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 '+eventDate+(ann.event_location?' · 📍 '+ann.event_location:'')+'</div>':'')+
         '</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
         (hasOptions?'<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="'+ann.id+'">📊 Poll Results ('+totalResponses+')</button>':'')+
@@ -2333,6 +2411,244 @@
     if(error){ showMsg('err',error.message); return; }
     showMsg('ok','✅ Password changed! Use your new password next time you log in.');
     document.getElementById('adm_cp_email').value='';
+  });
+
+  // ── AUTO AGE CALCULATION ──
+  function autoCalcAge(birthdate) {
+    if (!birthdate) return null;
+    const b = new Date(birthdate + 'T00:00:00');
+    if (isNaN(b)) return null;
+    const now = new Date();
+    let age = now.getFullYear() - b.getFullYear();
+    const m = now.getMonth() - b.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+    return age;
+  }
+
+  // ── UPDATE SCHOOL YEAR ──
+  const YEAR_LEVEL_PROGRESSION = {
+    'Grade 7': {nextYearLevel:'Grade 8', nextGradeLevel:'Junior High School'},
+    'Grade 8': {nextYearLevel:'Grade 9', nextGradeLevel:'Junior High School'},
+    'Grade 9': {nextYearLevel:'Grade 10', nextGradeLevel:'Junior High School'},
+    'Grade 10': {nextYearLevel:'Grade 11', nextGradeLevel:'Senior High School'},
+    'Grade 11': {nextYearLevel:'Grade 12', nextGradeLevel:'Senior High School'},
+    'Grade 12': {nextYearLevel:'1st Year', nextGradeLevel:'College'},
+    '1st Year': {nextYearLevel:'2nd Year', nextGradeLevel:'College'},
+    '2nd Year': {nextYearLevel:'3rd Year', nextGradeLevel:'College'},
+    '3rd Year': {nextYearLevel:'4th Year', nextGradeLevel:'College'},
+    '4th Year': {nextYearLevel:'5th Year', nextGradeLevel:'College'},
+    '5th Year': {nextYearLevel:'5th Year', nextGradeLevel:'College', graduate:true}
+  };
+
+  document.getElementById('updateSchoolYearBtn').addEventListener('click', function(){
+    // Show preview
+    const preview = document.getElementById('schoolYearPreview');
+    preview.innerHTML = '<div style="color:var(--muted)">Calculating...</div>';
+    openModal('mUpdateSchoolYear');
+    setTimeout(function(){
+      const changes = scholars.filter(function(s){ return s.scholar_status==='active' && s.year_level; });
+      if(!changes.length){
+        preview.innerHTML = '<div style="color:var(--muted)">No active scholars to update.</div>';
+        return;
+      }
+      preview.innerHTML = '<div style="font-weight:500;margin-bottom:8px;font-size:13px">Preview ('+changes.length+' active scholars):</div>'+
+        changes.slice(0,8).map(function(s){
+          const prog = YEAR_LEVEL_PROGRESSION[s.year_level];
+          if(!prog) return '';
+          const label = prog.graduate
+            ? s.name+': '+s.year_level+' → <strong style="color:#6366f1">Graduated</strong>'
+            : s.name+': '+s.year_level+' → <strong>'+prog.nextYearLevel+'</strong>';
+          return '<div style="padding:4px 0;border-bottom:1px solid #f4f4f8;font-size:12px">'+label+'</div>';
+        }).join('')+
+        (changes.length>8?'<div style="font-size:12px;color:var(--muted);margin-top:6px">...and '+(changes.length-8)+' more</div>':'');
+    }, 100);
+  });
+
+  document.getElementById('closeUpdateSchoolYear').addEventListener('click', function(){ closeModal('mUpdateSchoolYear'); });
+  document.getElementById('cancelUpdateSchoolYear').addEventListener('click', function(){ closeModal('mUpdateSchoolYear'); });
+  document.getElementById('mUpdateSchoolYear').addEventListener('click', function(e){ if(e.target===this) closeModal('mUpdateSchoolYear'); });
+
+  document.getElementById('confirmUpdateSchoolYear').addEventListener('click', async function(){
+    this.disabled=true; this.textContent='Updating...';
+    const active = scholars.filter(function(s){ return s.scholar_status==='active' && s.year_level; });
+    let updated=0, graduated=0, errors=0;
+    for(const s of active){
+      const prog = YEAR_LEVEL_PROGRESSION[s.year_level];
+      if(!prog) continue;
+      const newAge = autoCalcAge(s.birthdate);
+      const updatePayload = {
+        year_level: prog.nextYearLevel,
+        grade_level: prog.nextGradeLevel,
+        age: newAge
+      };
+      if(prog.graduate) updatePayload.scholar_status = 'graduated';
+      const {error} = await sb.from('scholars').update(updatePayload).eq('id',s.id);
+      if(error){ errors++; continue; }
+      const idx = scholars.findIndex(function(x){ return x.id===s.id; });
+      if(idx!==-1){
+        scholars[idx].year_level = prog.nextYearLevel;
+        scholars[idx].grade_level = prog.nextGradeLevel;
+        scholars[idx].age = newAge;
+        if(prog.graduate) scholars[idx].scholar_status='graduated';
+      }
+      if(prog.graduate) graduated++; else updated++;
+    }
+    // Also update all scholars ages from birthdate
+    for(const s of scholars){
+      if(s.birthdate && !active.find(function(a){return a.id===s.id;})){
+        const newAge = autoCalcAge(s.birthdate);
+        if(newAge !== s.age){
+          await sb.from('scholars').update({age:newAge}).eq('id',s.id);
+          const idx = scholars.findIndex(function(x){ return x.id===s.id; });
+          if(idx!==-1) scholars[idx].age=newAge;
+        }
+      }
+    }
+    this.disabled=false; this.textContent='Confirm Update';
+    closeModal('mUpdateSchoolYear');
+    toast('Updated '+updated+' scholars, '+graduated+' graduated'+(errors?' ('+errors+' errors)':''),'✅');
+    renderScholarsTable(); renderDash();
+  });
+
+  // ── ATTENDANCE TRACKER ──
+  let trackerFilter = 'all';
+
+  document.querySelectorAll('[data-attrtab]').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      trackerFilter = this.dataset.attrtab;
+      document.querySelectorAll('[data-attrtab]').forEach(function(t){ t.classList.remove('on'); });
+      this.classList.add('on');
+      renderAttendanceTracker();
+    });
+  });
+
+  async function renderAttendanceTracker(){
+    const container = document.getElementById('attendanceTrackerList');
+    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
+
+    // Get all announcements
+    const {data:anns} = await sb.from('announcements').select('*').order('event_date',{ascending:false});
+    if(!anns||!anns.length){
+      container.innerHTML='<div class="card"><div class="empty"><p>No events found. Create announcements first.</p></div></div>';
+      return;
+    }
+
+    // Filter by event type
+    const filtered = anns.filter(function(a){
+      if(trackerFilter==='all') return true;
+      return a.event_type===trackerFilter;
+    });
+
+    if(!filtered.length){
+      container.innerHTML='<div class="card"><div class="empty"><p>No '+trackerFilter+' events found.</p></div></div>';
+      return;
+    }
+
+    // Get all attendance tracker records
+    const {data:trackerRecords} = await sb.from('attendance_tracker').select('*');
+    const records = trackerRecords || [];
+
+    const htmlParts = filtered.map(function(ann){
+      const annRecords = records.filter(function(r){ return r.announcement_id===ann.id; });
+      const eventDate = ann.event_date ? new Date(ann.event_date+'T00:00:00').toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}) : null;
+      const typeBadge = ann.event_type==='mandatory'
+        ? '<span class="badge badge-pink">Mandatory</span>'
+        : '<span class="badge badge-blue">Elective</span>';
+      return '<div class="card" style="margin-bottom:14px">'+
+        '<div class="card-header">'+
+          '<div>'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">'+
+              '<span class="card-title">'+ann.title+'</span>'+typeBadge+
+            '</div>'+
+            (eventDate?'<div style="font-size:12px;color:var(--muted)">📅 '+eventDate+(ann.event_location?' · 📍 '+ann.event_location:'')+'</div>':'')+
+          '</div>'+
+          '<div style="display:flex;align-items:center;gap:10px">'+
+            '<span class="badge badge-green">'+annRecords.length+' submitted</span>'+
+            '<button class="btn btn-ghost btn-sm" data-action="viewTrackerList" data-id="'+ann.id+'">View Attendees</button>'+
+          '</div>'+
+        '</div>'+
+        '</div>';
+    }).join('');
+    container.innerHTML = htmlParts;
+  }
+
+  document.getElementById('attendanceTrackerList').addEventListener('click', async function(e){
+    const btn = e.target.closest('[data-action="viewTrackerList"]');
+    if(!btn) return;
+    await openTrackerModal(btn.dataset.id);
+  });
+
+  // Tracker modal
+  let currentTrackerAnnId = null;
+  async function openTrackerModal(annId){
+    currentTrackerAnnId = annId;
+    const ann = announcements.find(function(a){ return a.id===annId; });
+    const modalTitle = ann ? ann.title+' — Attendance Certificates' : 'Attendance Certificates';
+    // Reuse cert view modal - create a list modal instead
+    document.getElementById('certViewTitle').textContent = modalTitle;
+    document.getElementById('certViewSub').textContent = 'Scholars who submitted their attendance certificate';
+    const {data:records} = await sb.from('attendance_tracker')
+      .select('*, scholars(name,group_name,batch_no,grade_level,year_level,course)')
+      .eq('announcement_id', annId)
+      .order('uploaded_at',{ascending:false});
+    const recs = records || [];
+    if(!recs.length){
+      document.getElementById('certViewBody').innerHTML='<div style="color:var(--muted);font-size:13px;padding:40px">No certificates submitted yet.</div>';
+    } else {
+      document.getElementById('certViewBody').innerHTML =
+        '<div style="width:100%;text-align:left">'+
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:500">'+recs.length+' scholar'+(recs.length!==1?'s':'')+' submitted</div>'+
+        recs.map(function(r){
+          const s = r.scholars||{};
+          const info=[s.year_level,s.grade_level,s.course].filter(Boolean).join(' · ');
+          const ext=(r.certificate_name||'').toLowerCase();
+          const isImg=ext.endsWith('.jpg')||ext.endsWith('.jpeg')||ext.endsWith('.png');
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f4f4f8">'+
+            '<div style="display:flex;align-items:center;gap:10px">'+
+              '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
+              '<div>'+
+                '<div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
+                (info?'<div style="font-size:11px;color:var(--muted)">'+info+'</div>':'')+
+                '<div style="font-size:11px;color:var(--muted)">'+fmtDate(r.uploaded_at)+'</div>'+
+              '</div>'+
+            '</div>'+
+            '<button class="btn btn-ghost btn-sm" data-cert-url="'+r.certificate_url+'" data-cert-name="'+(r.certificate_name||'')+'" data-cert-img="'+isImg+'" onclick="viewCert(this)">View Certificate</button>'+
+            '</div>';
+        }).join('')+
+        '</div>';
+    }
+    document.getElementById('certViewImg').style.display='none';
+    document.getElementById('certViewFrame').style.display='none';
+    openModal('mCertView');
+  }
+
+  window.viewCert = function(btn){
+    const url = btn.dataset.certUrl;
+    const isImg = btn.dataset.certImg==='true';
+    const img = document.getElementById('certViewImg');
+    const frame = document.getElementById('certViewFrame');
+    if(isImg){
+      img.src=url; img.style.display='block';
+      frame.src='about:blank'; frame.style.display='none';
+    } else {
+      frame.src=url; frame.style.display='block';
+      img.style.display='none'; img.src='';
+    }
+  };
+
+  document.getElementById('closeCertView').addEventListener('click', function(){
+    document.getElementById('certViewImg').style.display='none';
+    document.getElementById('certViewImg').src='';
+    document.getElementById('certViewFrame').src='about:blank';
+    document.getElementById('certViewFrame').style.display='none';
+    closeModal('mCertView');
+  });
+  document.getElementById('mCertView').addEventListener('click', function(e){
+    if(e.target===this){
+      document.getElementById('certViewImg').src='';
+      document.getElementById('certViewFrame').src='about:blank';
+      closeModal('mCertView');
+    }
   });
 
   // ── BOOT ──
