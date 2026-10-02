@@ -270,6 +270,17 @@
   </div>
 </main>
 
+<!-- Delete Certificate Confirmation -->
+<div class="modal-bg" id="mDeleteCertConfirm">
+<div class="modal" style="max-width:400px">
+  <h2 class="modal-title" style="color:var(--red)">⚠️ Remove Certificate</h2>
+  <p class="modal-sub">Are you sure you want to remove your attendance certificate? You can re-upload anytime.</p>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" id="cancelDeleteCertBtn">Cancel</button>
+    <button class="btn btn-danger" id="confirmDeleteCertBtn">Yes, Remove</button>
+  </div>
+</div></div>
+
 <!-- Delete Attendance Confirmation -->
 <div class="modal-bg" id="mDeleteAttConfirm">
 <div class="modal" style="max-width:400px">
@@ -341,6 +352,16 @@
   };
 
   // ── HELPERS ──
+  function autoCalcAge(birthdate){
+    if(!birthdate) return null;
+    const b=new Date(birthdate+'T00:00:00');
+    if(isNaN(b)) return null;
+    const now=new Date();
+    let age=now.getFullYear()-b.getFullYear();
+    const m=now.getMonth()-b.getMonth();
+    if(m<0||(m===0&&now.getDate()<b.getDate())) age--;
+    return age;
+  }
   function populateYearLevel(selectId, gradeLevel, currentValue) {
     const sel = document.getElementById(selectId); if (!sel) return;
     const opts = YEAR_LEVELS[gradeLevel] || [];
@@ -432,6 +453,13 @@
     if (!currentUser) return;
     const s = currentUser;
     document.getElementById('homeGreet').textContent = 'Welcome back, '+s.name+' ♥';
+    // Auto-update age from birthdate silently
+    const autoAge = autoCalcAge(s.birthdate);
+    if(autoAge && autoAge !== s.age){
+      sb.from('scholars').update({age:autoAge}).eq('id',s.id).then(function(){
+        currentUser.age = autoAge;
+      });
+    }
     document.getElementById('homeSubtitle').textContent = [s.grade_level,s.year_level,s.course,s.school].filter(Boolean).join(' · ')||'VHO Scholar';
     document.getElementById('homeStats').innerHTML =
       '<div class="stat-card blue"><div class="stat-label">Scholar Status</div><div class="stat-val" style="font-size:18px">'+cap(s.scholar_status)+'</div><div class="stat-sub">Current standing</div></div>'+
@@ -759,6 +787,21 @@
     renderAnnouncements();
   });
 
+  document.getElementById('cancelDeleteCertBtn').addEventListener('click', function(){ closeModal('mDeleteCertConfirm'); });
+  document.getElementById('mDeleteCertConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteCertConfirm'); });
+  document.getElementById('confirmDeleteCertBtn').addEventListener('click', async function(){
+    const annId = this.dataset.ann;
+    if(!annId) return;
+    this.disabled=true; this.textContent='Removing...';
+    const {error} = await sb.from('attendance_tracker')
+      .delete().eq('announcement_id',annId).eq('scholar_id',currentUser.id);
+    this.disabled=false; this.textContent='Yes, Remove';
+    if(error){ toast(error.message,'❌'); return; }
+    closeModal('mDeleteCertConfirm');
+    toast('Certificate removed.','🗑️');
+    renderAnnouncements();
+  });
+
   document.getElementById('cancelDeleteAttBtn').addEventListener('click', function(){ closeModal('mDeleteAttConfirm'); });
   document.getElementById('mDeleteAttConfirm').addEventListener('click', function(e){ if(e.target===this) closeModal('mDeleteAttConfirm'); });
   document.getElementById('confirmDeleteAttBtn').addEventListener('click', async function(){
@@ -897,52 +940,48 @@
         pollHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+(ann.poll_question||'POLL')+'</div>'+pollContent+'</div>';
       }
 
-      // Attendance section
+      // Attendance certificate upload section (on/after event day)
       let attendanceHtml='';
       if(eventDate&&(isToday||isPast)){
-        const attLabel='EVENT ATTENDANCE'+(isToday?' — Today!':'');
-        if(myAtt){
-          if(myAtt.attended){
-            attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
-              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
-              '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
-                '<span>✅ You marked: <strong>Attended</strong></span>'+
-                '<div style="display:flex;gap:6px">'+
-                  '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
-                  '<button class="btn btn-danger btn-sm" data-action="deleteAttendance" data-ann="'+ann.id+'" style="font-size:12px">Delete</button>'+
-                '</div>'+
+        const attLabel='PROOF OF ATTENDANCE'+(isToday?' — Today!':'');
+        // Check if scholar uploaded certificate
+        const {data:myCert} = await sb.from('attendance_tracker')
+          .select('*').eq('announcement_id',ann.id).eq('scholar_id',currentUser.id).single().catch(function(){return {data:null};});
+        const typeBadge = ann.event_type==='mandatory'
+          ? '<span class="badge badge-pink" style="font-size:10px">Mandatory</span>'
+          : '<span class="badge badge-blue" style="font-size:10px">Elective</span>';
+
+        if(myCert){
+          attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+              '<div style="font-size:12px;font-weight:500;color:var(--muted)">'+attLabel+'</div>'+typeBadge+
+            '</div>'+
+            '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+              '<div>'+
+                '<div style="font-weight:500">✅ Certificate Submitted</div>'+
+                '<div style="font-size:11px;margin-top:2px">'+myCert.certificate_name+'</div>'+
               '</div>'+
-              '<div id="attForm_'+ann.id+'" style="display:none;margin-top:10px">'+
-                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ Attended</button>'+
-                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="'+ann.id+'" data-val="false">❌ Did Not Attend</button>'+
-              '</div></div>';
-          } else {
-            attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
-              '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
-              '<div style="background:#fff0f2;border:1px solid #fcc;border-radius:10px;padding:12px;font-size:13px;color:#e05065;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
-                '<span>❌ You marked: <strong>Did Not Attend</strong></span>'+
-                '<div style="display:flex;gap:6px">'+
-                  '<button class="btn btn-ghost btn-sm" data-action="changeAttendance" data-ann="'+ann.id+'" style="font-size:12px">Change</button>'+
-                  '<button class="btn btn-danger btn-sm" data-action="deleteAttendance" data-ann="'+ann.id+'" style="font-size:12px">Delete</button>'+
-                '</div>'+
-              '</div>'+
-              '<div id="attForm_'+ann.id+'" style="display:none;margin-top:10px">'+
-                '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ Attended</button>'+
-                '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="'+ann.id+'" data-val="false">❌ Did Not Attend</button>'+
-              '</div></div>';
-          }
+              '<button class="btn btn-danger btn-sm" data-action="deleteCert" data-ann="'+ann.id+'" style="font-size:12px">Remove</button>'+
+            '</div>'+
+          '</div>';
         } else {
           attendanceHtml='<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">'+
-            '<div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px">'+attLabel+'</div>'+
-            '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Please mark your actual attendance for this event:</div>'+
-            '<button class="btn btn-primary" style="width:100%;margin-bottom:8px" data-action="markAttended" data-ann="'+ann.id+'" data-val="true">✅ I Attended</button>'+
-            '<button class="btn btn-ghost" style="width:100%" data-action="markAttended" data-ann="'+ann.id+'" data-val="false">❌ I Did Not Attend</button>'+
-            '</div>';
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+              '<div style="font-size:12px;font-weight:500;color:var(--muted)">'+attLabel+'</div>'+typeBadge+
+            '</div>'+
+            '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload your certificate/proof of attendance (JPG, PNG, PDF — max 10MB):</div>'+
+            '<label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:2px dashed var(--border);border-radius:10px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s" class="cert-upload-label" id="certLabel_'+ann.id+'">'+
+              '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'+
+              'Click to upload certificate'+
+            '</label>'+
+            '<input type="file" id="certFile_'+ann.id+'" accept=".pdf,.jpg,.jpeg,.png" style="display:none" data-action="uploadCert" data-ann="'+ann.id+'">'+
+          '</div>';
         }
       }
 
       const dateStr=new Date(ann.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
-      let card='<div class="card" style="margin-bottom:14px"><div class="card-header"><div><span class="card-title">'+ann.title+'</span>';
+      const annTypeBadge = ann.event_type==='mandatory'?'<span class="badge badge-pink" style="font-size:10px">Mandatory</span>':'<span class="badge badge-blue" style="font-size:10px">Elective</span>';
+      let card='<div class="card" style="margin-bottom:14px"><div class="card-header"><div><div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><span class="card-title">'+ann.title+'</span>'+annTypeBadge+'</div>';
       if(eventDateStr){
         card+='<div style="font-size:12px;color:var(--muted);margin-top:2px">'+
           (isToday?'<span style="background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;margin-right:6px">TODAY</span>':'')+
@@ -967,6 +1006,57 @@
     badge.style.display=count?'':'none';
     if(count) badge.textContent=count;
   }
+
+  // Wire cert upload labels dynamically after render
+  document.getElementById('scholarAnnouncementsList').addEventListener('click', function(e){
+    const label = e.target.closest('.cert-upload-label');
+    if(label){
+      const annId = label.id.replace('certLabel_','');
+      const fileInput = document.getElementById('certFile_'+annId);
+      if(fileInput) fileInput.click();
+    }
+    const delBtn = e.target.closest('[data-action="deleteCert"]');
+    if(delBtn){
+      document.getElementById('confirmDeleteCertBtn').dataset.ann = delBtn.dataset.ann;
+      openModal('mDeleteCertConfirm');
+    }
+  });
+
+  document.getElementById('scholarAnnouncementsList').addEventListener('change', async function(e){
+    const fileInput = e.target.closest('[data-action="uploadCert"]');
+    if(!fileInput||!fileInput.files.length) return;
+    const file = fileInput.files[0];
+    const annId = fileInput.dataset.ann;
+    const allowed=['.pdf','.jpg','.jpeg','.png'];
+    const ext=file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+    if(!allowed.includes(ext)){ toast('Only PDF, JPG, JPEG, PNG allowed','⚠️'); fileInput.value=''; return; }
+    if(file.size>10*1024*1024){ toast('File must be under 10MB','⚠️'); fileInput.value=''; return; }
+    const label = document.getElementById('certLabel_'+annId);
+    if(label){ label.innerHTML='⏳ Uploading...'; label.style.pointerEvents='none'; }
+    try{
+      const safeFile = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const path = currentUser.id+'/'+annId+'/'+Date.now()+'_'+safeFile;
+      const {error:upErr} = await sb.storage.from('attendance-certificates').upload(path,file,{upsert:true,contentType:file.type});
+      if(upErr){ toast('Upload failed: '+upErr.message,'❌'); if(label){label.innerHTML='Click to upload certificate';label.style.pointerEvents='';} fileInput.value=''; return; }
+      const {data:urlData} = sb.storage.from('attendance-certificates').getPublicUrl(path);
+      const {error:dbErr} = await sb.from('attendance_tracker').upsert({
+        scholar_id: currentUser.id,
+        announcement_id: annId,
+        certificate_url: urlData.publicUrl,
+        certificate_name: file.name,
+        uploaded_at: new Date().toISOString()
+      },{onConflict:'scholar_id,announcement_id'});
+      if(dbErr){ toast('Saved but failed to record: '+dbErr.message,'❌'); fileInput.value=''; return; }
+      toast('Certificate uploaded successfully!','✅');
+      fileInput.value='';
+      renderAnnouncements();
+    } catch(err){
+      console.error(err);
+      toast('Upload failed. Try again.','❌');
+      fileInput.value='';
+      if(label){label.innerHTML='Click to upload certificate';label.style.pointerEvents='';}
+    }
+  });
 
   document.getElementById('scholarAnnouncementsList').addEventListener('click', async function(e){
     // Delete poll response
@@ -1031,20 +1121,7 @@
       return;
     }
 
-    // Change attendance toggle
-    const changeAttBtn=e.target.closest('[data-action="changeAttendance"]');
-    if(changeAttBtn){ const f=document.getElementById('attForm_'+changeAttBtn.dataset.ann); if(f) f.style.display=f.style.display==='none'?'block':'none'; return; }
-    // Mark attended
-    const attBtn=e.target.closest('[data-action="markAttended"]');
-    if(attBtn&&!attBtn.disabled){
-      const attended=attBtn.dataset.val==='true';
-      const origText=attBtn.textContent;
-      attBtn.disabled=true; attBtn.textContent='Saving...';
-      const {error}=await sb.from('attendance').upsert({announcement_id:attBtn.dataset.ann,scholar_id:currentUser.id,attended:attended,marked_at:new Date().toISOString()},{onConflict:'announcement_id,scholar_id'});
-      if(error){ toast(error.message,'❌'); attBtn.disabled=false; attBtn.textContent=origText; return; }
-      toast(attended?'Attendance marked! Thank you.':'Noted — marked as Did Not Attend.','✅');
-      renderAnnouncements();
-    }
+    // Legacy attendance handlers removed - now using certificate upload
   });
 
   // ── NOTIFICATIONS ──
