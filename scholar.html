@@ -944,9 +944,10 @@
       let attendanceHtml='';
       if(eventDate&&(isToday||isPast)){
         const attLabel='PROOF OF ATTENDANCE'+(isToday?' — Today!':'');
-        // Check if scholar uploaded certificate
-        const {data:myCert} = await sb.from('attendance_tracker')
-          .select('*').eq('announcement_id',ann.id).eq('scholar_id',currentUser.id).single().catch(function(){return {data:null};});
+        // Check if scholar uploaded certificate - use maybeSingle to avoid error when not found
+        const certResult = await sb.from('attendance_tracker')
+          .select('*').eq('announcement_id',ann.id).eq('scholar_id',currentUser.id).maybeSingle();
+        const myCert = certResult ? certResult.data : null;
         const typeBadge = ann.event_type==='mandatory'
           ? '<span class="badge badge-pink" style="font-size:10px">Mandatory</span>'
           : '<span class="badge badge-blue" style="font-size:10px">Elective</span>';
