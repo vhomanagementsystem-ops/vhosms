@@ -2526,12 +2526,14 @@
     const container = document.getElementById('attendanceTrackerList');
     container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
 
-    // Get all announcements
+    // Get all announcements and update the shared array too
     const {data:anns} = await sb.from('announcements').select('*').order('event_date',{ascending:false});
     if(!anns||!anns.length){
       container.innerHTML='<div class="card"><div class="empty"><p>No events found. Create announcements first.</p></div></div>';
       return;
     }
+    // Keep announcements array in sync
+    announcements = anns;
 
     // Filter by event type
     const filtered = anns.filter(function(a){
@@ -2564,7 +2566,7 @@
           '</div>'+
           '<div style="display:flex;align-items:center;gap:10px">'+
             '<span class="badge badge-green">'+annRecords.length+' submitted</span>'+
-            '<button class="btn btn-ghost btn-sm" data-action="viewTrackerList" data-id="'+ann.id+'">View Attendees</button>'+
+            '<button class="btn btn-ghost btn-sm" data-tracker-id="'+ann.id+'">View Attendees</button>'+
           '</div>'+
         '</div>'+
         '</div>';
@@ -2573,16 +2575,21 @@
   }
 
   document.getElementById('attendanceTrackerList').addEventListener('click', async function(e){
-    const btn = e.target.closest('[data-action="viewTrackerList"]');
+    const btn = e.target.closest('[data-tracker-id]');
     if(!btn) return;
-    await openTrackerModal(btn.dataset.id);
+    await openTrackerModal(btn.dataset.trackerId);
   });
 
   // Tracker modal
   let currentTrackerAnnId = null;
   async function openTrackerModal(annId){
     currentTrackerAnnId = annId;
-    const ann = announcements.find(function(a){ return a.id===annId; });
+    // Find from announcements array OR fetch directly
+    let ann = announcements.find(function(a){ return a.id===annId; });
+    if(!ann){
+      const {data:fetchedAnn} = await sb.from('announcements').select('*').eq('id',annId).single();
+      ann = fetchedAnn;
+    }
     const modalTitle = ann ? ann.title+' — Attendance Certificates' : 'Attendance Certificates';
     // Reuse cert view modal - create a list modal instead
     document.getElementById('certViewTitle').textContent = modalTitle;
