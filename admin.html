@@ -50,6 +50,8 @@
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l6.553 3.276A1 1 0 0 0 18 15V3z"/></svg>Announcements<span class="nav-badge" id="nb-announcements" style="display:none">0</span></a>
     <a class="nav-item" id="nav-attendancetracker">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2H6z"/></svg>Attendance Tracker</a>
+    <a class="nav-item" id="nav-feed">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5zm3.293 1.293a1 1 0 0 1 1.414 0l3 3a1 1 0 0 1 0 1.414l-3 3a1 1 0 0 1-1.414-1.414L7.586 10 5.293 7.707a1 1 0 0 1 0-1.414zM11 12a1 1 0 1 0 0 2h3a1 1 0 1 0 0-2h-3z"/></svg>Scholar Feed</a>
     <div class="nav-group-label">Partners</div>
     <a class="nav-item" id="nav-sponsors">
       <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a1 1 0 0 1-1.581.814L10 14.396l-4.419 2.418A1 1 0 0 1 4 16V4zm6 3a1 1 0 0 1 1 1v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1H8a1 1 0 1 1 0-2h1V8a1 1 0 0 1 1-1z"/></svg>Sponsor Database</a>
@@ -314,6 +316,15 @@
       </div>
     </div>
 
+    <!-- SCHOLAR FEED -->
+    <div id="page-feed" class="page" style="display:none">
+      <div class="page-header">
+        <div class="page-header-left"><h1>Scholar Feed</h1><p>View all posts from scholars</p></div>
+        <button class="btn btn-ghost" id="adminDownloadAllBtn">📥 Download All Media</button>
+      </div>
+      <div id="adminFeedList" style="max-width:680px;margin:0 auto"><div class="empty"><p>Loading...</p></div></div>
+    </div>
+
     <!-- CHANGE PASSWORD -->
     <div id="page-changepassword" class="page" style="display:none">
       <div class="page-header"><div class="page-header-left"><h1>Change Password</h1><p>Set a new password for your admin account</p></div></div>
@@ -455,7 +466,10 @@
       <input class="form-input" id="ann_max_votes" type="number" min="1" placeholder="e.g. 20 (leave blank for unlimited)">
     </div>
   </div>
-  <div class="form-field"><label class="form-label">Poll Question</label><input class="form-input" id="ann_poll_question" placeholder="e.g. Will you attend this event?"></div>
+  <div class="form-row">
+    <div class="form-field"><label class="form-label">Poll Question</label><input class="form-input" id="ann_poll_question" placeholder="e.g. Will you attend this event?"></div>
+    <div class="form-field"><label class="form-label">Poll Deadline <span style="font-size:11px;color:var(--muted)">(optional)</span></label><input class="form-input" id="ann_poll_deadline" type="datetime-local"></div>
+  </div>
   <div class="form-field">
     <label class="form-label">Poll Options <span style="font-size:11px;color:var(--muted)">(one per line)</span></label>
     <textarea class="form-textarea" id="ann_poll_options" placeholder="Yes, I will attend&#10;No, I cannot attend&#10;Maybe"></textarea>
@@ -686,6 +700,16 @@
   </div>
 </div></div>
 
+<!-- Attendees List Modal -->
+<div class="modal-bg" id="mAttendeesList">
+<div class="modal" style="max-width:680px">
+  <button class="modal-close" id="closeAttendeesList">✕</button>
+  <h2 class="modal-title" id="attendeesListTitle">Attendance Certificates</h2>
+  <p class="modal-sub" id="attendeesListSub">Scholars who submitted their proof of attendance</p>
+  <div id="attendeesListBody" style="max-height:500px;overflow-y:auto"></div>
+  <div class="modal-footer"><button class="btn btn-ghost" id="closeAttendeesListBtn">Close</button></div>
+</div></div>
+
 <!-- Certificate View Modal -->
 <div class="modal-bg" id="mCertView">
 <div class="modal" style="max-width:760px">
@@ -816,8 +840,8 @@
   }
 
   // ── NAV ──
-  const pages = ['dashboard','scholars','documents','announcements','attendancetracker','admins','sponsors','changepassword'];
-  const titles = {dashboard:'Dashboard',scholars:'All Scholars',documents:'Document Verification',announcements:'Announcements',attendancetracker:'Attendance Tracker',admins:'Admin Accounts',sponsors:'Sponsor Database',changepassword:'Change Password'};
+  const pages = ['dashboard','scholars','documents','announcements','attendancetracker','feed','admins','sponsors','changepassword'];
+  const titles = {dashboard:'Dashboard',scholars:'All Scholars',documents:'Document Verification',announcements:'Announcements',attendancetracker:'Attendance Tracker',feed:'Scholar Feed',admins:'Admin Accounts',sponsors:'Sponsor Database',changepassword:'Change Password'};
 
   function gotoPage(page) {
     pages.forEach(function(p) {
@@ -830,6 +854,7 @@
     if (page==='documents') { renderDocsTable(); initDocTabs(); }
     if (page==='announcements') renderAnnouncements();
     if (page==='attendancetracker') renderAttendanceTracker();
+    if (page==='feed') renderAdminFeed();
     if (page==='admins') renderAdmins();
     if (page==='sponsors') { renderSponsors(); updateSponsorTabButtons(); }
     closeSidebar();
@@ -1270,7 +1295,7 @@
 
   function openAddAnnouncement(){
     editingAnnouncementId=null;
-    ['ann_title','ann_desc','ann_date','ann_location','ann_poll_question','ann_poll_options','ann_max_votes'].forEach(function(id){ document.getElementById(id).value=''; });
+    ['ann_title','ann_desc','ann_date','ann_location','ann_poll_question','ann_poll_options','ann_max_votes','ann_poll_deadline'].forEach(function(id){ document.getElementById(id).value=''; });
     document.getElementById('ann_event_type').value='elective';
     document.getElementById('announcementFormTitle').textContent='New Announcement';
     document.getElementById('saveAnnouncementBtn').textContent='Post Announcement';
@@ -1287,6 +1312,7 @@
     document.getElementById('ann_poll_question').value=ann.poll_question||'';
     document.getElementById('ann_event_type').value=ann.event_type||'elective';
     document.getElementById('ann_max_votes').value=ann.max_votes||'';
+    document.getElementById('ann_poll_deadline').value=ann.poll_deadline?ann.poll_deadline.slice(0,16):'';
     // Load existing options WITHOUT removing existing responses
     const {data:opts}=await sb.from('poll_options').select('*').eq('announcement_id',id);
     document.getElementById('ann_poll_options').value=opts?opts.map(function(o){ return o.option_text; }).join('\n'):'';
@@ -1309,6 +1335,7 @@
       poll_question:document.getElementById('ann_poll_question').value.trim()||null,
       event_type:document.getElementById('ann_event_type').value||'elective',
       max_votes:maxVotesVal?parseInt(maxVotesVal):null,
+      poll_deadline:document.getElementById('ann_poll_deadline').value?new Date(document.getElementById('ann_poll_deadline').value).toISOString():null,
       updated_at:new Date().toISOString()
     };
     const optionsText=document.getElementById('ann_poll_options').value.trim();
@@ -1417,6 +1444,7 @@
         '<div class="card" style="margin-bottom:14px">'+
         '<div class="card-header"><div><div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><span class="card-title">'+ann.title+'</span>'+(ann.event_type==='mandatory'?'<span class="badge badge-pink">Mandatory</span>':'<span class="badge badge-blue">Elective</span>')+(ann.max_votes?'<span class="badge badge-amber">Max: '+ann.max_votes+' votes</span>':'')+'</div>'+
         (eventDate?'<div style="font-size:12px;color:var(--muted);margin-top:2px">📅 '+eventDate+(ann.event_location?' · 📍 '+ann.event_location:'')+'</div>':'')+
+        (ann.poll_deadline?'<div style="font-size:12px;color:'+(new Date(ann.poll_deadline)<new Date()?'var(--red)':'#f59e0b')+';margin-top:2px">⏰ Poll deadline: '+new Date(ann.poll_deadline).toLocaleString('en-PH',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+(new Date(ann.poll_deadline)<new Date()?' (Closed)':'')+'</div>':'')+
         '</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
         (hasOptions?'<button class="btn btn-ghost btn-sm" data-action="pollResults" data-id="'+ann.id+'">📊 Poll Results ('+totalResponses+')</button>':'')+
         '<button class="btn btn-ghost btn-sm" data-action="viewAttendance" data-id="'+ann.id+'">👥 Attendance (✅'+attendedCount+' / ❌'+notAttendedCount+')</button>'+
@@ -2510,6 +2538,154 @@
     renderScholarsTable(); renderDash();
   });
 
+  // ── SCHOLAR FEED (ADMIN VIEW) ──
+  let adminFeedPosts = [];
+
+  async function renderAdminFeed() {
+    const container = document.getElementById('adminFeedList');
+    container.innerHTML = '<div class="empty"><p>Loading...</p></div>';
+
+    const {data:posts, error} = await sb.from('feed_posts')
+      .select('*, scholars(name, group_name, batch_no, grade_level, year_level, course), feed_media(*), feed_likes(*), feed_comments(*, scholars(name))')
+      .order('created_at', {ascending:false});
+
+    if(error || !posts || !posts.length) {
+      container.innerHTML = '<div class="card"><div class="empty"><p>No posts yet.</p></div></div>';
+      return;
+    }
+    adminFeedPosts = posts;
+
+    container.innerHTML = posts.map(function(post) {
+      const s = post.scholars || {};
+      const media = post.feed_media || [];
+      const likes = post.feed_likes || [];
+      const comments = post.feed_comments || [];
+      const info = [s.grade_level, s.year_level, s.course].filter(Boolean).join(' · ');
+      const timeAgo = formatTimeAgo(post.created_at);
+
+      const mediaHtml = media.length ? renderMediaGrid(media, post.id, true) : '';
+      const commentsHtml = comments.slice(-3).map(function(c){
+        return '<div style="font-size:13px;padding:4px 0"><strong>'+(c.scholars?c.scholars.name:'Unknown')+'</strong> '+c.comment+'</div>';
+      }).join('');
+
+      return '<div class="card" style="margin-bottom:16px" id="feedpost_'+post.id+'">'+
+        '<div class="card-body">'+
+          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'+
+            '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
+            '<div>'+
+              '<div style="font-size:14px;font-weight:600">'+( s.name||'Unknown Scholar')+'</div>'+
+              (info?'<div style="font-size:11px;color:var(--muted)">'+info+'</div>':'')+
+              '<div style="font-size:11px;color:var(--muted)">'+timeAgo+'</div>'+
+            '</div>'+
+            '<button class="btn btn-danger btn-sm" style="margin-left:auto" data-action="adminDeletePost" data-id="'+post.id+'">Delete</button>'+
+          '</div>'+
+          (post.caption?'<p style="font-size:14px;line-height:1.6;margin-bottom:12px">'+escHtml(post.caption)+'</p>':'')+
+          mediaHtml+
+          '<div style="display:flex;align-items:center;gap:16px;padding-top:10px;border-top:1px solid var(--border);margin-top:10px;font-size:13px;color:var(--muted)">'+
+            '<span>❤️ '+likes.length+' like'+(likes.length!==1?'s':'')+'</span>'+
+            '<span>💬 '+comments.length+' comment'+(comments.length!==1?'s':'')+'</span>'+
+            (media.length?'<button class="btn btn-ghost btn-sm" style="margin-left:auto" data-action="downloadPostMedia" data-id="'+post.id+'">📥 Download</button>':'')+
+          '</div>'+
+          (comments.length?'<div style="margin-top:8px;border-top:1px solid #f4f4f8;padding-top:8px">'+commentsHtml+(comments.length>3?'<div style="font-size:12px;color:var(--muted);margin-top:4px">+'+( comments.length-3)+' more comments</div>':'')+'</div>':'')+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  function renderMediaGrid(media, postId, isAdmin) {
+    if(!media.length) return '';
+    const imgs = media.filter(function(m){ return m.media_type==='image'; });
+    const vids = media.filter(function(m){ return m.media_type==='video'; });
+    let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:12px">';
+    imgs.forEach(function(m){
+      html += '<div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#f0f0f5">'+
+        '<img src="'+m.media_url+'" style="width:100%;height:100%;object-fit:cover;cursor:pointer" data-action="viewFeedMedia" data-url="'+m.media_url+'" data-type="image">'+
+        '<a href="'+m.media_url+'" download="'+(m.file_name||'image')+'" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border-radius:6px;padding:3px 7px;font-size:11px;text-decoration:none">↓</a>'+
+      '</div>';
+    });
+    vids.forEach(function(m){
+      html += '<div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#000">'+
+        '<video src="'+m.media_url+'" style="width:100%;height:100%;object-fit:cover" controls></video>'+
+        '<a href="'+m.media_url+'" download="'+(m.file_name||'video')+'" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border-radius:6px;padding:3px 7px;font-size:11px;text-decoration:none">↓</a>'+
+      '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function formatTimeAgo(iso) {
+    const diff = (Date.now() - new Date(iso)) / 1000;
+    if(diff < 60) return 'just now';
+    if(diff < 3600) return Math.floor(diff/60)+'m ago';
+    if(diff < 86400) return Math.floor(diff/3600)+'h ago';
+    if(diff < 604800) return Math.floor(diff/86400)+'d ago';
+    return new Date(iso).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  document.getElementById('adminFeedList').addEventListener('click', async function(e) {
+    // View media full screen
+    const mediaEl = e.target.closest('[data-action="viewFeedMedia"]');
+    if(mediaEl) {
+      document.getElementById('certViewTitle').textContent = 'Media';
+      document.getElementById('certViewSub').textContent = '';
+      const img = document.getElementById('certViewImg');
+      const frame = document.getElementById('certViewFrame');
+      img.src = mediaEl.dataset.url; img.style.display='block';
+      frame.style.display='none'; frame.src='about:blank';
+      openModal('mCertView');
+      return;
+    }
+    // Delete post (admin)
+    const delBtn = e.target.closest('[data-action="adminDeletePost"]');
+    if(delBtn) {
+      if(!confirm('Delete this post? This cannot be undone.')) return;
+      delBtn.disabled=true;
+      const postId = delBtn.dataset.id;
+      await sb.from('feed_comments').delete().eq('post_id',postId);
+      await sb.from('feed_likes').delete().eq('post_id',postId);
+      await sb.from('feed_media').delete().eq('post_id',postId);
+      await sb.from('feed_posts').delete().eq('id',postId);
+      toast('Post deleted','🗑️');
+      renderAdminFeed();
+      return;
+    }
+    // Download all media of a post
+    const dlBtn = e.target.closest('[data-action="downloadPostMedia"]');
+    if(dlBtn) {
+      const post = adminFeedPosts.find(function(p){ return p.id===dlBtn.dataset.id; });
+      if(!post) return;
+      (post.feed_media||[]).forEach(function(m,i){
+        setTimeout(function(){
+          const a = document.createElement('a');
+          a.href = m.media_url;
+          a.download = m.file_name||('media_'+i);
+          a.click();
+        }, i*300);
+      });
+      return;
+    }
+  });
+
+  // Download ALL media from all posts
+  document.getElementById('adminDownloadAllBtn').addEventListener('click', function(){
+    let i=0;
+    adminFeedPosts.forEach(function(post){
+      (post.feed_media||[]).forEach(function(m){
+        setTimeout(function(){
+          const a=document.createElement('a');
+          a.href=m.media_url; a.download=m.file_name||('media_'+i);
+          a.click();
+        }, i*400);
+        i++;
+      });
+    });
+    toast('Downloading '+i+' files...','📥');
+  });
+
   // ── ATTENDANCE TRACKER ──
   let trackerFilter = 'all';
 
@@ -2582,6 +2758,9 @@
 
   // Tracker modal
   let currentTrackerAnnId = null;
+  let currentCertUrl = '';
+  let currentCertIsImg = false;
+
   async function openTrackerModal(annId){
     currentTrackerAnnId = annId;
     // Find from announcements array OR fetch directly
@@ -2590,48 +2769,58 @@
       const {data:fetchedAnn} = await sb.from('announcements').select('*').eq('id',annId).single();
       ann = fetchedAnn;
     }
-    const modalTitle = ann ? ann.title+' — Attendance Certificates' : 'Attendance Certificates';
-    // Reuse cert view modal - create a list modal instead
-    document.getElementById('certViewTitle').textContent = modalTitle;
-    document.getElementById('certViewSub').textContent = 'Scholars who submitted their attendance certificate';
+    const modalTitle = ann ? ann.title : 'Event';
+    document.getElementById('attendeesListTitle').textContent = modalTitle+' — Attendees';
+    document.getElementById('attendeesListSub').textContent = 'Scholars who submitted their proof of attendance';
+    document.getElementById('attendeesListBody').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div>';
+    openModal('mAttendeesList');
+
     const {data:records} = await sb.from('attendance_tracker')
       .select('*, scholars(name,group_name,batch_no,grade_level,year_level,course)')
       .eq('announcement_id', annId)
       .order('uploaded_at',{ascending:false});
     const recs = records || [];
+
     if(!recs.length){
-      document.getElementById('certViewBody').innerHTML='<div style="color:var(--muted);font-size:13px;padding:40px">No certificates submitted yet.</div>';
-    } else {
-      document.getElementById('certViewBody').innerHTML =
-        '<div style="width:100%;text-align:left">'+
-        '<div style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:500">'+recs.length+' scholar'+(recs.length!==1?'s':'')+' submitted</div>'+
-        recs.map(function(r){
-          const s = r.scholars||{};
-          const info=[s.year_level,s.grade_level,s.course].filter(Boolean).join(' · ');
-          const ext=(r.certificate_name||'').toLowerCase();
-          const isImg=ext.endsWith('.jpg')||ext.endsWith('.jpeg')||ext.endsWith('.png');
-          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f4f4f8">'+
-            '<div style="display:flex;align-items:center;gap:10px">'+
-              '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
-              '<div>'+
-                '<div style="font-size:13px;font-weight:500">'+(s.name||'—')+'</div>'+
-                (info?'<div style="font-size:11px;color:var(--muted)">'+info+'</div>':'')+
-                '<div style="font-size:11px;color:var(--muted)">'+fmtDate(r.uploaded_at)+'</div>'+
-              '</div>'+
-            '</div>'+
-            '<button class="btn btn-ghost btn-sm" data-cert-url="'+r.certificate_url+'" data-cert-name="'+(r.certificate_name||'')+'" data-cert-img="'+isImg+'" onclick="viewCert(this)">View Certificate</button>'+
-            '</div>';
-        }).join('')+
-        '</div>';
+      document.getElementById('attendeesListBody').innerHTML =
+        '<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">No certificates submitted yet.</div>';
+      return;
     }
-    document.getElementById('certViewImg').style.display='none';
-    document.getElementById('certViewFrame').style.display='none';
-    openModal('mCertView');
+
+    document.getElementById('attendeesListBody').innerHTML =
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:500">'+recs.length+' scholar'+(recs.length!==1?'s':'')+' submitted</div>'+
+      recs.map(function(r){
+        const s = r.scholars||{};
+        const info = [s.year_level, s.grade_level, s.course].filter(Boolean).join(' · ');
+        const ext = (r.certificate_name||'').toLowerCase();
+        const isImg = ext.endsWith('.jpg')||ext.endsWith('.jpeg')||ext.endsWith('.png');
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f4f4f8;gap:10px">'+
+          '<div style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer" data-view-cert="'+r.certificate_url+'" data-is-img="'+isImg+'">'+
+            '<div class="s-avatar">'+ini(s.name||'?')+'</div>'+
+            '<div>'+
+              '<div style="font-size:14px;font-weight:600;color:var(--text)">'+(s.name||'—')+'</div>'+
+              (info?'<div style="font-size:12px;color:var(--muted);margin-top:1px">'+info+'</div>':'')+
+              '<div style="font-size:11px;color:var(--muted);margin-top:1px">Submitted: '+fmtDate(r.uploaded_at)+'</div>'+
+            '</div>'+
+          '</div>'+
+          '<button class="btn btn-ghost btn-sm" style="flex-shrink:0" data-view-cert="'+r.certificate_url+'" data-cert-name="'+(r.certificate_name||'')+'" data-is-img="'+isImg+'">'+
+            '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+
+            ' View'+
+          '</button>'+
+          '</div>';
+      }).join('');
   }
 
-  window.viewCert = function(btn){
-    const url = btn.dataset.certUrl;
-    const isImg = btn.dataset.certImg==='true';
+  // Handle clicks inside attendees list - open cert viewer
+  document.getElementById('attendeesListBody').addEventListener('click', function(e){
+    const el = e.target.closest('[data-view-cert]');
+    if(!el) return;
+    const url = el.dataset.viewCert;
+    const isImg = el.dataset.isImg === 'true';
+    const name = el.dataset.certName || 'Certificate';
+    if(!url) return;
+    document.getElementById('certViewTitle').textContent = name;
+    document.getElementById('certViewSub').textContent = '';
     const img = document.getElementById('certViewImg');
     const frame = document.getElementById('certViewFrame');
     if(isImg){
@@ -2641,7 +2830,14 @@
       frame.src=url; frame.style.display='block';
       img.style.display='none'; img.src='';
     }
-  };
+    openModal('mCertView');
+  });
+
+  // viewCert handled by attendeesListBody click listener
+
+  document.getElementById('closeAttendeesList').addEventListener('click', function(){ closeModal('mAttendeesList'); });
+  document.getElementById('closeAttendeesListBtn').addEventListener('click', function(){ closeModal('mAttendeesList'); });
+  document.getElementById('mAttendeesList').addEventListener('click', function(e){ if(e.target===this) closeModal('mAttendeesList'); });
 
   document.getElementById('closeCertView').addEventListener('click', function(){
     document.getElementById('certViewImg').style.display='none';
